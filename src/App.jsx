@@ -144,24 +144,31 @@ export default function EMCLabUltra() {
         </div>
 
         {/* NAV */}
-        <header className="sticky top-0 z-40 border-b border-black/10 dark:border-white/10 bg-white/70 dark:bg-black/30 backdrop-blur">
-          <div className="mx-auto max-w-7xl px-4 h-14 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-400 ring-2 ring-white/60" aria-hidden />
-              <span className="font-semibold">EMC Lab</span>
-            </div>
-            <nav className="hidden md:flex items-center gap-7">
-              {NAV.map((n) => (
-                <a key={n.href} href={n.href} className="text-sm font-medium hover:opacity-80">
-                  {t(n.label.uz, n.label.ru)}
-                </a>
-              ))}
-            </nav>
-            <a href="#contact" className="rounded-2xl border border-black/10 bg-gray-900 text-white px-3 py-1.5 text-sm hover:-translate-y-0.5 transition will-change-transform">
-              {t("Sinovga buyurtma", "Заявка на испытания")}
-            </a>
-          </div>
-        </header>
+    {/* NAV */}
+<header className="sticky top-0 z-40 border-b border-black/10 dark:border-white/10 bg-white/70 dark:bg-black/30 backdrop-blur">
+  <div className="mx-auto max-w-7xl px-4 h-14 flex items-center justify-between">
+    {/* LOGO */}
+    <a href="#top" className="flex items-center gap-3">
+      <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-400 ring-2 ring-white/60" aria-hidden />
+      <span className="font-semibold">EMC Lab</span>
+    </a>
+
+    <nav className="hidden md:flex items-center gap-7">
+      {NAV.map((n) => (
+        <a key={n.href} href={n.href} className="text-sm font-medium hover:opacity-80">
+          {t(n.label.uz, n.label.ru)}
+        </a>
+      ))}
+    </nav>
+    <a
+      href="#contact"
+      className="rounded-2xl border border-black/10 bg-gray-900 text-white px-3 py-1.5 text-sm hover:-translate-y-0.5 transition will-change-transform"
+    >
+      {t("Sinovga buyurtma", "Заявка на испытания")}
+    </a>
+  </div>
+</header>
+
 
         {/* HERO */}
         <section className="relative overflow-hidden">
