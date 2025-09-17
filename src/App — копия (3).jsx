@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 
 /********************* CONFIG *********************/
 const NAV = [
@@ -23,8 +23,6 @@ const TESTS = [
 ];
 
 const EQUIPMENT = [
-  // Agar xohlasangiz bu obyektlarga keyinroq imgs: [...] qo'shasiz.
-  // Hozir kiritmasangiz, komponent avtomatik ravishda [img] dan foydalanadi.
   { name: "R&S ESW8", desc: "EMI qabul qilgich / Receiver", img: "/lab/receiver.jpg" },
   { name: "R&S ESR3", desc: "EMI qabul qilgich / Receiver", img: "/lab/receiver2.jpg" },
   { name: "Schaffner NX5", desc: "ESD/EFT/Surge generator", img: "/lab/nx5.jpg" },
@@ -102,149 +100,12 @@ function Card({ children, className = "" }) {
   return <div className={`rounded-3xl border border-black/10 bg-white/70 backdrop-blur shadow-sm ${className}`}>{children}</div>;
 }
 
-/********************* LIGHTBOX (Gallery & Equipment) *********************/
-function Lightbox({ open, images, index, onClose, onPrev, onNext }) {
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "ArrowLeft") onPrev();
-      if (e.key === "ArrowRight") onNext();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose, onPrev, onNext]);
-
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center">
-      <button
-        className="absolute top-4 right-4 rounded-full bg-white/90 px-3 py-1 text-sm shadow hover:bg-white"
-        onClick={onClose}
-      >
-        ✕
-      </button>
-
-      <button
-        className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 rounded-full bg-white/80 hover:bg-white px-3 py-2 text-xl shadow"
-        onClick={onPrev}
-      >
-        ‹
-      </button>
-
-      <div className="max-w-5xl w-[92vw]">
-        <img src={images[index]} alt="" className="w-full max-h-[82vh] object-contain rounded-xl shadow-2xl" />
-        {images.length > 1 && (
-          <div className="mt-3 flex justify-center gap-2">
-            {images.map((src, i) => (
-              <img
-                key={i}
-                src={src}
-                alt=""
-                onClick={() => onNext(i - index)} // jump
-                className={`h-14 w-20 object-cover rounded-md cursor-pointer border ${i === index ? "ring-2 ring-cyan-400 border-cyan-300" : "border-white/30 opacity-80 hover:opacity-100"}`}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
-      <button
-        className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 rounded-full bg-white/80 hover:bg-white px-3 py-2 text-xl shadow"
-        onClick={onNext}
-      >
-        ›
-      </button>
-    </div>
-  );
-}
-
-/********************* EQUIPMENT CARD (multi image + thumbs) *********************/
-function EquipmentCard({ eq, onOpenLightbox }) {
-  const [idx, setIdx] = useState(0);
-  const imgs = eq.imgs?.length ? eq.imgs : [eq.img]; // sizdagi ma'lumotga moslashadi
-
-  const prev = () => setIdx((p) => (p - 1 + imgs.length) % imgs.length);
-  const next = () => setIdx((p) => (p + 1) % imgs.length);
-
-  return (
-    <Card className="overflow-hidden hover:shadow-md transition">
-      <div className="relative aspect-video w-full bg-slate-100">
-        <img
-          src={imgs[idx]}
-          alt={eq.name}
-          className="h-full w-full object-cover cursor-zoom-in"
-          onClick={() => onOpenLightbox(imgs, idx)}
-        />
-        {imgs.length > 1 && (
-          <>
-            <button
-              type="button"
-              onClick={prev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/80 hover:bg-white p-2 shadow"
-              aria-label="Previous"
-            >
-              ‹
-            </button>
-            <button
-              type="button"
-              onClick={next}
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/80 hover:bg-white p-2 shadow"
-              aria-label="Next"
-            >
-              ›
-            </button>
-          </>
-        )}
-      </div>
-
-      {imgs.length > 1 && (
-        <div className="flex items-center justify-center gap-2 px-4 py-3">
-          {imgs.map((src, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => setIdx(i)}
-              className={`h-12 w-16 overflow-hidden rounded-md border transition 
-                ${i === idx ? "ring-2 ring-sky-500 border-sky-400" : "border-black/10 hover:opacity-90"}`}
-              aria-label={`preview ${i + 1}`}
-            >
-              <img src={src} alt="" className="h-full w-full object-cover" />
-            </button>
-          ))}
-        </div>
-      )}
-
-      <div className="p-5">
-        <div className="text-lg font-semibold">{eq.name}</div>
-        <div className="mt-1 text-sm text-gray-600 dark:text-gray-300">{eq.desc}</div>
-      </div>
-    </Card>
-  );
-}
-
 /********************* PAGE *********************/
 export default function EMCLabUltra() {
   const [lang, setLang] = useState("uz");
   const [dark, setDark] = useState(false);
   const [sending, setSending] = useState(false); // kontakt forma holati
   const t = (uz, ru) => (lang === "uz" ? uz : ru);
-
-  // Lightbox holati (faqat jihozlar & galereya uchun)
-  const [lbOpen, setLbOpen] = useState(false);
-  const [lbImages, setLbImages] = useState([]);
-  const [lbIndex, setLbIndex] = useState(0);
-
-  const openLightbox = (images, startIndex = 0) => {
-    setLbImages(images);
-    setLbIndex(startIndex);
-    setLbOpen(true);
-  };
-  const closeLightbox = () => setLbOpen(false);
-  const prevLb = (delta = -1) =>
-    setLbIndex((p) => (p + delta + lbImages.length) % lbImages.length);
-  const nextLb = (delta = 1) =>
-    setLbIndex((p) => (p + delta + lbImages.length) % lbImages.length);
 
   // Parallax-like blobs (dekor)
   const blobs = useMemo(
@@ -282,40 +143,42 @@ export default function EMCLabUltra() {
           </div>
         </div>
 
-        {/* NAV */}
-        <header
-          className="sticky top-0 z-40 border-b border-black/10 dark:border-white/10 
-  bg-slate-50/90 dark:bg-slate-800/50 backdrop-blur"
-        >
-          <div className="mx-auto max-w-7xl px-4 h-14 flex items-center justify-between">
-            {/* LOGO (smooth scroll to top) */}
-            <a
-              href="#top"
-              onClick={(e) => {
-                e.preventDefault();
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-              className="flex items-center gap-3"
-            >
-              <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-400 ring-2 ring-white/60" aria-hidden />
-              <span className="font-semibold">EMC Lab</span>
-            </a>
+        
+    {/* NAV */}
+<header className="sticky top-0 z-40 border-b border-black/10 dark:border-white/10 
+  bg-slate-50/90 dark:bg-slate-800/50 backdrop-blur">
 
-            <nav className="hidden md:flex items-center gap-7">
-              {NAV.map((n) => (
-                <a key={n.href} href={n.href} className="text-sm font-medium hover:opacity-80">
-                  {t(n.label.uz, n.label.ru)}
-                </a>
-              ))}
-            </nav>
-            <a
-              href="#contact"
-              className="rounded-2xl border border-black/10 bg-gray-900 text-white px-3 py-1.5 text-sm hover:-translate-y-0.5 transition will-change-transform"
-            >
-              {t("Sinovga buyurtma", "Заявка на испытания")}
-            </a>
-          </div>
-        </header>
+  <div className="mx-auto max-w-7xl px-4 h-14 flex items-center justify-between">
+    {/* LOGO */}
+  {/* LOGO (smooth scroll to top) */}
+<a
+  href="#top"
+  onClick={(e) => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }}
+  className="flex items-center gap-3"
+>
+  <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-400 ring-2 ring-white/60" aria-hidden />
+  <span className="font-semibold">EMC Lab</span>
+</a>
+
+    <nav className="hidden md:flex items-center gap-7">
+      {NAV.map((n) => (
+        <a key={n.href} href={n.href} className="text-sm font-medium hover:opacity-80">
+          {t(n.label.uz, n.label.ru)}
+        </a>
+      ))}
+    </nav>
+    <a
+      href="#contact"
+      className="rounded-2xl border border-black/10 bg-gray-900 text-white px-3 py-1.5 text-sm hover:-translate-y-0.5 transition will-change-transform"
+    >
+      {t("Sinovga buyurtma", "Заявка на испытания")}
+    </a>
+  </div>
+</header>
+
 
         {/* HERO */}
         <section className="relative overflow-hidden">
@@ -392,7 +255,15 @@ export default function EMCLabUltra() {
         <Section id="equipment" title={t("Jihozlar", "Оборудование")} subtitle={t("Asosiy o‘lchash va sinov kompleksi", "Основной комплекс измерений и испытаний")}>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {EQUIPMENT.map((eq, i) => (
-              <EquipmentCard key={i} eq={eq} onOpenLightbox={openLightbox} />
+              <Card key={i} className="overflow-hidden hover:shadow-md transition">
+                <div className="aspect-video w-full">
+                  <img src={eq.img} alt={eq.name} className="h-full w-full object-cover" />
+                </div>
+                <div className="p-5">
+                  <div className="text-lg font-semibold">{eq.name}</div>
+                  <div className="mt-1 text-sm text-gray-600 dark:text-gray-300">{eq.desc}</div>
+                </div>
+              </Card>
             ))}
           </div>
         </Section>
@@ -418,12 +289,7 @@ export default function EMCLabUltra() {
           <div className="px-4 max-w-7xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {GALLERY.map((src, i) => (
               <Card key={i}>
-                <img
-                  src={src}
-                  alt="lab photo"
-                  className="h-56 w-full object-cover hover:scale-105 transition-transform rounded-3xl cursor-zoom-in"
-                  onClick={() => openLightbox(GALLERY, i)}
-                />
+                <img src={src} alt="lab photo" className="h-56 w-full object-cover hover:scale-105 transition-transform rounded-3xl" />
               </Card>
             ))}
           </div>
@@ -593,61 +459,54 @@ export default function EMCLabUltra() {
         </Section>
 
         {/* FOOTER */}
-        <footer className="bg-gradient-to-r from-sky-700 to-cyan-600">
-          <div className="mx-auto max-w-7xl px-4 py-12 grid md:grid-cols-4 gap-8 text-white">
-            <div className="space-y-2">
-              <div className="text-lg font-semibold">EMC Lab</div>
-              <div className="text-sm opacity-80">
-                {t("O‘z MSt/IEC/CISPR bo‘yicha sinovlar", "Испытания по O‘z MSt/IEC/CISPR")}
-              </div>
-            </div>
-
-            <div>
-              <div className="text-sm font-semibold mb-3">{t("Navigatsiya", "Навигация")}</div>
-              <div className="space-y-2 text-sm">
-                {NAV.map((n) => (
-                  <div key={n.href}>
-                    <a
-                      href={n.href}
-                      className="hover:text-cyan-300 transition-colors"
-                    >
-                      {t(n.label.uz, n.label.ru)}
-                    </a>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <div className="text-sm font-semibold mb-3">Legal</div>
-              <div className="space-y-2 text-sm">
-                <div>© {new Date().getFullYear()} EMC Lab</div>
-                <div className="hover:text-cyan-300 transition-colors cursor-pointer">
-                  {t("Maxfiylik siyosati", "Политика конфиденциальности")}
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div className="text-sm font-semibold mb-3">{t("Manzil", "Адрес")}</div>
-              <div className="space-y-1 text-sm opacity-80">
-                <div>Toshkent vil., Piskent t.</div>
-                <div>O‘zbekiston ko‘chasi, 174-uy</div>
-              </div>
-            </div>
-          </div>
-        </footer>
+       {/* FOOTER */}
+<footer className="bg-gradient-to-r from-sky-700 to-cyan-600">
+  <div className="mx-auto max-w-7xl px-4 py-12 grid md:grid-cols-4 gap-8 text-white">
+    
+    <div className="space-y-2">
+      <div className="text-lg font-semibold">EMC Lab</div>
+      <div className="text-sm opacity-80">
+        {t("O‘z MSt/IEC/CISPR bo‘yicha sinovlar", "Испытания по O‘z MSt/IEC/CISPR")}
       </div>
+    </div>
 
-      {/* LIGHTBOX (faqat jihozlar va galereya uchun) */}
-      <Lightbox
-        open={lbOpen}
-        images={lbImages}
-        index={lbIndex}
-        onClose={closeLightbox}
-        onPrev={() => prevLb(-1)}
-        onNext={() => nextLb(1)}
-      />
+    <div>
+      <div className="text-sm font-semibold mb-3">{t("Navigatsiya", "Навигация")}</div>
+      <div className="space-y-2 text-sm">
+        {NAV.map((n) => (
+          <div key={n.href}>
+            <a 
+              href={n.href} 
+              className="hover:text-cyan-300 transition-colors"
+            >
+              {t(n.label.uz, n.label.ru)}
+            </a>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div>
+      <div className="text-sm font-semibold mb-3">Legal</div>
+      <div className="space-y-2 text-sm">
+        <div>© {new Date().getFullYear()} EMC Lab</div>
+        <div className="hover:text-cyan-300 transition-colors cursor-pointer">
+          {t("Maxfiylik siyosati", "Политика конфиденциальности")}
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div className="text-sm font-semibold mb-3">{t("Manzil", "Адрес")}</div>
+      <div className="space-y-1 text-sm opacity-80">
+        <div>Toshkent vil., Piskent t.</div>
+        <div>O‘zbekiston ko‘chasi, 174-uy</div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+      </div>
     </div>
   );
 }
