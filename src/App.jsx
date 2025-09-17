@@ -34,16 +34,16 @@ const EQUIPMENT = [
 
 // 10 xodim uchun placeholder – rasmlarni public/staff/ ichiga joylang
 const STAFF = [
-  { name: "Odamov G‘ulomjon", role: "Laboratoriya rahbari", img: "/staff/1.jpg" },
-  { name: "Abdurashidov Davron", role: "Bosh muhandis", img: "/staff/2.jpg" },
-  { name: "Tillayev Jamshid", role: "Bosh muhandis", img: "/staff/3.jpg" },
-  { name: "Alekseyev Ivan", role: "Bosh muhandis", img: "/staff/4.jpg" },
-  { name: "Rustamov Aziz", role: "Sinov muhandisi", img: "/staff/5.jpg" },
-  { name: "Qodirov Behruz", role: "Sinov muhandisi", img: "/staff/6.jpg" },
-  { name: "Yusupov Sherzod", role: "Sinov muhandisi", img: "/staff/7.jpg" },
-  { name: "Karimova Dilnoza", role: "Sinov muhandisi", img: "/staff/8.jpg" },
-  { name: "Sobirov Ibrohim", role: "Texnik xodim", img: "/staff/9.jpg" },
-  { name: "Ismoilova Zuxra", role: "Texnik xodim", img: "/staff/10.jpg" },
+  { name: "Xakimov Aziz", role: "Laboratoriya rahbari", img: "/staff/1.jpg" },
+   { name: "Tillayev Anvar", role: "Boshliq o'rinbosari", img: "/staff/2.jpg" },
+  { name: "Abdurashidov Davron", role: "Sektor boshlig'i", img: "/staff/3.jpg" },
+  { name: "Odamov G‘ulomjon", role: "Bosh muhandis", img: "/staff/4.jpg" },
+  { name: "Reimbayev Xushnud", role: "1-toifali mutaxassis", img: "/staff/5.jpg" },
+  { name: "Alekseyev Andrey", role: "1-toifali mutaxassis", img: "/staff/6.jpg" },
+  { name: "Abduvohobov Ravshan", role: "2-toifali mutaxassis", img: "/staff/7.jpg" },
+  { name: "Jo'ldasbayev Daston", role: "2-toifali mutaxassis", img: "/staff/8.jpg" },
+  { name: "Sobirov Doston", role: "Texnik xodim", img: "/staff/9.jpg" },
+  { name: "Karimov Suxrob", role: "Texnik xodim", img: "/staff/10.jpg" },
 ];
 
 
