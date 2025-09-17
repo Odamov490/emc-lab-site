@@ -33,11 +33,19 @@ const EQUIPMENT = [
 ];
 
 // 10 xodim uchun placeholder – rasmlarni public/staff/ ichiga joylang
-const STAFF = new Array(10).fill(0).map((_, i) => ({
-  name: `Xodim ${i + 1}`,
-  role: i === 0 ? "Laboratoriya rahbari" : i < 4 ? "Bosh muhandis" : i < 8 ? "Sinov muhandisi" : "Texnik xodim",
-  img: `/staff/${i + 1}.jpg`, // public/staff/1.jpg ... 18.jpg
-}));
+const STAFF = [
+  { name: "Odamov G‘ulomjon", role: "Laboratoriya rahbari", img: "/staff/1.jpg" },
+  { name: "Abdurashidov Davron", role: "Bosh muhandis", img: "/staff/2.jpg" },
+  { name: "Tillayev Jamshid", role: "Bosh muhandis", img: "/staff/3.jpg" },
+  { name: "Alekseyev Ivan", role: "Bosh muhandis", img: "/staff/4.jpg" },
+  { name: "Rustamov Aziz", role: "Sinov muhandisi", img: "/staff/5.jpg" },
+  { name: "Qodirov Behruz", role: "Sinov muhandisi", img: "/staff/6.jpg" },
+  { name: "Yusupov Sherzod", role: "Sinov muhandisi", img: "/staff/7.jpg" },
+  { name: "Karimova Dilnoza", role: "Sinov muhandisi", img: "/staff/8.jpg" },
+  { name: "Sobirov Ibrohim", role: "Texnik xodim", img: "/staff/9.jpg" },
+  { name: "Ismoilova Zuxra", role: "Texnik xodim", img: "/staff/10.jpg" },
+];
+
 
 const GALLERY = [
   "/gallery/1.jpg",
