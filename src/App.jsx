@@ -33,9 +33,9 @@ const EQUIPMENT = [
 ];
 
 // 18 xodim uchun placeholder – rasmlarni public/staff/ ichiga joylang
-const STAFF = new Array(18).fill(0).map((_, i) => ({
+const STAFF = new Array(10).fill(0).map((_, i) => ({
   name: `Xodim ${i + 1}`,
-  role: i === 0 ? "Laboratoriya rahbari" : i < 4 ? "Bosh muhandis" : i < 10 ? "Sinov muhandisi" : "Texnik xodim",
+  role: i === 0 ? "Laboratoriya rahbari" : i < 4 ? "Bosh muhandis" : i < 8 ? "Sinov muhandisi" : "Texnik xodim",
   img: `/staff/${i + 1}.jpg`, // public/staff/1.jpg ... 18.jpg
 }));
 
@@ -243,7 +243,7 @@ export default function EMCLabUltra() {
         </Section>
 
         {/* TEAM */}
-        <Section id="team" title={t("Bizning jamoa","Наша команда")} subtitle={t("18 nafar tajribali mutaxassis","18 опытных специалистов")}> 
+        <Section id="team" title={t("Bizning jamoa","Наша команда")} subtitle={t("10 nafar tajribali mutaxassis","10 опытных специалистов")}> 
           <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {STAFF.map((p, i) => (
               <Card key={i} className="p-5 text-center">
