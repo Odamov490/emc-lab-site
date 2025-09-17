@@ -143,15 +143,23 @@ export default function EMCLabUltra() {
           </div>
         </div>
 
-        {/* NAV */}
+        
     {/* NAV */}
 <header className="sticky top-0 z-40 border-b border-black/10 dark:border-white/10 bg-white/70 dark:bg-black/30 backdrop-blur">
   <div className="mx-auto max-w-7xl px-4 h-14 flex items-center justify-between">
     {/* LOGO */}
-    <a href="#top" className="flex items-center gap-3">
-      <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-400 ring-2 ring-white/60" aria-hidden />
-      <span className="font-semibold">EMC Lab</span>
-    </a>
+  {/* LOGO (smooth scroll to top) */}
+<a
+  href="#top"
+  onClick={(e) => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }}
+  className="flex items-center gap-3"
+>
+  <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-400 ring-2 ring-white/60" aria-hidden />
+  <span className="font-semibold">EMC Lab</span>
+</a>
 
     <nav className="hidden md:flex items-center gap-7">
       {NAV.map((n) => (
