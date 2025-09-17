@@ -10,16 +10,16 @@ const NAV = [
 ];
 
 const TESTS = [
-  { code: "IEC 61000-4-2", title: "Elektrostatik razryad (ESD)", note: "Immunitet", icon: "⚡" },
-  { code: "IEC 61000-4-4", title: "Tez o‘tuvchi jarayonlar (EFT/B)", note: "Immunitet", icon: "💥" },
-  { code: "IEC 61000-4-5", title: "Kuchlanish impulslari (Surge)", note: "Immunitet", icon: "🌩️" },
-  { code: "IEC 61000-4-11", title: "Kuchlanish pasayishi va uzilish", note: "Immunitet", icon: "🔌" },
-  { code: "IEC 61000-4-6", title: "O‘tkazuvchan RF shovqinlar", note: "Immunitet", icon: "🧲" },
-  { code: "IEC 61000-4-3", title: "Nurlanuvchi RF maydon", note: "Immunitet", icon: "📡" },
-  { code: "CISPR 14-1", title: "Nurlanuvchi emissiya", note: "Emissiya", icon: "📶" },
-  { code: "IEC 61000-3-3", title: "Flicker / tebranish", note: "Tarmoq sifati", icon: "🕯️" },
-  { code: "IEC 61000-3-2", title: "Garmonik tarkib", note: "Tarmoq sifati", icon: "🎚️" },
-  { code: "CISPR 14-1", title: "IRP (conducted)", note: "Emissiya", icon: "🔊" },
+  { code: "O’zMSt IEC 61000.4.2-2023", title: "Устойчивость к электростатическим разрядам", note: "Sifat", icon: "⚡" },
+  { code: "O‘z MSt IEC 61000-4-4:2023", title: "Устойчивость к электрическим быстрым переходным процессам (пачкам)", note: "Immunitet", icon: "💥" },
+  { code: "Oʻz MSt IEC 61000-4-5:2023", title: "Устойчивость к выбросу напряжения", note: "Immunitet", icon: "🌩️" },
+  { code: "Oʻz MSt IEC 61000.4.11-2013", title: "Устойчивость к провалам, кратковременным прерываниям", note: "Immunitet", icon: "🔌" },
+  { code: "O'z MSt IEC 61000-4-6:2023", title: "Устойчивость к кондуктивным  помехам, вызванным радиочастотными полями", note: "Immunitet", icon: "🧲" },
+  { code: "O‘zMSt IEC 61000-4-3:2023", title: "Устойчивость к радиочастотному электромагнитному полю", note: "Immunitet", icon: "📡" },
+  { code: "ГОСТ CISPR 14-1-2022", title: "Уровень напряженности поля ИРП", note: "Emissiya", icon: "📶" },
+  { code: "O‘zMSt IEC 61000-3-3:2023", title: "Ограничение изменений напряжения, колебаний напряжения и фликера", note: "Tarmoq sifati", icon: "🕯️" },
+  { code: "O‘zMSt IEC 61000-3-2:2023", title: "Гармонические составляющие тока", note: "Tarmoq sifati", icon: "🎚️" },
+  { code: "ГОСТ CISPR 14-1-2022", title: "Уровень напряжения ИРП на сетевых зажимах", note: "Emissiya", icon: "🔊" },
 ];
 
 const EQUIPMENT = [
