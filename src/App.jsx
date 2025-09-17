@@ -83,21 +83,7 @@ const EQUIPMENT = [
     desc: "Izoh",
     images: ["/lab/item12/1.jpg", "/lab/item12/2.jpg", "/lab/item12/3.jpg", "/lab/item12/4.jpg"],
   },
-  {
-    name: "Jihoz 13",
-    desc: "Izoh",
-    images: ["/lab/item13/1.jpg", "/lab/item13/2.jpg", "/lab/item13/3.jpg", "/lab/item13/4.jpg"],
-  },
-  {
-    name: "Jihoz 14",
-    desc: "Izoh",
-    images: ["/lab/item14/1.jpg", "/lab/item14/2.jpg", "/lab/item14/3.jpg", "/lab/item14/4.jpg"],
-  },
-  {
-    name: "Jihoz 15",
-    desc: "Izoh",
-    images: ["/lab/item15/1.jpg", "/lab/item15/2.jpg", "/lab/item15/3.jpg", "/lab/item15/4.jpg"],
-  },
+
 ];
 
 // 11 xodim (rasmlarni public/staff/ ichiga joylang)
