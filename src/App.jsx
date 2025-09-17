@@ -431,6 +431,7 @@ export default function EMCLabUltra() {
         </section>
 
      {/* SERVICES */}
+{/* SERVICES */}
 <Section
   id="services"
   title={t("Xizmatlar va sinovlar", "Услуги и испытания")}
@@ -441,12 +442,9 @@ export default function EMCLabUltra() {
       <Card
         key={i}
         className="
-          group p-6 transition
-          bg-gradient-to-b from-sky-50/70 to-white
-          dark:from-slate-800/40 dark:to-slate-900/40
-          border-sky-100/70 dark:border-slate-700
-          hover:shadow-md hover:ring-1 hover:ring-sky-200
-          dark:hover:ring-sky-700/60
+          group p-6 transition text-white
+          bg-gradient-to-r from-sky-700 to-cyan-600
+          hover:shadow-lg hover:scale-[1.02]
         "
       >
         <div className="flex items-center justify-between">
@@ -454,12 +452,12 @@ export default function EMCLabUltra() {
             <span className="text-xl">{tst.icon}</span>
             {tst.title}
           </h3>
-          <Badge>{tst.code}</Badge>
+          <Badge className="!bg-white/20 !text-white">{tst.code}</Badge>
         </div>
-        <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">{tst.note}</p>
+        <p className="mt-3 text-sm opacity-90">{tst.note}</p>
         <a
           href="#contact"
-          className="mt-4 inline-block text-sm font-medium underline decoration-sky-500 group-hover:decoration-2"
+          className="mt-4 inline-block text-sm font-medium underline decoration-white/70 hover:decoration-white"
         >
           {t("Buyurtma berish", "Заказать")}
         </a>
@@ -467,6 +465,7 @@ export default function EMCLabUltra() {
     ))}
   </div>
 </Section>
+
 
 
         {/* EQUIPMENT */}
