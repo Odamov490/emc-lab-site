@@ -34,7 +34,7 @@ const STAFF = [
   { name: "Xakimov Aziz", role: "Laboratoriya rahbari", img: "/staff/1.jpg" },
   { name: "Tillayev Anvar", role: "Boshliq o'rinbosari", img: "/staff/2.jpg" },
   { name: "Abdurashidov Davron", role: "Sektor boshlig'i", img: "/staff/3.jpg" },
-  { name: "Odamov G‘ulomjon", role: "Bosh muhandis", img: "/staff/4.jpg" },
+  { name: "Odamov G‘ulomjon", role: "Bosh mutaxassis", img: "/staff/4.jpg" },
   { name: "Reimbayev Xushnud", role: "1-toifali mutaxassis", img: "/staff/5.jpg" },
   { name: "Alekseyev Andrey", role: "1-toifali mutaxassis", img: "/staff/6.jpg" },
   { name: "Abduvohobov Ravshan", role: "2-toifali mutaxassis", img: "/staff/7.jpg" },
