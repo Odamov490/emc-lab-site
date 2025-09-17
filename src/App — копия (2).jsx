@@ -44,7 +44,14 @@ const STAFF = [
   { name: "Sharofiddinov Najmiddin", role: "Texnik xodim", img: "/staff/11.jpg" },
 ];
 
-const GALLERY = ["/gallery/1.jpg", "/gallery/2.jpg", "/gallery/3.jpg", "/gallery/4.jpg", "/gallery/5.jpg", "/gallery/6.jpg"];
+const GALLERY = [
+  "/gallery/1.jpg",
+  "/gallery/2.jpg",
+  "/gallery/3.jpg",
+  "/gallery/4.jpg",
+  "/gallery/5.jpg",
+  "/gallery/6.jpg",
+];
 
 // QUICK LINKS – kontakt bo‘limining o‘ng panelida kartalar ko‘rinishida chiqadi
 const QUICK_LINKS = [
@@ -70,6 +77,9 @@ const QUICK_LINKS = [
       "https://akkred.uz:8081/media/file/pdf/2023-06/e9f59504-1802-4f3f-b7de-e44908444f73.pdf#toolbar=0",
   },
 ];
+
+
+const [sending, setSending] = useState(false);
 
 /********************* UI PRIMITIVES *********************/
 function Badge({ children }) {
@@ -104,7 +114,6 @@ function Card({ children, className = "" }) {
 export default function EMCLabUltra() {
   const [lang, setLang] = useState("uz");
   const [dark, setDark] = useState(false);
-  const [sending, setSending] = useState(false); // kontakt forma holati
   const t = (uz, ru) => (lang === "uz" ? uz : ru);
 
   // Parallax-like blobs (dekor)
@@ -259,7 +268,7 @@ export default function EMCLabUltra() {
                 <div className="text-sm/5 opacity-90">{t("Akkreditatsiya va doira", "Аккредитация и область")}</div>
                 <div className="text-xl font-semibold">O’ZAK.SL.0309 • ISO/IEC 17025</div>
               </div>
-              {/* Tugma kontakt bo‘limiga olib boradi (o‘ng panelda hujjatlar linklari bor) */}
+              {/* Endi tugma kontakt bo‘limiga olib boradi, u yerda Quick Links kartalari bor */}
               <a href="#contact" className="rounded-xl bg-white/15 px-4 py-2 text-sm font-medium hover:bg-white/20">
                 {t("Hujjatlarni ko‘rish", "Просмотреть документы")}
               </a>
@@ -318,57 +327,32 @@ export default function EMCLabUltra() {
           subtitle={t("Ariza qoldiring – 1 ish kuni ichida javob", "Оставьте заявку – ответ в течение 1 рабочего дня")}
         >
           <div className="grid md:grid-cols-2 gap-8">
-            {/* Chap — forma (serverga yuboriladi) */}
+            {/* Chap — forma */}
             <Card className="p-6 space-y-4">
               <form
-                onSubmit={async (e) => {
+                onSubmit={(e) => {
                   e.preventDefault();
-                  const fd = new FormData(e.currentTarget);
-                  const payload = {
-                    name: fd.get("name"),
-                    email: fd.get("email"),
-                    phone: fd.get("phone"),
-                    test: fd.get("test"),
-                    message: fd.get("message"),
-                  };
-                  try {
-                    setSending(true);
-                    const resp = await fetch("/api/contact", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify(payload),
-                    });
-                    setSending(false);
-                    if (resp.ok) {
-                      alert(t("Rahmat! Arizangiz qabul qilindi.", "Спасибо! Ваша заявка принята."));
-                      e.currentTarget.reset();
-                    } else {
-                      alert(t("Uzr, yuborishda xatolik bo‘ldi.", "Ошибка при отправке."));
-                    }
-                  } catch {
-                    setSending(false);
-                    alert(t("Tarmoq xatosi. Keyinroq urinib ko‘ring.", "Сетевая ошибка. Попробуйте позже."));
-                  }
+                  alert(t("Rahmat! Arizangiz qabul qilindi.", "Спасибо! Ваша заявка принята."));
                 }}
                 className="space-y-4"
               >
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium">{t("Ism", "Имя")}</label>
-                    <input name="name" className="mt-1 w-full rounded-xl border px-3 py-2" placeholder={t("Ismingiz", "Ваше имя")} required />
+                    <input className="mt-1 w-full rounded-xl border px-3 py-2" placeholder={t("Ismingiz", "Ваше имя")} required />
                   </div>
                   <div>
                     <label className="text-sm font-medium">Email</label>
-                    <input name="email" type="email" className="mt-1 w-full rounded-xl border px-3 py-2" placeholder="name@example.com" required />
+                    <input type="email" className="mt-1 w-full rounded-xl border px-3 py-2" placeholder="name@example.com" required />
                   </div>
                 </div>
                 <div>
                   <label className="text-sm font-medium">{t("Telefon", "Телефон")}</label>
-                  <input name="phone" className="mt-1 w-full rounded-xl border px-3 py-2" placeholder="+998 __ ___ __ __" />
+                  <input className="mt-1 w-full rounded-xl border px-3 py-2" placeholder="+998 __ ___ __ __" />
                 </div>
                 <div>
                   <label className="text-sm font-medium">{t("Qiziqtirgan sinov(lar)", "Интересующие испытания")}</label>
-                  <select name="test" className="mt-1 w-full rounded-xl border px-3 py-2">
+                  <select className="mt-1 w-full rounded-xl border px-3 py-2">
                     {TESTS.map((tst, i) => (
                       <option key={i}>{`${tst.code} – ${tst.title}`}</option>
                     ))}
@@ -377,16 +361,12 @@ export default function EMCLabUltra() {
                 <div>
                   <label className="text-sm font-medium">{t("Xabar", "Сообщение")}</label>
                   <textarea
-                    name="message"
                     className="mt-1 w-full rounded-xl border px-3 py-2 h-28"
                     placeholder={t("Namuna turi, kuchlanish, port(lar), sinov darajalari...", "Тип образца, напряжение, порты, уровни испытаний...")}
                   ></textarea>
                 </div>
-                <button
-                  disabled={sending}
-                  className="rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-60"
-                >
-                  {sending ? t("Yuborilmoqda...", "Отправляется...") : t("Yuborish", "Отправить")}
+                <button className="rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm font-medium hover:opacity-90">
+                  {t("Yuborish", "Отправить")}
                 </button>
               </form>
             </Card>
