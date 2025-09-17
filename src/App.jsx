@@ -432,6 +432,7 @@ export default function EMCLabUltra() {
 
      {/* SERVICES */}
 {/* SERVICES */}
+{/* SERVICES */}
 <Section
   id="services"
   title={t("Xizmatlar va sinovlar", "Услуги и испытания")}
@@ -447,17 +448,17 @@ export default function EMCLabUltra() {
           hover:shadow-lg hover:scale-[1.02]
         "
       >
-        <div className="flex items-center justify-between">
-          <h3 className="text-base font-semibold flex items-center gap-2">
+        <div className="flex items-center justify-between drop-shadow-md">
+          <h3 className="text-base font-semibold flex items-center gap-2 drop-shadow-md">
             <span className="text-xl">{tst.icon}</span>
             {tst.title}
           </h3>
-          <Badge className="!bg-white/20 !text-white">{tst.code}</Badge>
+          <Badge className="!bg-white/20 !text-white drop-shadow">{tst.code}</Badge>
         </div>
-        <p className="mt-3 text-sm opacity-90">{tst.note}</p>
+        <p className="mt-3 text-sm opacity-90 drop-shadow">{tst.note}</p>
         <a
           href="#contact"
-          className="mt-4 inline-block text-sm font-medium underline decoration-white/70 hover:decoration-white"
+          className="mt-4 inline-block text-sm font-medium underline decoration-white/70 hover:decoration-white drop-shadow"
         >
           {t("Buyurtma berish", "Заказать")}
         </a>
@@ -465,6 +466,7 @@ export default function EMCLabUltra() {
     ))}
   </div>
 </Section>
+
 
 
 
