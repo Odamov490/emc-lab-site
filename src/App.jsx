@@ -32,7 +32,7 @@ const EQUIPMENT = [
   { name: "CDN M216-10", desc: "Coupling/Decoupling tarmog‘i", img: "/lab/cdn.jpg" },
 ];
 
-// 10 xodim uchun placeholder – rasmlarni public/staff/ ichiga joylang
+// 11 xodim uchun placeholder – rasmlarni public/staff/ ichiga joylang
 const STAFF = [
   { name: "Xakimov Aziz", role: "Laboratoriya rahbari", img: "/staff/1.jpg" },
    { name: "Tillayev Anvar", role: "Boshliq o'rinbosari", img: "/staff/2.jpg" },
@@ -41,9 +41,10 @@ const STAFF = [
   { name: "Reimbayev Xushnud", role: "1-toifali mutaxassis", img: "/staff/5.jpg" },
   { name: "Alekseyev Andrey", role: "1-toifali mutaxassis", img: "/staff/6.jpg" },
   { name: "Abduvohobov Ravshan", role: "2-toifali mutaxassis", img: "/staff/7.jpg" },
-  { name: "Jo'ldasbayev Daston", role: "2-toifali mutaxassis", img: "/staff/8.jpg" },
+  { name: "Joldasbaev Dastanbek", role: "2-toifali mutaxassis", img: "/staff/8.jpg" },
   { name: "Sobirov Doston", role: "Texnik xodim", img: "/staff/9.jpg" },
   { name: "Karimov Suxrob", role: "Texnik xodim", img: "/staff/10.jpg" },
+   { name: "Sharofiddinov Najmiddin", role: "Texnik xodim", img: "/staff/10.jpg" },
 ];
 
 
