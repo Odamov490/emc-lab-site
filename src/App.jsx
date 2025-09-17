@@ -145,7 +145,9 @@ export default function EMCLabUltra() {
 
         
     {/* NAV */}
-<header className="sticky top-0 z-40 border-b border-black/10 dark:border-white/10 bg-white/70 dark:bg-black/30 backdrop-blur">
+<header className="sticky top-0 z-40 border-b border-black/10 dark:border-white/10 
+  bg-slate-50/90 dark:bg-slate-800/50 backdrop-blur">
+
   <div className="mx-auto max-w-7xl px-4 h-14 flex items-center justify-between">
     {/* LOGO */}
   {/* LOGO (smooth scroll to top) */}
@@ -457,7 +459,9 @@ export default function EMCLabUltra() {
         </Section>
 
         {/* FOOTER */}
-        <footer className="border-t border-black/10 dark:border-white/10">
+       <footer className="border-t border-black/10 dark:border-white/10 
+  bg-slate-100/70 dark:bg-slate-900/40">
+
           <div className="mx-auto max-w-7xl px-4 py-12 grid md:grid-cols-4 gap-8">
             <div className="space-y-2">
               <div className="text-lg font-semibold">EMC Lab</div>
