@@ -433,6 +433,7 @@ export default function EMCLabUltra() {
      {/* SERVICES */}
 {/* SERVICES */}
 {/* SERVICES */}
+{/* SERVICES */}
 <Section
   id="services"
   title={t("Xizmatlar va sinovlar", "Услуги и испытания")}
@@ -442,23 +443,22 @@ export default function EMCLabUltra() {
     {TESTS.map((tst, i) => (
       <Card
         key={i}
-        className="
-          group p-6 transition text-white
-          bg-gradient-to-r from-sky-700 to-cyan-600
-          hover:shadow-lg hover:scale-[1.02]
-        "
+        className="group p-6 hover:shadow-lg transition bg-gradient-to-r from-sky-700 to-cyan-600 text-white"
       >
-        <div className="flex items-center justify-between drop-shadow-md">
-          <h3 className="text-base font-semibold flex items-center gap-2 drop-shadow-md">
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-semibold flex items-center gap-2 drop-shadow">
             <span className="text-xl">{tst.icon}</span>
             {tst.title}
           </h3>
-          <Badge className="!bg-white/20 !text-white drop-shadow">{tst.code}</Badge>
+          <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium 
+            bg-white text-gray-900 shadow-md">
+            {tst.code}
+          </span>
         </div>
-        <p className="mt-3 text-sm opacity-90 drop-shadow">{tst.note}</p>
+        <p className="mt-3 text-sm text-white/90 drop-shadow">{tst.note}</p>
         <a
           href="#contact"
-          className="mt-4 inline-block text-sm font-medium underline decoration-white/70 hover:decoration-white drop-shadow"
+          className="mt-4 inline-block text-sm font-medium underline decoration-white/80 hover:decoration-2"
         >
           {t("Buyurtma berish", "Заказать")}
         </a>
@@ -466,6 +466,7 @@ export default function EMCLabUltra() {
     ))}
   </div>
 </Section>
+
 
 
 
