@@ -1,9 +1,18 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 
-// EMC Lab – Premium UI (React + Tailwind only)
-// No extra deps. All images use royalty-free placeholders; swap later.
+// EMC Lab – ULTRA UI (Apple minimal + Stripe gradients)
+// Pure React + Tailwind (no extra deps). All images are placeholders you can swap later.
 
-const tests = [
+/********************* CONFIG *********************/
+const NAV = [
+  { href: "#services", label: { uz: "Xizmatlar", ru: "Услуги" } },
+  { href: "#equipment", label: { uz: "Jihozlar", ru: "Оборудование" } },
+  { href: "#team", label: { uz: "Jamoa", ru: "Команда" } },
+  { href: "#accreditation", label: { uz: "Akkreditatsiya", ru: "Аккредитация" } },
+  { href: "#contact", label: { uz: "Bog‘lanish", ru: "Контакты" } },
+];
+
+const TESTS = [
   { code: "IEC 61000-4-2", title: "Elektrostatik razryad (ESD)", note: "Immunitet", icon: "⚡" },
   { code: "IEC 61000-4-4", title: "Tez o‘tuvchi jarayonlar (EFT/B)", note: "Immunitet", icon: "💥" },
   { code: "IEC 61000-4-5", title: "Kuchlanish impulslari (Surge)", note: "Immunitet", icon: "🌩️" },
@@ -16,22 +25,30 @@ const tests = [
   { code: "CISPR 14-1", title: "IRP (conducted)", note: "Emissiya", icon: "🔊" },
 ];
 
-const equipment = [
-  { name: "R&S ESW8", desc: "EMI qabul qilgich / Receiver", img: "https://images.unsplash.com/photo-1535223289827-42f1e9919769?q=80&w=1200&auto=format&fit=crop" },
-  { name: "R&S ESR3", desc: "EMI qabul qilgich / Receiver", img: "https://images.unsplash.com/photo-1581091012184-7c54b00b2b91?q=80&w=1200&auto=format&fit=crop" },
-  { name: "Schaffner NX5", desc: "ESD/EFT/Surge generator", img: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop" },
-  { name: "CDN M216-10", desc: "Coupling/Decoupling tarmog‘i", img: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=1200&auto=format&fit=crop" },
+const EQUIPMENT = [
+  { name: "R&S ESW8", desc: "EMI qabul qilgich / Receiver", img: "/lab/receiver.jpg" },
+  { name: "R&S ESR3", desc: "EMI qabul qilgich / Receiver", img: "/lab/receiver2.jpg" },
+  { name: "Schaffner NX5", desc: "ESD/EFT/Surge generator", img: "/lab/nx5.jpg" },
+  { name: "CDN M216-10", desc: "Coupling/Decoupling tarmog‘i", img: "/lab/cdn.jpg" },
 ];
 
-const gallery = [
-  "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=1400&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1605901309584-818e25960a8b?q=80&w=1400&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=1400&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1400&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1581094483507-48c1af3b6c54?q=80&w=1400&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1585079542156-2755d9c8c69f?q=80&w=1400&auto=format&fit=crop",
+// 18 xodim uchun placeholder – rasmlarni public/staff/ ichiga joylang
+const STAFF = new Array(18).fill(0).map((_, i) => ({
+  name: `Xodim ${i + 1}`,
+  role: i === 0 ? "Laboratoriya rahbari" : i < 4 ? "Bosh muhandis" : i < 10 ? "Sinov muhandisi" : "Texnik xodim",
+  img: `/staff/${i + 1}.jpg`, // public/staff/1.jpg ... 18.jpg
+}));
+
+const GALLERY = [
+  "/gallery/1.jpg",
+  "/gallery/2.jpg",
+  "/gallery/3.jpg",
+  "/gallery/4.jpg",
+  "/gallery/5.jpg",
+  "/gallery/6.jpg",
 ];
 
+/********************* UI PRIMITIVES *********************/
 function Badge({ children }) {
   return (
     <span className="inline-flex items-center rounded-full border border-black/10 bg-white/70 px-3 py-1 text-xs font-medium shadow-sm backdrop-blur">
@@ -40,11 +57,11 @@ function Badge({ children }) {
   );
 }
 
-function Section({ id, title, subtitle, children }) {
+function Section({ id, title, subtitle, children, bleed=false }) {
   return (
-    <section id={id} className="py-16 sm:py-20" aria-labelledby={`${id}-title`}>
-      <div className="mx-auto max-w-7xl px-4">
-        <div className="mb-10">
+    <section id={id} className={`py-16 sm:py-24 ${bleed?"px-0":""}`} aria-labelledby={`${id}-title`}>
+      <div className={`mx-auto ${bleed?"max-w-none":"max-w-7xl px-4"}`}>
+        <div className={`${bleed?"px-4 max-w-7xl mx-auto":""} mb-10` }>
           <h2 id={`${id}-title`} className="text-3xl sm:text-4xl font-semibold tracking-tight">{title}</h2>
           {subtitle && (
             <p className="mt-2 text-base text-gray-600 dark:text-gray-300 max-w-2xl">{subtitle}</p>
@@ -56,23 +73,28 @@ function Section({ id, title, subtitle, children }) {
   );
 }
 
-function NavLink({ href, children }) {
+function Card({ children, className = "" }) {
   return (
-    <a href={href} className="text-sm font-medium hover:opacity-80">
-      {children}
-    </a>
+    <div className={`rounded-3xl border border-black/10 bg-white/70 backdrop-blur shadow-sm ${className}`}>{children}</div>
   );
 }
 
-export default function EMCLabPremium() {
+/********************* PAGE *********************/
+export default function EMCLabUltra() {
   const [lang, setLang] = useState("uz");
   const [dark, setDark] = useState(false);
   const t = (uz, ru) => (lang === "uz" ? uz : ru);
 
+  // Parallax-like translate for hero blobs
+  const blobs = useMemo(() => [
+    { class: "bg-gradient-to-tr from-sky-500 to-cyan-400", size: "h-[42rem] w-[42rem]", blur: "blur-3xl", pos: "-top-40 -left-20" },
+    { class: "bg-gradient-to-br from-indigo-400 to-sky-400", size: "h-[32rem] w-[32rem]", blur: "blur-3xl", pos: "top-20 -right-16" },
+  ], []);
+
   return (
     <div className={dark ? "dark" : ""}>
-      <div className="min-h-screen bg-gradient-to-b from-white to-sky-50 text-gray-900 dark:from-slate-950 dark:to-slate-900 dark:text-slate-100">
-        {/* Top bar */}
+      <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-gray-900 dark:from-slate-950 dark:to-slate-900 dark:text-slate-100 selection:bg-sky-200/50">
+        {/* TOP BAR */}
         <div className="border-b border-black/10 dark:border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur">
           <div className="mx-auto max-w-7xl px-4 py-2 flex items-center justify-between text-xs">
             <div className="flex items-center gap-2">
@@ -80,31 +102,31 @@ export default function EMCLabPremium() {
               <Badge>ISO/IEC 17025</Badge>
               <Badge>ILAC – G8</Badge>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <button onClick={() => setLang("uz")} className={`hover:underline ${lang==="uz"?"font-semibold":""}`}>UZ</button>
               <span className="text-gray-400">|</span>
               <button onClick={() => setLang("ru")} className={`hover:underline ${lang==="ru"?"font-semibold":""}`}>РУ</button>
               <span className="mx-1"/>
               <button onClick={() => setDark(d=>!d)} className="rounded-lg border px-2 py-1 text-[11px] hover:opacity-80">
-                {dark ? t("Yorug‘ rejim","Светлая тема") : t("Qorong‘i rejim","Тёмная тема")}
+                {dark ? t("Yorug‘","Светлая") : t("Qorong‘i","Тёмная")}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Header */}
+        {/* NAV */}
         <header className="sticky top-0 z-40 border-b border-black/10 dark:border-white/10 bg-white/70 dark:bg-black/30 backdrop-blur">
           <div className="mx-auto max-w-7xl px-4 h-14 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-400 ring-2 ring-white/60" aria-hidden />
               <span className="font-semibold">EMC Lab</span>
             </div>
-            <nav className="hidden md:flex items-center gap-6">
-              <NavLink href="#services">{t("Xizmatlar","Услуги")}</NavLink>
-              <NavLink href="#equipment">{t("Jihozlar","Оборудование")}</NavLink>
-              <NavLink href="#accreditation">{t("Akkreditatsiya","Аккредитация")}</NavLink>
-              <NavLink href="#gallery">{t("Galereya","Галерея")}</NavLink>
-              <NavLink href="#contact">{t("Bog‘lanish","Контакты")}</NavLink>
+            <nav className="hidden md:flex items-center gap-7">
+              {NAV.map((n) => (
+                <a key={n.href} href={n.href} className="text-sm font-medium hover:opacity-80">
+                  {t(n.label.uz, n.label.ru)}
+                </a>
+              ))}
             </nav>
             <a href="#contact" className="rounded-2xl border border-black/10 bg-gray-900 text-white px-3 py-1.5 text-sm hover:-translate-y-0.5 transition will-change-transform">
               {t("Sinovga buyurtma","Заявка на испытания")}
@@ -112,48 +134,44 @@ export default function EMCLabPremium() {
           </div>
         </header>
 
-        {/* Hero */}
+        {/* HERO – Apple clean + Stripe gradients */}
         <section className="relative overflow-hidden">
-          <div className="absolute inset-0 -z-10 opacity-40 dark:opacity-30" aria-hidden>
-            <img src="https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1800&auto=format&fit=crop" alt="lab" className="h-full w-full object-cover"/>
-            <div className="absolute inset-0 bg-gradient-to-br from-white via-white/70 to-transparent dark:from-slate-950 dark:via-slate-900/60"/>
+          <div className="absolute inset-0 -z-10" aria-hidden>
+            {blobs.map((b,i)=> (
+              <div key={i} className={`pointer-events-none absolute ${b.pos} ${b.size} ${b.blur} opacity-40 dark:opacity-30 rounded-full ${b.class}`}/>
+            ))}
           </div>
-          <div className="mx-auto max-w-7xl px-4 py-16 sm:py-24">
-            <div className="grid md:grid-cols-2 gap-10 items-center">
+          <div className="mx-auto max-w-7xl px-4 py-20 sm:py-28">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
                 <p className="text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400">{t("Sertifikatlangan sinovlar","Сертифицированные испытания")}</p>
-                <h1 className="mt-2 text-4xl sm:text-6xl font-semibold leading-tight">
-                  {t("Elektromagnit moslashuvchanlik sinovlari","Испытания по электромагнитной совместимости")}
+                <h1 className="mt-2 text-5xl sm:text-6xl font-semibold tracking-tight">
+                  {t("Elektromagnit moslashuvchanlik","Электромагнитная совместимость")}
                 </h1>
                 <p className="mt-4 text-gray-700 dark:text-gray-300 text-base sm:text-lg max-w-xl">
-                  {t("Maishiy va sanoat qurilmalari uchun ESD, EFT/B, Surge, RF immunitet, Flicker, Garmonik va emissiya o‘lchovlari.","ESD, EFT/B, Surge, RF иммунитет, мерцание, гармоники и измерения излучаемых/проводимых помех.")}
+                  {t("ESD, EFT/B, Surge, RF immunitet, Flicker, Garmonik va emissiya o‘lchovlari. ISO/IEC 17025 akkreditatsiya doirasida.","ESD, EFT/B, Surge, RF иммунитет, мерцание, гармоники и измерения помех. В рамках аккредитации ISO/IEC 17025.")}
                 </p>
                 <div className="mt-6 flex items-center gap-3">
                   <a href="#services" className="rounded-xl border border-black/10 bg-white/70 px-4 py-2 text-sm font-medium hover:opacity-90 backdrop-blur">
                     {t("Xizmatlarni ko‘rish","Смотреть услуги")}
                   </a>
                   <a href="#contact" className="rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm font-medium shadow hover:shadow-md">
-                    {t("Tizimga ariza qoldirish","Оставить заявку")}
+                    {t("Ariza qoldirish","Оставить заявку")}
                   </a>
-                </div>
-                <div className="mt-6 flex flex-wrap gap-2 text-xs text-gray-600 dark:text-gray-300">
-                  <Badge>O‘z MSt / IEC 61000</Badge>
-                  <Badge>CISPR</Badge>
-                  <Badge>UzTR.389-010:2016</Badge>
                 </div>
                 <div className="mt-8 grid grid-cols-3 gap-6 text-center">
                   {[{v:"1200+",l:t("o‘lchov","измерений")},{v:"98%",l:t("qoniqish","удовл.")},{v:"24h",l:t("javob","ответ")}]?.map((s,i)=> (
-                    <div key={i} className="rounded-2xl border border-black/10 bg-white/70 backdrop-blur p-4 shadow-sm">
+                    <Card key={i} className="p-4">
                       <div className="text-2xl font-semibold">{s.v}</div>
                       <div className="text-xs text-gray-600 dark:text-gray-300">{s.l}</div>
-                    </div>
+                    </Card>
                   ))}
                 </div>
               </div>
               <div className="relative">
-                <div className="aspect-[4/3] w-full rounded-3xl border border-black/10 bg-white/70 backdrop-blur shadow-xl overflow-hidden ring-1 ring-black/5">
-                  <img src="https://images.unsplash.com/photo-1508385082359-f38ae991e8f2?q=80&w=1600&auto=format&fit=crop" alt="anechoic" className="h-full w-full object-cover"/>
-                </div>
+                <Card className="aspect-[4/3] overflow-hidden shadow-xl ring-1 ring-black/5">
+                  <img src="/hero/anechoic.jpg" alt="anechoic" className="h-full w-full object-cover scale-105"/>
+                </Card>
                 <div className="absolute -bottom-6 -right-6 hidden sm:block">
                   <div className="rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-400 text-white px-5 py-3 shadow-lg">
                     <div className="text-xs">ISO/IEC 17025</div>
@@ -165,29 +183,29 @@ export default function EMCLabPremium() {
           </div>
         </section>
 
-        {/* Services */}
+        {/* SERVICES */}
         <Section id="services" title={t("Xizmatlar va sinovlar","Услуги и испытания")} subtitle={t("IEC/CISPR talablari asosida to‘liq EMC dasturi","Полный перечень EMC-испытаний по IEC/CISPR")}> 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {tests.map((tst, i) => (
-              <div key={i} className="group rounded-2xl border border-black/10 bg-white/70 backdrop-blur p-5 shadow-sm hover:shadow-md transition">
+            {TESTS.map((tst, i) => (
+              <Card key={i} className="group p-6 hover:shadow-md transition">
                 <div className="flex items-center justify-between">
                   <h3 className="text-base font-semibold flex items-center gap-2"><span className="text-xl">{tst.icon}</span>{tst.title}</h3>
                   <Badge>{tst.code}</Badge>
                 </div>
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">{tst.note}</p>
+                <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">{tst.note}</p>
                 <a href="#contact" className="mt-4 inline-block text-sm font-medium underline decoration-sky-500 group-hover:decoration-2">
                   {t("Buyurtma berish","Заказать")}
                 </a>
-              </div>
+              </Card>
             ))}
           </div>
         </Section>
 
-        {/* Equipment */}
+        {/* EQUIPMENT */}
         <Section id="equipment" title={t("Jihozlar","Оборудование")} subtitle={t("Asosiy o‘lchash va sinov kompleksi","Основной комплекс измерений и испытаний")}> 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {equipment.map((eq, i) => (
-              <div key={i} className="rounded-2xl overflow-hidden border border-black/10 bg-white/70 backdrop-blur shadow-sm hover:shadow-md transition">
+            {EQUIPMENT.map((eq, i) => (
+              <Card key={i} className="overflow-hidden hover:shadow-md transition">
                 <div className="aspect-video w-full">
                   <img src={eq.img} alt={eq.name} className="h-full w-full object-cover"/>
                 </div>
@@ -195,14 +213,14 @@ export default function EMCLabPremium() {
                   <div className="text-lg font-semibold">{eq.name}</div>
                   <div className="mt-1 text-sm text-gray-600 dark:text-gray-300">{eq.desc}</div>
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
         </Section>
 
-        {/* Accreditation ribbon */}
+        {/* ACCREDITATION CTA */}
         <div className="mx-auto max-w-7xl px-4">
-          <div className="rounded-2xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white p-6 shadow-md">
+          <div className="rounded-3xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white p-6 shadow-md">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <div className="text-sm/5 opacity-90">{t("Akkreditatsiya va doira","Аккредитация и область")}</div>
@@ -213,22 +231,35 @@ export default function EMCLabPremium() {
           </div>
         </div>
 
-        {/* Gallery */}
-        <Section id="gallery" title={t("Galereya","Галерея")} subtitle={t("Laboratoriya, jihozlar va sinov jarayonlaridan suratlar","Фото лаборатории, оборудования и процесса испытаний")}> 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {gallery.map((src, i) => (
-              <div key={i} className="overflow-hidden rounded-2xl border border-black/10 shadow-sm">
-                <img src={src} alt="lab photo" className="h-56 w-full object-cover hover:scale-105 transition-transform"/>
-              </div>
+        {/* GALLERY (bleed) */}
+        <Section id="gallery" title={t("Galereya","Галерея")} subtitle={t("Laboratoriya, jihozlar va sinov jarayonlaridan suratlar","Фото лаборатории, оборудования и процесса испытаний")} bleed>
+          <div className="px-4 max-w-7xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {GALLERY.map((src, i) => (
+              <Card key={i}>
+                <img src={src} alt="lab photo" className="h-56 w-full object-cover hover:scale-105 transition-transform rounded-3xl"/>
+              </Card>
             ))}
           </div>
         </Section>
 
-        {/* Pricing */}
-        <Section id="pricing" title={t("Narxlar","Цены")} subtitle={t("Sinov turiga va namunaga qarab individual hisob-kitob","Индивидуальный расчет по типу испытаний и образцу")}> 
+        {/* TEAM */}
+        <Section id="team" title={t("Bizning jamoa","Наша команда")} subtitle={t("18 nafar tajribali mutaxassis","18 опытных специалистов")}> 
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {STAFF.map((p, i) => (
+              <Card key={i} className="p-5 text-center">
+                <img src={p.img} alt={p.name} className="w-24 h-24 mx-auto rounded-full object-cover border" />
+                <div className="mt-3 text-lg font-semibold">{p.name}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">{p.role}</div>
+              </Card>
+            ))}
+          </div>
+        </Section>
+
+        {/* PRICING */}
+        <Section id="pricing" title={t("Narxlar","Цены")} subtitle={t("Individual kalkulyatsiya","Индивидуальный расчет")}> 
           <div className="grid md:grid-cols-3 gap-6">
             {["Basic","Standard","Premium"].map((tier,i)=> (
-              <div key={i} className="rounded-2xl border border-black/10 bg-white/70 backdrop-blur p-6 shadow-sm hover:shadow-md">
+              <Card key={i} className="p-6 hover:shadow-md">
                 <div className="text-sm uppercase tracking-wide text-gray-500">{tier}</div>
                 <div className="mt-2 text-3xl font-semibold">$ —</div>
                 <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300">
@@ -237,64 +268,66 @@ export default function EMCLabPremium() {
                   <li>• {t("Xulosa va tavsiyalar","Заключение и рекомендации")}</li>
                 </ul>
                 <a href="#contact" className="mt-5 inline-block rounded-xl bg-gray-900 text-white px-4 py-2 text-sm font-medium hover:opacity-90">{t("Kalkulyatsiya so‘rash","Запросить расчет")}</a>
-              </div>
+              </Card>
             ))}
           </div>
         </Section>
 
-        {/* Contact */}
+        {/* CONTACT */}
         <Section id="contact" title={t("Bog‘lanish","Контакты")} subtitle={t("Ariza qoldiring – 1 ish kuni ichida javob","Оставьте заявку – ответ в течение 1 рабочего дня")}> 
           <div className="grid md:grid-cols-2 gap-8">
-            <form onSubmit={(e)=>{e.preventDefault(); alert(t("Rahmat! Arizangiz qabul qilindi.", "Спасибо! Ваша заявка принята."));}} className="rounded-2xl border border-black/10 bg-white/70 backdrop-blur p-6 space-y-4 shadow-sm">
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium">{t("Ism","Имя")}</label>
-                  <input className="mt-1 w-full rounded-xl border px-3 py-2" placeholder={t("Ismingiz","Ваше имя")} required/>
+            <Card className="p-6 space-y-4">
+              <form onSubmit={(e)=>{e.preventDefault(); alert(t("Rahmat! Arizangiz qabul qilindi.", "Спасибо! Ваша заявка принята."));}} className="space-y-4">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium">{t("Ism","Имя")}</label>
+                    <input className="mt-1 w-full rounded-xl border px-3 py-2" placeholder={t("Ismingiz","Ваше имя")} required/>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Email</label>
+                    <input type="email" className="mt-1 w-full rounded-xl border px-3 py-2" placeholder="name@example.com" required/>
+                  </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Email</label>
-                  <input type="email" className="mt-1 w-full rounded-xl border px-3 py-2" placeholder="name@example.com" required/>
+                  <label className="text-sm font-medium">{t("Telefon","Телефон")}</label>
+                  <input className="mt-1 w-full rounded-xl border px-3 py-2" placeholder="+998 __ ___ __ __"/>
                 </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium">{t("Telefon","Телефон")}</label>
-                <input className="mt-1 w-full rounded-xl border px-3 py-2" placeholder="+998 __ ___ __ __"/>
-              </div>
-              <div>
-                <label className="text-sm font-medium">{t("Qiziqtirgan sinov(lar)","Интересующие испытания")}</label>
-                <select className="mt-1 w-full rounded-xl border px-3 py-2">
-                  {tests.map((tst,i)=>(<option key={i}>{`${tst.code} – ${tst.title}`}</option>))}
-                </select>
-              </div>
-              <div>
-                <label className="text-sm font-medium">{t("Xabar","Сообщение")}</label>
-                <textarea className="mt-1 w-full rounded-xl border px-3 py-2 h-28" placeholder={t("Namuna turi, kuchlanish, port(lar), sinov darajalari...","Тип образца, напряжение, порты, уровни испытаний...")}></textarea>
-              </div>
-              <button className="rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm font-medium hover:opacity-90">{t("Yuborish","Отправить")}</button>
-            </form>
+                <div>
+                  <label className="text-sm font-medium">{t("Qiziqtirgan sinov(lar)","Интересующие испытания")}</label>
+                  <select className="mt-1 w-full rounded-xl border px-3 py-2">
+                    {TESTS.map((tst,i)=>(<option key={i}>{`${tst.code} – ${tst.title}`}</option>))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">{t("Xabar","Сообщение")}</label>
+                  <textarea className="mt-1 w-full rounded-xl border px-3 py-2 h-28" placeholder={t("Namuna turi, kuchlanish, port(lar), sinov darajalari...","Тип образца, напряжение, порты, уровни испытаний...")}></textarea>
+                </div>
+                <button className="rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm font-medium hover:opacity-90">{t("Yuborish","Отправить")}</button>
+              </form>
+            </Card>
             <div className="space-y-5">
-              <div className="rounded-2xl border border-black/10 bg-white/70 backdrop-blur p-6 shadow-sm">
+              <Card className="p-6">
                 <div className="text-sm font-semibold">{t("Manzil","Адрес")}</div>
                 <div className="text-gray-700 dark:text-gray-300 text-sm">Toshkent vil., Piskent t., Lola-ariq MFY, O‘zbekiston ko‘chasi, 174-uy</div>
                 <div className="mt-3 text-sm"><span className="font-medium">Telegram:</span> @EMM_Rasmiy</div>
                 <div className="text-sm"><span className="font-medium">Email:</span> info@emc-lab.uz</div>
                 <div className="text-sm"><span className="font-medium">Tel:</span> +998 (90) 000-00-00</div>
-              </div>
-              <div className="rounded-2xl border border-black/10 bg-white/70 backdrop-blur p-6 shadow-sm">
+              </Card>
+              <Card className="p-6">
                 <div className="text-sm font-semibold">{t("Ish vaqti","График работы")}</div>
                 <ul className="mt-2 text-sm text-gray-700 dark:text-gray-300 space-y-1">
                   <li>{t("Du–Ju: 09:00–18:00","Пн–Пт: 09:00–18:00")}</li>
                   <li>{t("Sh: 10:00–16:00","Сб: 10:00–16:00")}</li>
                   <li>{t("Yak: dam olish","Вс: выходной")}</li>
                 </ul>
-              </div>
+              </Card>
             </div>
           </div>
         </Section>
 
-        {/* Footer */}
+        {/* FOOTER */}
         <footer className="border-t border-black/10 dark:border-white/10">
-          <div className="mx-auto max-w-7xl px-4 py-10 grid md:grid-cols-4 gap-8">
+          <div className="mx-auto max-w-7xl px-4 py-12 grid md:grid-cols-4 gap-8">
             <div className="space-y-2">
               <div className="text-lg font-semibold">EMC Lab</div>
               <div className="text-sm text-gray-600 dark:text-gray-300">{t("O‘z MSt/IEC/CISPR bo‘yicha sinovlar","Испытания по O‘z MSt/IEC/CISPR")}</div>
@@ -302,11 +335,9 @@ export default function EMCLabPremium() {
             <div>
               <div className="text-sm font-semibold mb-3">{t("Navigatsiya","Навигация")}</div>
               <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                <a href="#services" className="hover:underline">{t("Xizmatlar","Услуги")}</a>
-                <div/>
-                <a href="#equipment" className="hover:underline">{t("Jihozlar","Оборудование")}</a>
-                <div/>
-                <a href="#contact" className="hover:underline">{t("Bog‘lanish","Контакты")}</a>
+                {NAV.map(n=> (
+                  <div key={n.href}><a href={n.href} className="hover:underline">{t(n.label.uz,n.label.ru)}</a></div>
+                ))}
               </div>
             </div>
             <div>
