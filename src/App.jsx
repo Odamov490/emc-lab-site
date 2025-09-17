@@ -430,26 +430,44 @@ export default function EMCLabUltra() {
           </div>
         </section>
 
-        {/* SERVICES */}
-        <Section id="services" title={t("Xizmatlar va sinovlar", "Услуги и испытания")} subtitle={t("IEC/CISPR talablari asosida to‘liq EMC dasturi", "Полный перечень EMC-испытаний по IEC/CISPR")}>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {TESTS.map((tst, i) => (
-              <Card key={i} className="group p-6 hover:shadow-md transition">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-base font-semibold flex items-center gap-2">
-                    <span className="text-xl">{tst.icon}</span>
-                    {tst.title}
-                  </h3>
-                  <Badge>{tst.code}</Badge>
-                </div>
-                <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">{tst.note}</p>
-                <a href="#contact" className="mt-4 inline-block text-sm font-medium underline decoration-sky-500 group-hover:decoration-2">
-                  {t("Buyurtma berish", "Заказать")}
-                </a>
-              </Card>
-            ))}
-          </div>
-        </Section>
+     {/* SERVICES */}
+<Section
+  id="services"
+  title={t("Xizmatlar va sinovlar", "Услуги и испытания")}
+  subtitle={t("IEC/CISPR talablari asosida to‘liq EMC dasturi", "Полный перечень EMC-испытаний по IEC/CISPR")}
+>
+  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {TESTS.map((tst, i) => (
+      <Card
+        key={i}
+        className="
+          group p-6 transition
+          bg-gradient-to-b from-sky-50/70 to-white
+          dark:from-slate-800/40 dark:to-slate-900/40
+          border-sky-100/70 dark:border-slate-700
+          hover:shadow-md hover:ring-1 hover:ring-sky-200
+          dark:hover:ring-sky-700/60
+        "
+      >
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-semibold flex items-center gap-2">
+            <span className="text-xl">{tst.icon}</span>
+            {tst.title}
+          </h3>
+          <Badge>{tst.code}</Badge>
+        </div>
+        <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">{tst.note}</p>
+        <a
+          href="#contact"
+          className="mt-4 inline-block text-sm font-medium underline decoration-sky-500 group-hover:decoration-2"
+        >
+          {t("Buyurtma berish", "Заказать")}
+        </a>
+      </Card>
+    ))}
+  </div>
+</Section>
+
 
         {/* EQUIPMENT */}
         <Section id="equipment" title={t("Jihozlar", "Оборудование")} subtitle={t("Asosiy o‘lchash va sinov kompleksi", "Основной комплекс измерений и испытаний")}>
