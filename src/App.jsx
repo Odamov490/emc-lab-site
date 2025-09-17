@@ -32,7 +32,7 @@ const EQUIPMENT = [
   { name: "CDN M216-10", desc: "Coupling/Decoupling tarmog‘i", img: "/lab/cdn.jpg" },
 ];
 
-// 18 xodim uchun placeholder – rasmlarni public/staff/ ichiga joylang
+// 10 xodim uchun placeholder – rasmlarni public/staff/ ichiga joylang
 const STAFF = new Array(10).fill(0).map((_, i) => ({
   name: `Xodim ${i + 1}`,
   role: i === 0 ? "Laboratoriya rahbari" : i < 4 ? "Bosh muhandis" : i < 8 ? "Sinov muhandisi" : "Texnik xodim",
