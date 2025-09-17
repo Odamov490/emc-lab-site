@@ -83,7 +83,6 @@ const EQUIPMENT = [
     desc: "Izoh",
     images: ["/lab/item12/1.jpg", "/lab/item12/2.jpg", "/lab/item12/3.jpg", "/lab/item12/4.jpg"],
   },
-
 ];
 
 // 11 xodim (rasmlarni public/staff/ ichiga joylang)
@@ -217,21 +216,29 @@ function Lightbox({ open, images, index, onClose, onPrev, onNext }) {
 /********************* EQUIPMENT CARD (multi image + thumbs) *********************/
 function EquipmentCard({ eq, onOpenLightbox }) {
   const [idx, setIdx] = useState(0);
-  const imgs = eq.imgs?.length ? eq.imgs : [eq.img]; // sizdagi ma'lumotga moslashadi
 
-  const prev = () => setIdx((p) => (p - 1 + imgs.length) % imgs.length);
-  const next = () => setIdx((p) => (p + 1) % imgs.length);
+  // >>> MUHIM: endi images massivini o‘qiymiz (sizning EQUIPMENT bilan mos)
+  const imgs = Array.isArray(eq.images) && eq.images.length
+    ? eq.images
+    : (Array.isArray(eq.imgs) && eq.imgs.length ? eq.imgs : (eq.img ? [eq.img] : []));
+
+  const safeImgs = imgs.length ? imgs : ["/placeholder-equipment.jpg"];
+
+  const prev = () => setIdx((p) => (p - 1 + safeImgs.length) % safeImgs.length);
+  const next = () => setIdx((p) => (p + 1) % safeImgs.length);
 
   return (
     <Card className="overflow-hidden hover:shadow-md transition">
       <div className="relative aspect-video w-full bg-slate-100">
         <img
-          src={imgs[idx]}
+          src={safeImgs[idx]}
           alt={eq.name}
           className="h-full w-full object-cover cursor-zoom-in"
-          onClick={() => onOpenLightbox(imgs, idx)}
+          onClick={() => onOpenLightbox(safeImgs, idx)}
+          onError={(e)=>{ e.currentTarget.src="/placeholder-equipment.jpg"; }}
+          loading="lazy"
         />
-        {imgs.length > 1 && (
+        {safeImgs.length > 1 && (
           <>
             <button
               type="button"
@@ -253,9 +260,9 @@ function EquipmentCard({ eq, onOpenLightbox }) {
         )}
       </div>
 
-      {imgs.length > 1 && (
+      {safeImgs.length > 1 && (
         <div className="flex items-center justify-center gap-2 px-4 py-3">
-          {imgs.map((src, i) => (
+          {safeImgs.map((src, i) => (
             <button
               key={i}
               type="button"
@@ -264,7 +271,8 @@ function EquipmentCard({ eq, onOpenLightbox }) {
                 ${i === idx ? "ring-2 ring-sky-500 border-sky-400" : "border-black/10 hover:opacity-90"}`}
               aria-label={`preview ${i + 1}`}
             >
-              <img src={src} alt="" className="h-full w-full object-cover" />
+              <img src={src} alt="" className="h-full w-full object-cover"
+                   onError={(e)=>{ e.currentTarget.src="/placeholder-equipment.jpg"; }}/>
             </button>
           ))}
         </div>
