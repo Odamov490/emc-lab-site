@@ -459,42 +459,53 @@ export default function EMCLabUltra() {
         </Section>
 
         {/* FOOTER */}
-       <footer className="border-t border-black/10 dark:border-white/10 
-  bg-slate-100/70 dark:bg-slate-900/40">
+       {/* FOOTER */}
+<footer className="bg-gradient-to-r from-sky-700 to-cyan-600">
+  <div className="mx-auto max-w-7xl px-4 py-12 grid md:grid-cols-4 gap-8 text-white">
+    
+    <div className="space-y-2">
+      <div className="text-lg font-semibold">EMC Lab</div>
+      <div className="text-sm opacity-80">
+        {t("O‘z MSt/IEC/CISPR bo‘yicha sinovlar", "Испытания по O‘z MSt/IEC/CISPR")}
+      </div>
+    </div>
 
-          <div className="mx-auto max-w-7xl px-4 py-12 grid md:grid-cols-4 gap-8">
-            <div className="space-y-2">
-              <div className="text-lg font-semibold">EMC Lab</div>
-              <div className="text-sm text-gray-600 dark:text-gray-300">{t("O‘z MSt/IEC/CISPR bo‘yicha sinovlar", "Испытания по O‘z MSt/IEC/CISPR")}</div>
-            </div>
-            <div>
-              <div className="text-sm font-semibold mb-3">{t("Navigatsiya", "Навигация")}</div>
-              <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                {NAV.map((n) => (
-                  <div key={n.href}>
-                    <a href={n.href} className="hover:underline">
-                      {t(n.label.uz, n.label.ru)}
-                    </a>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <div className="text-sm font-semibold mb-3">Legal</div>
-              <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                <div>© {new Date().getFullYear()} EMC Lab</div>
-                <div>{t("Maxfiylik siyosati", "Политика конфиденциальности")}</div>
-              </div>
-            </div>
-            <div>
-              <div className="text-sm font-semibold mb-3">{t("Manzil", "Адрес")}</div>
-              <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
-                <div>Toshkent vil., Piskent t.</div>
-                <div>O‘zbekiston ko‘chasi, 174-uy</div>
-              </div>
-            </div>
+    <div>
+      <div className="text-sm font-semibold mb-3">{t("Navigatsiya", "Навигация")}</div>
+      <div className="space-y-2 text-sm">
+        {NAV.map((n) => (
+          <div key={n.href}>
+            <a 
+              href={n.href} 
+              className="hover:text-cyan-300 transition-colors"
+            >
+              {t(n.label.uz, n.label.ru)}
+            </a>
           </div>
-        </footer>
+        ))}
+      </div>
+    </div>
+
+    <div>
+      <div className="text-sm font-semibold mb-3">Legal</div>
+      <div className="space-y-2 text-sm">
+        <div>© {new Date().getFullYear()} EMC Lab</div>
+        <div className="hover:text-cyan-300 transition-colors cursor-pointer">
+          {t("Maxfiylik siyosati", "Политика конфиденциальности")}
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div className="text-sm font-semibold mb-3">{t("Manzil", "Адрес")}</div>
+      <div className="space-y-1 text-sm opacity-80">
+        <div>Toshkent vil., Piskent t.</div>
+        <div>O‘zbekiston ko‘chasi, 174-uy</div>
+      </div>
+    </div>
+  </div>
+</footer>
+
       </div>
     </div>
   );
