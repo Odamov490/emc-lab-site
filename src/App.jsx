@@ -23,12 +23,81 @@ const TESTS = [
 ];
 
 const EQUIPMENT = [
-  // Agar xohlasangiz bu obyektlarga keyinroq imgs: [...] qo'shasiz.
-  // Hozir kiritmasangiz, komponent avtomatik ravishda [img] dan foydalanadi.
-  { name: "R&S ESW8", desc: "EMI qabul qilgich / Receiver", img: "/lab/receiver.jpg" },
-  { name: "R&S ESR3", desc: "EMI qabul qilgich / Receiver", img: "/lab/receiver2.jpg" },
-  { name: "Schaffner NX5", desc: "ESD/EFT/Surge generator", img: "/lab/nx5.jpg" },
-  { name: "CDN M216-10", desc: "Coupling/Decoupling tarmog‘i", img: "/lab/cdn.jpg" },
+  {
+    name: "R&S ESW8",
+    desc: "EMI qabul qilgich / Receiver",
+    images: ["/lab/esw8/1.jpg", "/lab/esw8/2.jpg", "/lab/esw8/3.jpg", "/lab/esw8/4.jpg"],
+  },
+  {
+    name: "R&S ESR3",
+    desc: "EMI qabul qilgich / Receiver",
+    images: ["/lab/esr3/1.jpg", "/lab/esr3/2.jpg", "/lab/esr3/3.jpg", "/lab/esr3/4.jpg"],
+  },
+  {
+    name: "Schaffner NX5",
+    desc: "ESD/EFT/Surge generator",
+    images: ["/lab/nx5/1.jpg", "/lab/nx5/2.jpg", "/lab/nx5/3.jpg", "/lab/nx5/4.jpg"],
+  },
+  {
+    name: "CDN M216-10",
+    desc: "Coupling/Decoupling tarmog‘i",
+    images: ["/lab/cdn/1.jpg", "/lab/cdn/2.jpg", "/lab/cdn/3.jpg", "/lab/cdn/4.jpg"],
+  },
+  {
+    name: "Jihoz 5",
+    desc: "Izoh",
+    images: ["/lab/item5/1.jpg", "/lab/item5/2.jpg", "/lab/item5/3.jpg", "/lab/item5/4.jpg"],
+  },
+  {
+    name: "Jihoz 6",
+    desc: "Izoh",
+    images: ["/lab/item6/1.jpg", "/lab/item6/2.jpg", "/lab/item6/3.jpg", "/lab/item6/4.jpg"],
+  },
+  {
+    name: "Jihoz 7",
+    desc: "Izoh",
+    images: ["/lab/item7/1.jpg", "/lab/item7/2.jpg", "/lab/item7/3.jpg", "/lab/item7/4.jpg"],
+  },
+  {
+    name: "Jihoz 8",
+    desc: "Izoh",
+    images: ["/lab/item8/1.jpg", "/lab/item8/2.jpg", "/lab/item8/3.jpg", "/lab/item8/4.jpg"],
+  },
+  {
+    name: "Jihoz 9",
+    desc: "Izoh",
+    images: ["/lab/item9/1.jpg", "/lab/item9/2.jpg", "/lab/item9/3.jpg", "/lab/item9/4.jpg"],
+  },
+  {
+    name: "Jihoz 10",
+    desc: "Izoh",
+    images: ["/lab/item10/1.jpg", "/lab/item10/2.jpg", "/lab/item10/3.jpg", "/lab/item10/4.jpg"],
+  },
+  {
+    name: "Jihoz 11",
+    desc: "Izoh",
+    images: ["/lab/item11/1.jpg", "/lab/item11/2.jpg", "/lab/item11/3.jpg", "/lab/item11/4.jpg"],
+  },
+  {
+    name: "Jihoz 12",
+    desc: "Izoh",
+    images: ["/lab/item12/1.jpg", "/lab/item12/2.jpg", "/lab/item12/3.jpg", "/lab/item12/4.jpg"],
+  },
+  {
+    name: "Jihoz 13",
+    desc: "Izoh",
+    images: ["/lab/item13/1.jpg", "/lab/item13/2.jpg", "/lab/item13/3.jpg", "/lab/item13/4.jpg"],
+  },
+  {
+    name: "Jihoz 14",
+    desc: "Izoh",
+    images: ["/lab/item14/1.jpg", "/lab/item14/2.jpg", "/lab/item14/3.jpg", "/lab/item14/4.jpg"],
+  },
+  {
+    name: "Jihoz 15",
+    desc: "Izoh",
+    images: ["/lab/item15/1.jpg", "/lab/item15/2.jpg", "/lab/item15/3.jpg", "/lab/item15/4.jpg"],
+  },
 ];
 
 // 11 xodim (rasmlarni public/staff/ ichiga joylang)
