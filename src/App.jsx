@@ -298,6 +298,16 @@ export default function EMCLabUltra() {
   const t = (uz, ru) => (lang === "uz" ? uz : ru);
   const [aboutTab, setAboutTab] = useState("innovations");
 
+
+function Pill({ children }) {
+  return (
+    <span className="text-[11px] px-3 py-1 rounded-full bg-white/15 border border-white/20 text-white shadow-sm">
+      {children}
+    </span>
+  );
+}
+
+
   // Lightbox holati (faqat jihozlar & galereya uchun)
   const [lbOpen, setLbOpen] = useState(false);
   const [lbImages, setLbImages] = useState([]);
@@ -435,54 +445,17 @@ export default function EMCLabUltra() {
           </div>
         </section>
 
-/* === ABOUT: boyitilgan versiya (animatsiya + timeline + KPI) === */
-/* Komponent tepasida: */
-const [aboutTab, setAboutTab] = useState("results");
-
-/* Kichik yordamchi komponentlar */
-function Counter({ to = 100, duration = 1200, suffix = "" }) {
-  const [val, setVal] = useState(0);
-  useEffect(() => {
-    let raf, start;
-    const step = (ts) => {
-      if (!start) start = ts;
-      const p = Math.min((ts - start) / duration, 1);
-      setVal(Math.floor(p * to));
-      if (p < 1) raf = requestAnimationFrame(step);
-    };
-    raf = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(raf);
-  }, [to, duration]);
-  return <span>{val}{suffix}</span>;
-}
-
-function Pill({ children }) {
-  return (
-    <span className="text-[11px] px-3 py-1 rounded-full bg-white/80 border border-black/10 shadow-sm">
-      {children}
-    </span>
-  );
-}
-
-function KpiCard({ title, children }) {
-  return (
-    <div className="rounded-2xl bg-white/70 border border-black/10 shadow-sm p-6 text-center">
-      <div className="text-2xl font-semibold">{children}</div>
-      <div className="mt-1 text-xs opacity-70">{title}</div>
-    </div>
-  );
-}
-
-/* ——— ABOUT SECTSIYA ——— */
 <Section
   id="about"
   title={t("Biz haqimizda", "О нас")}
   subtitle={t(
     "ISO/IEC 17025 doirasida akkreditatsiya qilingan EMC laboratoriyasi. Natija, shaffoflik va tezkor aloqa — bir joyda.",
-    "Лаборатория ЭМС, аккредитованная по ISO/IEC 17025. Результат, прозрачность и быстрая связь — в одном месте."
+    "Лаборатория ЭМС, аккредитованная по ISO/IEC 17025. Прозрачность и быстрая связь — в одном месте."
   )}
 >
-  <div className="rounded-3xl border border-black/10 p-6 md:p-8 bg-gradient-to-br from-sky-50 to-cyan-50 dark:from-slate-900/50 dark:to-slate-800/40">
+  <div className="rounded-3xl border border-white/15 p-6 md:p-8 
+                  text-white bg-gradient-to-r from-sky-700 to-cyan-600">
+
     {/* chips */}
     <div className="flex flex-wrap gap-2 mb-5">
       <Pill>O’ZAK.SL.0309</Pill>
@@ -491,22 +464,20 @@ function KpiCard({ title, children }) {
       <Pill>{t("Tezkor aloqa","Оперативная связь")}</Pill>
     </div>
 
-    {/* tabs */}
+    {/* tabs (Natijalar olib tashlangan) */}
     <div className="flex flex-wrap gap-2">
       {[
         { key: "innov", uz: "Innovatsiyalar", ru: "Инновации" },
         { key: "process", uz: "Jarayon", ru: "Процесс" },
         { key: "quality", uz: "Sifat", ru: "Качество" },
-        { key: "results", uz: "Natijalar", ru: "Результаты" },
       ].map((tab) => (
         <button
           key={tab.key}
           onClick={() => setAboutTab(tab.key)}
-          className={`text-sm px-4 py-2 rounded-xl border transition ${
-            aboutTab === tab.key
-              ? "bg-gray-900 text-white border-gray-900"
-              : "bg-white/70 border-black/10 hover:bg-white"
-          }`}
+          className={`text-sm px-4 py-2 rounded-xl border transition
+            ${aboutTab === tab.key
+              ? "bg-white text-sky-800 border-white"
+              : "bg-white/10 border-white/20 text-white hover:bg-white/20"}`}
         >
           {t(tab.uz, tab.ru)}
         </button>
@@ -518,33 +489,33 @@ function KpiCard({ title, children }) {
       {/* Innovatsiyalar */}
       {aboutTab === "innov" && (
         <div className="grid md:grid-cols-3 gap-4">
-          <Card className="p-5">
+          <div className="rounded-2xl bg-white/10 border border-white/20 p-5">
             <div className="text-sm font-semibold mb-1">{t("Onlayn monitoring","Онлайн-мониторинг")}</div>
-            <p className="text-sm text-gray-700 dark:text-gray-300">
+            <p className="text-sm/6 text-white/90">
               {t("Parametrlar real vaqt rejimida log qilinadi, jarayonni mijoz kabinetidan ko‘rasiz.",
                  "Параметры логируются в реальном времени, доступ в кабинете клиента.")}
             </p>
-          </Card>
-          <Card className="p-5">
+          </div>
+          <div className="rounded-2xl bg-white/10 border border-white/20 p-5">
             <div className="text-sm font-semibold mb-1">{t("QR-kodli protokollar","Протоколы с QR-кодом")}</div>
-            <p className="text-sm text-gray-700 dark:text-gray-300">
+            <p className="text-sm/6 text-white/90">
               {t("Har bir protokol QR orqali tekshiriladi — qalbakilashtirishdan himoya.",
                  "Каждый протокол проверяется по QR — защита от подделок.")}
             </p>
-          </Card>
-          <Card className="p-5">
+          </div>
+          <div className="rounded-2xl bg-white/10 border border-white/20 p-5">
             <div className="text-sm font-semibold mb-1">{t("IEC/CISPR presetlar","Пресеты IEC/CISPR")}</div>
-            <p className="text-sm text-gray-700 dark:text-gray-300">
+            <p className="text-sm/6 text-white/90">
               {t("Standartlarga tayyor raqamli presetlar sinov vaqtini qisqartiradi.",
-                 "Готовые цифровые пресеты по стандартам сокращают время.")}
+                 "Готовые пресеты по стандартам сокращают время.")}
             </p>
-          </Card>
+          </div>
         </div>
       )}
 
       {/* Jarayon (timeline) */}
       {aboutTab === "process" && (
-        <Card className="p-5">
+        <div className="rounded-2xl bg-white/10 border border-white/20 p-5">
           <div className="text-sm font-semibold mb-3">{t("Ish jarayoni","Как мы работаем")}</div>
           <div className="grid sm:grid-cols-5 gap-3">
             {[
@@ -554,79 +525,50 @@ function KpiCard({ title, children }) {
               t("Tahlil","Аналитика"),
               t("Protokol","Протокол"),
             ].map((s,i)=>(
-              <div key={i} className="rounded-2xl border border-black/10 bg-white/80 p-4 text-center">
-                <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-gradient-to-br from-sky-500 to-cyan-500 text-white flex items-center justify-center text-sm font-semibold">{i+1}</div>
-                <div className="text-xs">{s}</div>
+              <div key={i} className="rounded-2xl bg-white/10 border border-white/20 p-4 text-center">
+                <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-white text-sky-800 
+                                flex items-center justify-center text-sm font-semibold">{i+1}</div>
+                <div className="text-xs text-white/90">{s}</div>
               </div>
             ))}
           </div>
-        </Card>
+        </div>
       )}
 
-      {/* Sifat (nazorat nuqtalari + standartlar) */}
+      {/* Sifat */}
       {aboutTab === "quality" && (
         <div className="grid md:grid-cols-2 gap-4">
-          <Card className="p-5">
+          <div className="rounded-2xl bg-white/10 border border-white/20 p-5">
             <div className="text-sm font-semibold mb-2">{t("Nazorat nuqtalari","Точки контроля")}</div>
-            <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+            <ul className="text-sm text-white/90 space-y-1">
               <li>• {t("Kalibrlangan jihozlar","Калиброванное оборудование")}</li>
               <li>• {t("Takrorlanuvchanlik protokoli","Протокол воспроизводимости")}</li>
               <li>• {t("Foto & o‘lchash loglari","Фото и логи измерений")}</li>
             </ul>
-          </Card>
-          <Card className="p-5">
+          </div>
+          <div className="rounded-2xl bg-white/10 border border-white/20 p-5">
             <div className="text-sm font-semibold mb-2">{t("Standartlar","Стандарты")}</div>
             <div className="flex flex-wrap gap-2">
               {["IEC 61000-4-2","IEC 61000-4-4","IEC 61000-4-5","CISPR 14-1","IEC 61000-3-2/3"].map((s,i)=>(
-                <Pill key={i}>{s}</Pill>
+                <span key={i} className="text-[11px] px-3 py-1 rounded-full bg-white text-sky-800">{s}</span>
               ))}
             </div>
-          </Card>
+          </div>
         </div>
       )}
 
-      {/* Natijalar (KPI + CTA) */}
-      {aboutTab === "results" && (
-        <>
-          <div className="grid md:grid-cols-3 gap-4">
-            <KpiCard title={t("yakunlangan sinov","завершённых испытаний")}>
-              <Counter to={1200} suffix="+" />
-            </KpiCard>
-            <KpiCard title={t("qoniqish","удовлетворённость")}>
-              <Counter to={98} suffix="%" />
-            </KpiCard>
-            <KpiCard title={t("tezkor javob","быстрый ответ")}>
-              <Counter to={24} suffix="h" />
-            </KpiCard>
-          </div>
-
-          <div className="mt-4 flex items-center gap-3">
-            <Card className="flex-1 p-4">
-              <div className="text-sm text-gray-700 dark:text-gray-300">
-                {t("Mahsulotingiz uchun dastur tuzib beramiz — qisqa brif kifoya.",
-                   "Составим программу испытаний под ваш продукт — достаточно короткого брифа.")}
-              </div>
-            </Card>
-            <a href="#contact" className="rounded-xl bg-gray-900 text-white px-5 py-3 text-sm font-medium hover:opacity-90">
-              {t("Aloqaga chiqish","Связаться")}
-            </a>
-          </div>
-        </>
-      )}
-
-      {/* Hamkorlar (ixtiyoriy logotiplar) */}
+      {/* Hamkorlar */}
       <div className="mt-6">
         <div className="text-sm font-semibold mb-2">{t("Hamkorlarimiz","Наши партнёры")}</div>
-        <div className="flex items-center gap-6 opacity-80">
-          <img src="/partners/uztest.svg" alt="UZTEST" className="h-7 grayscale hover:grayscale-0 transition" />
-          <img src="/partners/tuv.svg" alt="TÜV SÜD" className="h-7 grayscale hover:grayscale-0 transition" />
-          <img src="/partners/autosert.svg" alt="Autosert" className="h-7 grayscale hover:grayscale-0 transition" />
+        <div className="flex items-center gap-6 opacity-90">
+          <img src="/partners/uztest.svg" alt="UZTEST" className="h-7 invert brightness-200" />
+          <img src="/partners/tuv.svg" alt="TÜV SÜD" className="h-7 invert brightness-200" />
+          <img src="/partners/autosert.svg" alt="Autosert" className="h-7 invert brightness-200" />
         </div>
       </div>
     </div>
   </div>
 </Section>
-
 
 
 
