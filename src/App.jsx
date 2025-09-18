@@ -439,6 +439,9 @@ export default function EMCLabUltra() {
           </div>
         </section>
 
+
+
+
 {/* ABOUT */}
 <Section
   id="about"
@@ -448,46 +451,7 @@ export default function EMCLabUltra() {
     "EMC-лаборатория, аккредитованная по ISO/IEC 17025. Ниже смотрите, с какими инновациями мы работаем."
   )}
 >
-  <div className="rounded-3xl bg-gradient-to-r from-sky-700 to-cyan-600 text-white shadow-lg p-8 space-y-8">
-    <div className="grid md:grid-cols-3 gap-6">
-      <Card className="p-6 bg-white/10 hover:bg-white/20 transition text-center text-white">
-        <h4 className="text-lg font-semibold mb-2">{t("Onlayn monitoring", "Онлайн-мониторинг")}</h4>
-        <p className="text-sm opacity-90">
-          {t(
-            "Sinov vaqtida parametrlarni real vaqt rejimida kuzatamiz va elektron jurnalga yozamiz.",
-            "Во время испытаний параметры фиксируются в реальном времени и сохраняются в электронный журнал."
-          )}
-        </p>
-      </Card>
-      <Card className="p-6 bg-white/10 hover:bg-white/20 transition text-center text-white">
-        <h4 className="text-lg font-semibold mb-2">{t("QR-kodli protokollar", "Протоколы с QR-кодом")}</h4>
-        <p className="text-sm opacity-90">
-          {t(
-            "Har bir protokolga QR-kod biriktiriladi: w/c, muvofiqlik, revisiya tarixini tez tekshirish mumkin.",
-            "Каждый протокол снабжен QR-кодом: можно быстро проверить соответствие и историю ревизий."
-          )}
-        </p>
-      </Card>
-      <Card className="p-6 bg-white/10 hover:bg-white/20 transition text-center text-white">
-        <h4 className="text-lg font-semibold mb-2">{t("Raqamli presetlar", "Цифровые пресеты")}</h4>
-        <p className="text-sm opacity-90">
-          {t(
-            "IEC/CISPR talablariga ko‘ra tayyor presetlar: tez sozlash, kam xato.",
-            "Готовые пресеты для испытаний по IEC/CISPR: быстрое конфигурирование и минимум ошибок."
-          )}
-        </p>
-      </Card>
-    </div>
 
-    <div className="mt-8">
-      <h4 className="text-lg font-semibold mb-3">{t("Hamkorlarimiz", "Наши партнёры")}</h4>
-      <div className="flex items-center gap-6">
-        <img src="/partners/uztest.png" alt="UZTEST" className="h-10" />
-        <img src="/partners/tuvsud.png" alt="TÜV SÜD" className="h-10" />
-        <img src="/partners/autosert.png" alt="Autosert" className="h-10" />
-      </div>
-    </div>
-  </div>
 </Section>
 
 
