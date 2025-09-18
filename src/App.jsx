@@ -444,65 +444,48 @@ export default function EMCLabUltra() {
   id="about"
   title={t("Biz haqimizda", "О нас")}
   subtitle={t(
-    "EMC laboratoriyasi haqida umumiy ma’lumot",
-    "Общая информация об EMC-лаборатории"
+    "ISO/IEC 17025 doirasida akkreditatsiya qilingan EMC laboratoriyasi. Quyida qanday innovatsiyalar bilan ishlashimizni ko‘ring.",
+    "EMC-лаборатория, аккредитованная по ISO/IEC 17025. Ниже смотрите, с какими инновациями мы работаем."
   )}
 >
   <div className="rounded-3xl bg-gradient-to-r from-sky-700 to-cyan-600 text-white shadow-lg p-8 space-y-8">
-    <div className="grid md:grid-cols-2 gap-8 items-center">
-      <div>
-        <h3 className="text-2xl font-semibold mb-4">
-          {t("Laboratoriyamiz tarixi va maqsadi", "История и цель нашей лаборатории")}
-        </h3>
-        <p className="text-sm leading-relaxed opacity-90">
+    <div className="grid md:grid-cols-3 gap-6">
+      <Card className="p-6 bg-white/10 hover:bg-white/20 transition text-center text-white">
+        <h4 className="text-lg font-semibold mb-2">{t("Onlayn monitoring", "Онлайн-мониторинг")}</h4>
+        <p className="text-sm opacity-90">
           {t(
-            "Piskentdagi Elektromagnit Moslashuvchanlik (EMC) laboratoriyasi 2023-yildan boshlab faoliyat yuritib kelmoqda. Bizning asosiy maqsadimiz – O‘zbekiston va mintaqadagi ishlab chiqaruvchilarni xalqaro IEC/CISPR standartlariga mos sertifikatsiya sinovlari bilan ta’minlash.",
-            "EMC-лаборатория в Пскенте функционирует с 2023 года. Наша главная цель – обеспечить производителей Узбекистана и региона сертификационными испытаниями в соответствии с международными стандартами IEC/CISPR."
+            "Sinov vaqtida parametrlarni real vaqt rejimida kuzatamiz va elektron jurnalga yozamiz.",
+            "Во время испытаний параметры фиксируются в реальном времени и сохраняются в электронный журнал."
           )}
         </p>
-      </div>
-      <div className="rounded-2xl overflow-hidden shadow-lg">
-        <img src="/hero/anechoic.jpg" alt="lab about" className="w-full h-full object-cover" />
-      </div>
+      </Card>
+      <Card className="p-6 bg-white/10 hover:bg-white/20 transition text-center text-white">
+        <h4 className="text-lg font-semibold mb-2">{t("QR-kodli protokollar", "Протоколы с QR-кодом")}</h4>
+        <p className="text-sm opacity-90">
+          {t(
+            "Har bir protokolga QR-kod biriktiriladi: w/c, muvofiqlik, revisiya tarixini tez tekshirish mumkin.",
+            "Каждый протокол снабжен QR-кодом: можно быстро проверить соответствие и историю ревизий."
+          )}
+        </p>
+      </Card>
+      <Card className="p-6 bg-white/10 hover:bg-white/20 transition text-center text-white">
+        <h4 className="text-lg font-semibold mb-2">{t("Raqamli presetlar", "Цифровые пресеты")}</h4>
+        <p className="text-sm opacity-90">
+          {t(
+            "IEC/CISPR talablariga ko‘ra tayyor presetlar: tez sozlash, kam xato.",
+            "Готовые пресеты для испытаний по IEC/CISPR: быстрое конфигурирование и минимум ошибок."
+          )}
+        </p>
+      </Card>
     </div>
 
-    <div className="grid md:grid-cols-3 gap-6 mt-8">
-      <Card className="p-6 bg-white/10 hover:bg-white/20 transition text-center text-white">
-        <div className="text-3xl mb-3">🎯</div>
-        <h4 className="text-lg font-semibold mb-2">
-          {t("Bizning vazifamiz", "Наша миссия")}
-        </h4>
-        <p className="text-sm opacity-90">
-          {t(
-            "Mahsulotlarning elektromagnit moslashuvchanligini aniq, tez va ishonchli tekshirish.",
-            "Точное, быстрое и надежное тестирование электромагнитной совместимости продукции."
-          )}
-        </p>
-      </Card>
-      <Card className="p-6 bg-white/10 hover:bg-white/20 transition text-center text-white">
-        <div className="text-3xl mb-3">🌍</div>
-        <h4 className="text-lg font-semibold mb-2">
-          {t("Global standartlar", "Международные стандарты")}
-        </h4>
-        <p className="text-sm opacity-90">
-          {t(
-            "IEC va CISPR xalqaro standartlariga asoslangan sinovlar.",
-            "Испытания на основе международных стандартов IEC и CISPR."
-          )}
-        </p>
-      </Card>
-      <Card className="p-6 bg-white/10 hover:bg-white/20 transition text-center text-white">
-        <div className="text-3xl mb-3">🤝</div>
-        <h4 className="text-lg font-semibold mb-2">
-          {t("Hamkorlik", "Сотрудничество")}
-        </h4>
-        <p className="text-sm opacity-90">
-          {t(
-            "Yevropa va Osiyodagi akkreditatsiya markazlari bilan hamkorlik.",
-            "Сотрудничество с аккредитационными центрами Европы и Азии."
-          )}
-        </p>
-      </Card>
+    <div className="mt-8">
+      <h4 className="text-lg font-semibold mb-3">{t("Hamkorlarimiz", "Наши партнёры")}</h4>
+      <div className="flex items-center gap-6">
+        <img src="/partners/uztest.png" alt="UZTEST" className="h-10" />
+        <img src="/partners/tuvsud.png" alt="TÜV SÜD" className="h-10" />
+        <img src="/partners/autosert.png" alt="Autosert" className="h-10" />
+      </div>
     </div>
   </div>
 </Section>
