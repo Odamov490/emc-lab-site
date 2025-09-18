@@ -836,6 +836,8 @@ export default function EMCLabUltra() {
         onPrev={() => prevLb(-1)}
         onNext={() => nextLb(1)}
       />
+      <ScrollToTopButton />
+
     </div>
   );
 }
