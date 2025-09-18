@@ -442,9 +442,11 @@ export default function EMCLabUltra() {
     {TESTS.map((tst, i) => (
       <Card
         key={i}
-        className="relative p-6 hover:shadow-lg transition bg-gradient-to-r from-sky-700 to-cyan-600 text-white"
+        // >>> MUHIM: relative va bir xil padding/gradient
+        className="relative p-6 hover:shadow-lg transition 
+                   bg-gradient-to-r from-sky-700 to-cyan-600 text-white"
       >
-        {/* Badge – doim yuqorida o‘ng burchakda */}
+        {/* doim yuqori-o‘ng burchakda */}
         <span
           className="absolute top-3 right-3 inline-flex max-w-[60%] truncate
                      items-center rounded-full px-3 py-1
@@ -453,7 +455,7 @@ export default function EMCLabUltra() {
           {tst.code}
         </span>
 
-        {/* Content */}
+        {/* Matn – badge bilan to‘qnashmasin */}
         <h3 className="text-base font-semibold flex items-center gap-2 pr-32 drop-shadow">
           <span className="text-xl">{tst.icon}</span>
           {tst.title}
@@ -463,7 +465,8 @@ export default function EMCLabUltra() {
 
         <a
           href="#contact"
-          className="mt-4 inline-block text-sm font-medium underline decoration-white/80 hover:decoration-2"
+          className="mt-4 inline-block text-sm font-medium underline 
+                     decoration-white/80 hover:decoration-2"
         >
           {t("Buyurtma berish", "Заказать")}
         </a>
