@@ -9,7 +9,8 @@ const NAV = [
   { href: "#accreditation", label: { uz: "Akkreditatsiya", ru: "Аккредитация" } },
   { href: "#contact", label: { uz: "Bog‘lanish", ru: "Контакты" } },
 ];
-const [aboutTab, setAboutTab] = useState("innovations");
+
+
 
 
 const TESTS = [
@@ -295,6 +296,7 @@ export default function EMCLabUltra() {
   const [dark, setDark] = useState(false);
   const [sending, setSending] = useState(false); // kontakt forma holati
   const t = (uz, ru) => (lang === "uz" ? uz : ru);
+  const [aboutTab, setAboutTab] = useState("innovations");
 
   // Lightbox holati (faqat jihozlar & galereya uchun)
   const [lbOpen, setLbOpen] = useState(false);
