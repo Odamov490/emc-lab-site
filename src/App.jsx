@@ -299,13 +299,7 @@ export default function EMCLabUltra() {
   const [aboutTab, setAboutTab] = useState("innovations");
 
 
-function Pill({ children }) {
-  return (
-    <span className="text-[11px] px-3 py-1 rounded-full bg-white/15 border border-white/20 text-white shadow-sm">
-      {children}
-    </span>
-  );
-}
+
 
 
   // Lightbox holati (faqat jihozlar & galereya uchun)
