@@ -440,18 +440,89 @@ export default function EMCLabUltra() {
         </section>
 
 
-
-
-{/* ABOUT */}
 <Section
   id="about"
   title={t("Biz haqimizda", "О нас")}
   subtitle={t(
-    "ISO/IEC 17025 doirasida akkreditatsiya qilingan EMC laboratoriyasi. Quyida qanday innovatsiyalar bilan ishlashimizni ko‘ring.",
-    "EMC-лаборатория, аккредитованная по ISO/IEC 17025. Ниже смотрите, с какими инновациями мы работаем."
+    "ISO/IEC 17025 doirasida akkreditatsiyadan o‘tgan EMC laboratoriyasi (O’ZAK.SL.0309). 2021-yildan buyon elektromagnit moslashuvchanlik sinovlarini o‘tkazamiz.",
+    "EMC-лаборатория, аккредитованная по ISO/IEC 17025 (O’ZAK.SL.0309). С 2021 года проводим испытания на электромагнитную совместимость."
   )}
 >
+  <div className="rounded-3xl bg-gradient-to-r from-sky-700 to-cyan-600 text-white shadow-lg p-6 sm:p-8 space-y-6">
+    <div className="space-y-3">
+      <h3 className="text-xl font-semibold">
+        {t("EMC sinovlari — Elektromagnit moslashuvchanlik", "EMC-испытания — Электромагнитная совместимость")}
+      </h3>
+      <p className="opacity-95">
+        {t(
+          "Elektr qurilma yoki komponentni bozorga chiqarishdan avval, u boshqa qurilmalar bilan muvofiq ishlashi shart. Bunga elektromagnit moslashuvchanlik (EMC) deyiladi. Bizning laboratoriya qurilmalaringizning emissiya va immunitet ko‘rsatkichlarini IEC/CISPR talablariga muvofiq tekshiradi — natijada mahsulotlar milliy va xalqaro standartlarga hamda EMC direktivasiga mos keladi.",
+          "Перед выводом электрического изделия или компонента на рынок необходимо убедиться, что оно не мешает работе других устройств и устойчиво к помехам. Это и есть электромагнитная совместимость (EMC). Наша лаборатория проверяет эмиссию и иммунитет по требованиям IEC/CISPR — чтобы продукция соответствовала национальным и международным стандартам и EMC-директиве."
+        )}
+      </p>
+    </div>
 
+    <div className="grid md:grid-cols-3 gap-4">
+      <div className="bg-white/10 rounded-2xl p-4">
+        <h4 className="font-semibold mb-1">{t("Afzalliklar", "Преимущества")}</h4>
+        <ul className="list-disc list-inside text-sm/6 opacity-95">
+          <li>{t("Elektr mahsulotini bozorda sotish uchun majburiy talablar bajariladi.", "Выполнение обязательных требований для вывода продукции на рынок.")}</li>
+          <li>{t("Xalqaro bozorga kirish imkoniyati kengayadi.", "Доступ к международным рынкам.")}</li>
+          <li>{t("Qurilmalar xavfsiz va ishonchli ishlashi ta’minlanadi.", "Гарантируется безопасная и надежная работа устройств.")}</li>
+        </ul>
+      </div>
+
+      <div className="bg-white/10 rounded-2xl p-4">
+        <h4 className="font-semibold mb-1">{t("Biz nima qilamiz", "Что мы проверяем")}</h4>
+        <p className="text-sm opacity-95">
+          {t(
+            "Har qanday elektr qurilma va komponent uchun EMC sinovlari: emissiya (chiqish) va immunitet (barqarorlik) darajalari o‘lchanadi hamda EMC direktivalari talablari bilan taqqoslanadi.",
+            "Проводим EMC-испытания практически для любых электрических устройств и компонентов: измеряем уровни эмиссии и устойчивости к помехам и сопоставляем с требованиями EMC-директив."
+          )}
+        </p>
+      </div>
+
+      <div className="bg-white/10 rounded-2xl p-4">
+        <h4 className="font-semibold mb-1">{t("Natijalar", "Результат")}</h4>
+        <p className="text-sm opacity-95">
+          {t(
+            "Mahsulotlaringiz elektromagnit shovqinlarga bardoshliligi va chiqish darajalari me’yordan pastligi bo‘yicha hujjatli tasdiqqa ega bo‘ladi.",
+            "Вы получаете подтверждение устойчивости к помехам и того, что уровни излучения вашей продукции ниже установленных норм."
+          )}
+        </p>
+      </div>
+    </div>
+
+    <div>
+      <h4 className="font-semibold mb-2">{t("Qo‘llaniladigan qurilmalar", "Области применения")}</h4>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 text-sm">
+        {[
+          t("Aqlli qurilmalar (smart devices)", "Умные устройства (smart devices)"),
+          t("Mobil/wireless mahsulotlar", "Портативные и беспроводные изделия"),
+          t("Sanoat, ilmiy va tibbiyot qurilmalari", "Промышленные, научные и медицинские приборы"),
+          t("O‘lchov va laboratoriya jihozlari", "Измерительное и лабораторное оборудование"),
+          t("Elektr komponentlar (kalit, dimmer va b.)", "Электрокомпоненты (выключатели, диммеры и др.)"),
+          t("Quvvat manbalari, elektronika (UPS, PV-invertor)", "Источники питания, электроника (ИБП, PV-инверторы)"),
+          t("Maishiy texnika", "Бытовая техника"),
+          t("Elektr asboblar", "Электроинструмент"),
+          t("Elektr o‘yinchoqlar", "Электронные игрушки"),
+          t("Yoritish mahsulotlari", "Светотехника"),
+          t("Iste’molchi elektronika", "Потребительская электроника"),
+          t("IT va ofis uskunalari", "IT и офисное оборудование"),
+          t("Audio-video qurilmalar", "Аудио-видео аппаратура"),
+          t("Telekommunikatsiya qurilmalari", "Телекоммуникационное оборудование"),
+        ].map((item, i) => (
+          <div key={i} className="bg-white/10 rounded-xl px-3 py-2">{item}</div>
+        ))}
+      </div>
+    </div>
+
+    <div className="text-xs opacity-80">
+      {t(
+        "Izoh: metodlar va sinov usullari (IEC/CISPR) hamda jihozlar ro‘yxati amaldagi tartib bo‘yicha qo‘llanadi.",
+        "Примечание: методики и процедуры испытаний (IEC/CISPR), а также перечень оборудования применяются в действующей редакции."
+      )}
+    </div>
+  </div>
 </Section>
 
 
