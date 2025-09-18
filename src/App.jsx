@@ -9,6 +9,7 @@ const NAV = [
   { href: "#accreditation", label: { uz: "Akkreditatsiya", ru: "Аккредитация" } },
   { href: "#contact", label: { uz: "Bog‘lanish", ru: "Контакты" } },
 ];
+const [aboutTab, setAboutTab] = useState("innovations");
 
 
 const TESTS = [
