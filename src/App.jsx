@@ -439,130 +439,40 @@ export default function EMCLabUltra() {
           </div>
         </section>
 
+
+{/* INNOVATION SECTION */}
 <Section
-  id="about"
-  title={t("Biz haqimizda", "О нас")}
-  subtitle={t(
-    "ISO/IEC 17025 doirasida akkreditatsiya qilingan EMC laboratoriyasi. Natija, shaffoflik va tezkor aloqa — bir joyda.",
-    "Лаборатория ЭМС, аккредитованная по ISO/IEC 17025. Прозрачность и быстрая связь — в одном месте."
-  )}
+  id="innovation"
+  title={t("Innovatsiyalar", "Инновации")}
+  subtitle={t("Bizning laboratoriyada joriy etilgan zamonaviy texnologiyalar", "Современные технологии в нашей лаборатории")}
 >
-  <div className="rounded-3xl border border-white/15 p-6 md:p-8 
-                  text-white bg-gradient-to-r from-sky-700 to-cyan-600">
-
-    {/* chips */}
-    <div className="flex flex-wrap gap-2 mb-5">
-      <Pill>O’ZAK.SL.0309</Pill>
-      <Pill>ISO/IEC 17025</Pill>
-      <Pill>{t("QR-kodli protokollar","Протоколы с QR-кодом")}</Pill>
-      <Pill>{t("Tezkor aloqa","Оперативная связь")}</Pill>
-    </div>
-
-    {/* tabs (Natijalar olib tashlangan) */}
-    <div className="flex flex-wrap gap-2">
-      {[
-        { key: "innov", uz: "Innovatsiyalar", ru: "Инновации" },
-        { key: "process", uz: "Jarayon", ru: "Процесс" },
-        { key: "quality", uz: "Sifat", ru: "Качество" },
-      ].map((tab) => (
-        <button
-          key={tab.key}
-          onClick={() => setAboutTab(tab.key)}
-          className={`text-sm px-4 py-2 rounded-xl border transition
-            ${aboutTab === tab.key
-              ? "bg-white text-sky-800 border-white"
-              : "bg-white/10 border-white/20 text-white hover:bg-white/20"}`}
-        >
-          {t(tab.uz, tab.ru)}
-        </button>
-      ))}
-    </div>
-
-    {/* CONTENT */}
-    <div className="mt-6">
-      {/* Innovatsiyalar */}
-      {aboutTab === "innov" && (
-        <div className="grid md:grid-cols-3 gap-4">
-          <div className="rounded-2xl bg-white/10 border border-white/20 p-5">
-            <div className="text-sm font-semibold mb-1">{t("Onlayn monitoring","Онлайн-мониторинг")}</div>
-            <p className="text-sm/6 text-white/90">
-              {t("Parametrlar real vaqt rejimida log qilinadi, jarayonni mijoz kabinetidan ko‘rasiz.",
-                 "Параметры логируются в реальном времени, доступ в кабинете клиента.")}
-            </p>
-          </div>
-          <div className="rounded-2xl bg-white/10 border border-white/20 p-5">
-            <div className="text-sm font-semibold mb-1">{t("QR-kodli protokollar","Протоколы с QR-кодом")}</div>
-            <p className="text-sm/6 text-white/90">
-              {t("Har bir protokol QR orqali tekshiriladi — qalbakilashtirishdan himoya.",
-                 "Каждый протокол проверяется по QR — защита от подделок.")}
-            </p>
-          </div>
-          <div className="rounded-2xl bg-white/10 border border-white/20 p-5">
-            <div className="text-sm font-semibold mb-1">{t("IEC/CISPR presetlar","Пресеты IEC/CISPR")}</div>
-            <p className="text-sm/6 text-white/90">
-              {t("Standartlarga tayyor raqamli presetlar sinov vaqtini qisqartiradi.",
-                 "Готовые пресеты по стандартам сокращают время.")}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Jarayon (timeline) */}
-      {aboutTab === "process" && (
-        <div className="rounded-2xl bg-white/10 border border-white/20 p-5">
-          <div className="text-sm font-semibold mb-3">{t("Ish jarayoni","Как мы работаем")}</div>
-          <div className="grid sm:grid-cols-5 gap-3">
-            {[
-              t("Brif","Бриф"),
-              t("Dastur","Программа"),
-              t("Sinovlar","Испытания"),
-              t("Tahlil","Аналитика"),
-              t("Protokol","Протокол"),
-            ].map((s,i)=>(
-              <div key={i} className="rounded-2xl bg-white/10 border border-white/20 p-4 text-center">
-                <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-white text-sky-800 
-                                flex items-center justify-center text-sm font-semibold">{i+1}</div>
-                <div className="text-xs text-white/90">{s}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Sifat */}
-      {aboutTab === "quality" && (
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="rounded-2xl bg-white/10 border border-white/20 p-5">
-            <div className="text-sm font-semibold mb-2">{t("Nazorat nuqtalari","Точки контроля")}</div>
-            <ul className="text-sm text-white/90 space-y-1">
-              <li>• {t("Kalibrlangan jihozlar","Калиброванное оборудование")}</li>
-              <li>• {t("Takrorlanuvchanlik protokoli","Протокол воспроизводимости")}</li>
-              <li>• {t("Foto & o‘lchash loglari","Фото и логи измерений")}</li>
-            </ul>
-          </div>
-          <div className="rounded-2xl bg-white/10 border border-white/20 p-5">
-            <div className="text-sm font-semibold mb-2">{t("Standartlar","Стандарты")}</div>
-            <div className="flex flex-wrap gap-2">
-              {["IEC 61000-4-2","IEC 61000-4-4","IEC 61000-4-5","CISPR 14-1","IEC 61000-3-2/3"].map((s,i)=>(
-                <span key={i} className="text-[11px] px-3 py-1 rounded-full bg-white text-sky-800">{s}</span>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Hamkorlar */}
-      <div className="mt-6">
-        <div className="text-sm font-semibold mb-2">{t("Hamkorlarimiz","Наши партнёры")}</div>
-        <div className="flex items-center gap-6 opacity-90">
-          <img src="/partners/uztest.svg" alt="UZTEST" className="h-7 invert brightness-200" />
-          <img src="/partners/tuv.svg" alt="TÜV SÜD" className="h-7 invert brightness-200" />
-          <img src="/partners/autosert.svg" alt="Autosert" className="h-7 invert brightness-200" />
-        </div>
-      </div>
+  <div className="rounded-3xl bg-gradient-to-r from-sky-700 to-cyan-600 text-white shadow-lg p-8 space-y-6">
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <Card className="p-6 bg-white/10 hover:bg-white/20 transition text-center">
+        <div className="text-3xl mb-3">🤖</div>
+        <h3 className="text-lg font-semibold">{t("AI yordamida test nazorati", "Контроль испытаний с помощью ИИ")}</h3>
+        <p className="text-sm opacity-90">
+          {t("Sun’iy intellekt yordamida test jarayonlarini tez va aniq kuzatish.", "Искусственный интеллект для быстрой и точной проверки испытаний.")}
+        </p>
+      </Card>
+      <Card className="p-6 bg-white/10 hover:bg-white/20 transition text-center">
+        <div className="text-3xl mb-3">🌐</div>
+        <h3 className="text-lg font-semibold">{t("Onlayn monitoring", "Онлайн мониторинг")}</h3>
+        <p className="text-sm opacity-90">
+          {t("Natijalarni real vaqt rejimida kuzatish va tahlil qilish imkoniyati.", "Возможность отслеживать и анализировать результаты в реальном времени.")}
+        </p>
+      </Card>
+      <Card className="p-6 bg-white/10 hover:bg-white/20 transition text-center">
+        <div className="text-3xl mb-3">🔬</div>
+        <h3 className="text-lg font-semibold">{t("Yuqori aniqlikdagi o‘lchovlar", "Высокоточные измерения")}</h3>
+        <p className="text-sm opacity-90">
+          {t("So‘nggi avlod uskunalari yordamida yuqori aniqlikda o‘lchovlar.", "Высокоточные измерения с использованием оборудования нового поколения.")}
+        </p>
+      </Card>
     </div>
   </div>
 </Section>
+
 
 
 

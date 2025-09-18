@@ -2,3 +2,4 @@
 @tailwind components;
 @tailwind utilities;
 html { scroll-behavior: smooth; }
+bg-gradient-to-r from-sky-700 to-cyan-600
