@@ -442,31 +442,26 @@ export default function EMCLabUltra() {
     {TESTS.map((tst, i) => (
       <Card
         key={i}
-        // >>> MUHIM: relative va bir xil padding/gradient
-        className="relative p-6 hover:shadow-lg transition 
-                   bg-gradient-to-r from-sky-700 to-cyan-600 text-white"
+        className="p-6 hover:shadow-lg transition bg-gradient-to-r from-sky-700 to-cyan-600 text-white"
       >
-        {/* doim yuqori-o‘ng burchakda */}
-        <span
-          className="absolute top-3 right-3 inline-flex max-w-[60%] truncate
-                     items-center rounded-full px-3 py-1
-                     text-xs font-medium bg-white text-gray-900 shadow-md"
-        >
-          {tst.code}
-        </span>
+        {/* ↑ sarlavha qatori: chapda icon+title, o‘ngda badge */}
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="text-base font-semibold flex items-start gap-2 drop-shadow">
+            <span className="text-xl leading-none">{tst.icon}</span>
+            <span>{tst.title}</span>
+          </h3>
+          <span className="shrink-0 inline-flex max-w-[60%] truncate items-center rounded-full px-3 py-1 text-xs font-medium bg-white text-gray-900 shadow-md">
+            {tst.code}
+          </span>
+        </div>
 
-        {/* Matn – badge bilan to‘qnashmasin */}
-        <h3 className="text-base font-semibold flex items-center gap-2 pr-32 drop-shadow">
-          <span className="text-xl">{tst.icon}</span>
-          {tst.title}
-        </h3>
-
-        <p className="mt-3 text-sm text-white/90 drop-shadow">{tst.note}</p>
+        <p className="mt-3 text-sm text-white/90 drop-shadow">
+          {tst.note}
+        </p>
 
         <a
           href="#contact"
-          className="mt-4 inline-block text-sm font-medium underline 
-                     decoration-white/80 hover:decoration-2"
+          className="mt-4 inline-block text-sm font-medium underline decoration-white/80 hover:decoration-2"
         >
           {t("Buyurtma berish", "Заказать")}
         </a>
@@ -474,6 +469,7 @@ export default function EMCLabUltra() {
     ))}
   </div>
 </Section>
+
 
 
 
