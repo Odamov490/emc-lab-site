@@ -429,8 +429,7 @@ export default function EMCLabUltra() {
             </div>
           </div>
         </section>
-
-     {/* SERVICES */}
+        
 {/* SERVICES */}
 <Section
   id="services"
@@ -438,50 +437,37 @@ export default function EMCLabUltra() {
   subtitle={t("IEC/CISPR talablari asosida to‘liq EMC dasturi", "Полный перечень EMC-испытаний по IEC/CISPR")}
 >
   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    {TESTS.map((tst, i) => {
-      // Agar title juda uzun bo‘lsa, faqat birinchi qismi yuqorida qolsin, qolganini note'ga qo‘shamiz
-      const maxLen = 45; // belgilar limiti
-      const title = tst.title.length > maxLen ? tst.title.slice(0, maxLen) + "…" : tst.title;
-      const extra =
-        tst.title.length > maxLen ? tst.title.slice(maxLen).trim() : null;
+    {TESTS.map((tst, i) => (
+      <Card
+        key={i}
+        className="p-6 hover:shadow-lg transition bg-gradient-to-r from-sky-700 to-cyan-600 text-white"
+      >
+        {/* ↑ sarlavha qatori: chapda icon+title, o‘ngda badge */}
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="text-base font-semibold flex items-start gap-2 drop-shadow">
+            <span className="text-xl leading-none">{tst.icon}</span>
+            <span>{tst.title}</span>
+          </h3>
+          <span className="shrink-0 inline-flex max-w-[60%] truncate items-center rounded-full px-3 py-1 text-xs font-medium bg-white text-gray-900 shadow-md">
+            {tst.code}
+          </span>
+        </div>
 
-      return (
-        <Card
-          key={i}
-          className="p-6 hover:shadow-lg transition bg-gradient-to-r from-sky-700 to-cyan-600 text-white"
+        <p className="mt-3 text-sm text-white/90 drop-shadow">
+          {tst.note}
+        </p>
+
+        <a
+          href="#contact"
+          className="mt-4 inline-block text-sm font-medium underline decoration-white/80 hover:decoration-2"
         >
-          <div className="flex items-start justify-between gap-3">
-            <h3 className="text-base font-semibold flex items-start gap-2 drop-shadow">
-              <span className="text-xl leading-none">{tst.icon}</span>
-              <span>{title}</span>
-            </h3>
-            <span className="shrink-0 inline-flex max-w-[60%] truncate items-center rounded-full px-3 py-1 text-xs font-medium bg-white text-gray-900 shadow-md">
-              {tst.code}
-            </span>
-          </div>
-
-          {/* Qo‘shimcha matn pastga tushadi */}
-          {extra && (
-            <p className="mt-2 text-sm font-medium text-white drop-shadow">
-              {extra}
-            </p>
-          )}
-
-          <p className="mt-2 text-sm text-white/90 drop-shadow">
-            {tst.note}
-          </p>
-
-          <a
-            href="#contact"
-            className="mt-4 inline-block text-sm font-medium underline decoration-white/80 hover:decoration-2"
-          >
-            {t("Buyurtma berish", "Заказать")}
-          </a>
-        </Card>
-      );
-    })}
+          {t("Buyurtma berish", "Заказать")}
+        </a>
+      </Card>
+    ))}
   </div>
 </Section>
+
 
 
 
