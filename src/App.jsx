@@ -431,8 +431,7 @@ export default function EMCLabUltra() {
         </section>
 
      {/* SERVICES */}
-{/* SERVICES */}
-{/* SERVICES */}
+
 {/* SERVICES */}
 <Section
   id="services"
@@ -443,19 +442,24 @@ export default function EMCLabUltra() {
     {TESTS.map((tst, i) => (
       <Card
         key={i}
-        className="group p-6 hover:shadow-lg transition bg-gradient-to-r from-sky-700 to-cyan-600 text-white"
+        className="relative p-6 hover:shadow-lg transition bg-gradient-to-r from-sky-700 to-cyan-600 text-white"
       >
-        <div className="flex items-center justify-between">
-          <h3 className="text-base font-semibold flex items-center gap-2 drop-shadow">
-            <span className="text-xl">{tst.icon}</span>
-            {tst.title}
-          </h3>
-          <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium 
-            bg-white text-gray-900 shadow-md">
-            {tst.code}
-          </span>
-        </div>
+        {/* Badge: doimiy yuqori-o‘ngda */}
+        <span
+          className="absolute top-3 right-3 inline-flex items-center rounded-full px-3 py-1
+                     text-xs font-medium bg-white text-gray-900 shadow-md"
+        >
+          {tst.code}
+        </span>
+
+        {/* Sarlavha + ikonka. pr-28: badge bilan to‘qnashmasin */}
+        <h3 className="pr-28 text-base font-semibold flex items-center gap-2 drop-shadow">
+          <span className="text-xl">{tst.icon}</span>
+          {tst.title}
+        </h3>
+
         <p className="mt-3 text-sm text-white/90 drop-shadow">{tst.note}</p>
+
         <a
           href="#contact"
           className="mt-4 inline-block text-sm font-medium underline decoration-white/80 hover:decoration-2"
@@ -466,6 +470,7 @@ export default function EMCLabUltra() {
     ))}
   </div>
 </Section>
+
 
 
 
