@@ -439,34 +439,68 @@ export default function EMCLabUltra() {
           </div>
         </section>
 
-
-{/* INNOVATION SECTION */}
+{/* ABOUT */}
 <Section
-  id="innovation"
-  title={t("Innovatsiyalar", "Инновации")}
-  subtitle={t("Bizning laboratoriyada joriy etilgan zamonaviy texnologiyalar", "Современные технологии в нашей лаборатории")}
+  id="about"
+  title={t("Biz haqimizda", "О нас")}
+  subtitle={t(
+    "EMC laboratoriyasi haqida umumiy ma’lumot",
+    "Общая информация об EMC-лаборатории"
+  )}
 >
-  <div className="rounded-3xl bg-gradient-to-r from-sky-700 to-cyan-600 text-white shadow-lg p-8 space-y-6">
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <Card className="p-6 bg-white/10 hover:bg-white/20 transition text-center">
-        <div className="text-3xl mb-3">🤖</div>
-        <h3 className="text-lg font-semibold">{t("AI yordamida test nazorati", "Контроль испытаний с помощью ИИ")}</h3>
+  <div className="rounded-3xl bg-gradient-to-r from-sky-700 to-cyan-600 text-white shadow-lg p-8 space-y-8">
+    <div className="grid md:grid-cols-2 gap-8 items-center">
+      <div>
+        <h3 className="text-2xl font-semibold mb-4">
+          {t("Laboratoriyamiz tarixi va maqsadi", "История и цель нашей лаборатории")}
+        </h3>
+        <p className="text-sm leading-relaxed opacity-90">
+          {t(
+            "Piskentdagi Elektromagnit Moslashuvchanlik (EMC) laboratoriyasi 2023-yildan boshlab faoliyat yuritib kelmoqda. Bizning asosiy maqsadimiz – O‘zbekiston va mintaqadagi ishlab chiqaruvchilarni xalqaro IEC/CISPR standartlariga mos sertifikatsiya sinovlari bilan ta’minlash.",
+            "EMC-лаборатория в Пскенте функционирует с 2023 года. Наша главная цель – обеспечить производителей Узбекистана и региона сертификационными испытаниями в соответствии с международными стандартами IEC/CISPR."
+          )}
+        </p>
+      </div>
+      <div className="rounded-2xl overflow-hidden shadow-lg">
+        <img src="/hero/anechoic.jpg" alt="lab about" className="w-full h-full object-cover" />
+      </div>
+    </div>
+
+    <div className="grid md:grid-cols-3 gap-6 mt-8">
+      <Card className="p-6 bg-white/10 hover:bg-white/20 transition text-center text-white">
+        <div className="text-3xl mb-3">🎯</div>
+        <h4 className="text-lg font-semibold mb-2">
+          {t("Bizning vazifamiz", "Наша миссия")}
+        </h4>
         <p className="text-sm opacity-90">
-          {t("Sun’iy intellekt yordamida test jarayonlarini tez va aniq kuzatish.", "Искусственный интеллект для быстрой и точной проверки испытаний.")}
+          {t(
+            "Mahsulotlarning elektromagnit moslashuvchanligini aniq, tez va ishonchli tekshirish.",
+            "Точное, быстрое и надежное тестирование электромагнитной совместимости продукции."
+          )}
         </p>
       </Card>
-      <Card className="p-6 bg-white/10 hover:bg-white/20 transition text-center">
-        <div className="text-3xl mb-3">🌐</div>
-        <h3 className="text-lg font-semibold">{t("Onlayn monitoring", "Онлайн мониторинг")}</h3>
+      <Card className="p-6 bg-white/10 hover:bg-white/20 transition text-center text-white">
+        <div className="text-3xl mb-3">🌍</div>
+        <h4 className="text-lg font-semibold mb-2">
+          {t("Global standartlar", "Международные стандарты")}
+        </h4>
         <p className="text-sm opacity-90">
-          {t("Natijalarni real vaqt rejimida kuzatish va tahlil qilish imkoniyati.", "Возможность отслеживать и анализировать результаты в реальном времени.")}
+          {t(
+            "IEC va CISPR xalqaro standartlariga asoslangan sinovlar.",
+            "Испытания на основе международных стандартов IEC и CISPR."
+          )}
         </p>
       </Card>
-      <Card className="p-6 bg-white/10 hover:bg-white/20 transition text-center">
-        <div className="text-3xl mb-3">🔬</div>
-        <h3 className="text-lg font-semibold">{t("Yuqori aniqlikdagi o‘lchovlar", "Высокоточные измерения")}</h3>
+      <Card className="p-6 bg-white/10 hover:bg-white/20 transition text-center text-white">
+        <div className="text-3xl mb-3">🤝</div>
+        <h4 className="text-lg font-semibold mb-2">
+          {t("Hamkorlik", "Сотрудничество")}
+        </h4>
         <p className="text-sm opacity-90">
-          {t("So‘nggi avlod uskunalari yordamida yuqori aniqlikda o‘lchovlar.", "Высокоточные измерения с использованием оборудования нового поколения.")}
+          {t(
+            "Yevropa va Osiyodagi akkreditatsiya markazlari bilan hamkorlik.",
+            "Сотрудничество с аккредитационными центрами Европы и Азии."
+          )}
         </p>
       </Card>
     </div>
