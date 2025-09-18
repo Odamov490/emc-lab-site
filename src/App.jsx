@@ -444,15 +444,16 @@ export default function EMCLabUltra() {
         key={i}
         className="relative p-6 hover:shadow-lg transition bg-gradient-to-r from-sky-700 to-cyan-600 text-white"
       >
-        {/* Badge: doim yuqorida o‘ngda */}
+        {/* Badge – doim yuqorida o‘ng burchakda */}
         <span
-          className="absolute top-3 right-3 inline-flex items-center rounded-full px-3 py-1
+          className="absolute top-3 right-3 inline-flex max-w-[60%] truncate
+                     items-center rounded-full px-3 py-1
                      text-xs font-medium bg-white text-gray-900 shadow-md"
         >
           {tst.code}
         </span>
 
-        {/* Sarlavha uchun badge joyini ochib qo‘yamiz */}
+        {/* Content */}
         <h3 className="text-base font-semibold flex items-center gap-2 pr-32 drop-shadow">
           <span className="text-xl">{tst.icon}</span>
           {tst.title}
