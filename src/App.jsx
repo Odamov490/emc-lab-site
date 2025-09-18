@@ -825,6 +825,7 @@ export default function EMCLabUltra() {
             </div>
           </div>
         </footer>
+         <ScrollToTopButton />
       </div>
 
       {/* LIGHTBOX (faqat jihozlar va galereya uchun) */}
@@ -836,7 +837,6 @@ export default function EMCLabUltra() {
         onPrev={() => prevLb(-1)}
         onNext={() => nextLb(1)}
       />
-      <ScrollToTopButton />
 
     </div>
   );
