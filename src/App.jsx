@@ -432,82 +432,120 @@ export default function EMCLabUltra() {
           </div>
         </section>
 
-{/* ABOUT / BIZ HAQIMIZDA */}
+{/* ABOUT */}
 <Section
   id="about"
   title={t("Biz haqimizda", "О нас")}
   subtitle={t(
-    "ISO/IEC 17025 doirasida EMC sinovlari. Mahalliy ishlab chiqaruvchilarni xalqaro bozorlarga chiqishda qo‘llab-quvvatlaymiz.",
-    "EMC-испытания в рамках ISO/IEC 17025. Поддерживаем локальных производителей в выходе на международные рынки."
+    "EMC laboratoriyasi — ISO/IEC 17025 doirasida akkreditatsiya qilingan zamonaviy sinov markazi. Mahsulotlarning elektromagnit moslashuvchanligini ishonchli va shaffof baholaymiz.",
+    "EMC лаборатория — современный испытательный центр, аккредитованный по ISO/IEC 17025. Надежно и прозрачно оцениваем электромагнитную совместимость изделий."
   )}
 >
-  <div className="grid md:grid-cols-3 gap-6">
-    {/* Missiya */}
-    <Card className="p-6">
-      <div className="text-sm font-semibold mb-2">{t("Missiyamiz", "Наша миссия")}</div>
-      <p className="text-sm text-gray-700 dark:text-gray-300">
-        {t(
-          "Mahsulotlarning elektromagnit moslashuvchanligini ishonchli, tez va shaffof tekshirish hamda sifatli tavsiyalar berish.",
-          "Надежно, быстро и прозрачно проверять электромагнитную совместимость продукции и давать качественные рекомендации."
-        )}
-      </p>
-      <div className="mt-4 flex flex-wrap gap-2">
-        <Badge>ISO/IEC 17025</Badge>
-        <Badge>O’ZAK.SL.0309</Badge>
-        <Badge>ILAC</Badge>
+  <Card className="p-6 md:p-8 bg-gradient-to-r from-sky-50 to-cyan-50 dark:from-slate-900/40 dark:to-slate-800/40">
+    <div className="grid md:grid-cols-2 gap-8 items-center">
+      {/* Matn */}
+      <div className="space-y-4">
+        <p className="text-sm/6 text-gray-700 dark:text-gray-300">
+          {t(
+            "EMS laboratoriyasi  — O‘ZAK.SL.0309 raqami bilan akkreditatsiya qilingan bo‘lib, ESD, EFT/B, Surge, RF immunitet, IRP, garmonik va flicker kabi asosiy EMC sinovlarini o‘tkazadi. Biz o‘lchovlar aniqligi, tezkorlik va mijozlar bilan ochiq kommunikatsiyani ustuvor deb bilamiz.",
+            "EMS лаборатория аккредитована под номером O‘ZAK.SL.0309 и проводит ключевые EMC-испытания: ESD, EFT/B, Surge, RF-иммунитет, уровни излучения/проводимых помех, гармоники и фликер. Для нас приоритет — точность, скорость и прозрачная коммуникация с заказчиком."
+          )}
+        </p>
+        <p className="text-sm/6 text-gray-700 dark:text-gray-300">
+          {t(
+            "Jihozlar tarkibi R&S ESW8/ESR3 qabul qilgichlari, Schaffner NX5 generatori, turli CDN va yordamchi qurilmalardan iborat. Har bir sinov protokoli QR-kod bilan rasmiylashtiriladi.",
+            "Оснащение включает приёмники R&S ESW8/ESR3, генератор Schaffner NX5, различные CDN и вспомогательные устройства. Каждый протокол оформляется с QR-кодом."
+          )}
+        </p>
+
+        <div className="flex flex-wrap gap-2 pt-1">
+          <Badge>ISO/IEC 17025</Badge>
+          <Badge>O’ZAK.SL.0309</Badge>
+          <Badge>ILAC</Badge>
+        </div>
       </div>
-    </Card>
 
-    {/* Qadriyatlar */}
-    <Card className="p-6">
-      <div className="text-sm font-semibold mb-2">{t("Qadriyatlarimiz", "Наши ценности")}</div>
-      <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-        <li>• {t("Halollik va shaffoflik", "Честность и прозрачность")}</li>
-        <li>• {t("Innovatsiya va zamonaviy texnologiyalar", "Инновации и современные технологии")}</li>
-        <li>• {t("Professionalizm va mas’uliyat", "Профессионализм и ответственность")}</li>
-        <li>• {t("Mijozlar uchun yuqori sifat", "Высокое качество для клиентов")}</li>
-      </ul>
-    </Card>
-
-    {/* Nega biz? */}
-    <Card className="p-6">
-      <div className="text-sm font-semibold mb-2">{t("Nega biz?", "Почему мы?")}</div>
-      <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-        <li>• {t("24 soat ichida javob", "Ответ в течение 24 часов")}</li>
-        <li>• {t("Zamonaviy jihozlar (R&S ESW8, ESR3, NX5...)", "Современное оборудование (R&S ESW8, ESR3, NX5...)")}</li>
-        <li>• {t("Akkreditatsiya qilingan laboratoriya", "Аккредитованная лаборатория")}</li>
-        <li>• {t("Xalqaro tajribaga ega jamoa", "Команда с международным опытом")}</li>
-      </ul>
-    </Card>
-  </div>
-
-  {/* Statistika / ko‘rsatkichlar */}
-  <div className="mt-6 grid sm:grid-cols-3 gap-4">
-    <Card className="p-5 text-center">
-      <div className="text-2xl font-semibold">1200+</div>
-      <div className="text-xs text-gray-600 dark:text-gray-300">{t("o‘lchov va sinov", "измерений и испытаний")}</div>
-    </Card>
-    <Card className="p-5 text-center">
-      <div className="text-2xl font-semibold">98%</div>
-      <div className="text-xs text-gray-600 dark:text-gray-300">{t("mijozlar qoniqishi", "удовлетворенность клиентов")}</div>
-    </Card>
-    <Card className="p-5 text-center">
-      <div className="text-2xl font-semibold">11</div>
-      <div className="text-xs text-gray-600 dark:text-gray-300">{t("mutaxassis", "специалистов")}</div>
-    </Card>
-  </div>
-
-  {/* Hamkorlar (ixtiyoriy logotiplar) */}
-  {/* public/partners/ ichiga logotip qo‘ysangiz, pastdagi blok avtomatik ko‘rinadi */}
-  <div className="mt-8">
-    <div className="text-sm font-semibold mb-3">{t("Hamkorlarimiz", "Наши партнёры")}</div>
-    <div className="flex flex-wrap items-center gap-4 opacity-80">
-      <img src="/partners/uztest.svg" alt="UZTEST" className="h-8" />
-      <img src="/partners/tuvsud.svg" alt="TÜV SÜD" className="h-8" />
-      <img src="/partners/autosert.svg" alt="Autosert" className="h-8" />
-      {/* Rasmlaringiz bo‘lmasa — bu blokni olib tashlashingiz mumkin */}
+      {/* Illyustrativ rasm (xohlasangiz o‘zingizning rasmingizni qo‘ying) */}
+      <Card className="overflow-hidden">
+        <img
+          src="/hero/anechoic.jpg"
+          alt="EMC lab"
+          className="w-full h-64 md:h-80 object-cover"
+        />
+      </Card>
     </div>
-  </div>
+
+    {/* Statlar */}
+    <div className="grid sm:grid-cols-3 gap-4 mt-8">
+      <Card className="p-5 text-center">
+        <div className="text-2xl font-semibold">1200+</div>
+        <div className="text-xs text-gray-600 dark:text-gray-300">
+          {t("o‘lchov va sinov", "измерений и испытаний")}
+        </div>
+      </Card>
+      <Card className="p-5 text-center">
+        <div className="text-2xl font-semibold">98%</div>
+        <div className="text-xs text-gray-600 dark:text-gray-300">
+          {t("mijozlar qoniqishi", "удовлетворенность клиентов")}
+        </div>
+      </Card>
+      <Card className="p-5 text-center">
+        <div className="text-2xl font-semibold">24h</div>
+        <div className="text-xs text-gray-600 dark:text-gray-300">
+          {t("javob muddati", "срок ответа")}
+        </div>
+      </Card>
+    </div>
+
+    {/* Qadriyatlar / afzalliklar */}
+    <div className="grid md:grid-cols-3 gap-6 mt-8">
+      <Card className="p-5">
+        <div className="text-sm font-semibold mb-2">
+          {t("Missiyamiz", "Наша миссия")}
+        </div>
+        <p className="text-sm text-gray-700 dark:text-gray-300">
+          {t(
+            "Mahsulotlarning elektromagnit moslashuvchanligini xalqaro talablarga muvofiq, tez va ishonchli tasdiqlash.",
+            "Быстро и надежно подтверждать ЭМС продукции в соответствии с международными требованиями."
+          )}
+        </p>
+      </Card>
+
+      <Card className="p-5">
+        <div className="text-sm font-semibold mb-2">
+          {t("Qadriyatlar", "Ценности")}
+        </div>
+        <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+          <li>• {t("Halollik va shaffoflik", "Честность и прозрачность")}</li>
+          <li>• {t("Aniqlik va takrorlanuvchanlik", "Точность и воспроизводимость")}</li>
+          <li>• {t("Innovatsiya", "Инновации")}</li>
+        </ul>
+      </Card>
+
+      <Card className="p-5">
+        <div className="text-sm font-semibold mb-2">
+          {t("Nega biz?", "Почему мы?")}
+        </div>
+        <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+          <li>• {t("Akkreditatsiya qilingan lab.", "Аккредитованная лаб.")}</li>
+          <li>• {t("Zamonaviy jihozlar", "Современное оборудование")}</li>
+          <li>• {t("QR-kodli protokollar", "Протоколы с QR-кодом")}</li>
+        </ul>
+      </Card>
+    </div>
+
+    {/* Hamkorlar (ixtiyoriy) */}
+    <div className="mt-8">
+      <div className="text-sm font-semibold mb-3">
+        {t("Hamkorlarimiz", "Наши партнёры")}
+      </div>
+      <div className="flex flex-wrap items-center gap-6 opacity-80">
+        <img src="/partners/uztest.svg" alt="UZTEST" className="h-8" />
+        <img src="/partners/tuvsud.svg" alt="TÜV SÜD" className="h-8" />
+        <img src="/partners/autosert.svg" alt="Autosert" className="h-8" />
+      </div>
+    </div>
+  </Card>
 </Section>
 
 
