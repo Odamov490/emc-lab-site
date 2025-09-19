@@ -6,9 +6,12 @@ const NAV = [
   { href: "#about", label: { uz: "Biz haqimizda", ru: "О нас" } },
   { href: "#services", label: { uz: "Xizmatlar", ru: "Услуги" } },
   { href: "#equipment", label: { uz: "Jihozlar", ru: "Оборудование" } },
-  { href: "#team", label: { uz: "Jamoa", ru: "Команда" } },
   { href: "#accreditation", label: { uz: "Akkreditatsiya", ru: "Аккредитация" } },
+  { href: "#gallery", label: { uz: "Galereya", ru: "Галерея" } },
+   { href: "#excursion", label: { uz: "Ekskursiya", ru: "Экскурсия" } },
+  { href: "#team", label: { uz: "Jamoa", ru: "Команда" } },
   { href: "#contact", label: { uz: "Bog‘lanish", ru: "Контакты" } },
+ 
 ];
 
 const TESTS = [
@@ -735,6 +738,43 @@ export default function EMCLabUltra() {
             ))}
           </div>
         </Section>
+
+
+        {/* EXCURSION */}
+<Section
+  id="excursion"
+  title={lang==="uz" ? "Ekskursiya" : "Экскурсия"}
+  subtitle={lang==="uz" ? "Laboratoriya bo‘ylab 360° sayohat" : "360° тур по лаборатории"}
+>
+  <Card className="overflow-hidden p-0">
+    <div className="relative w-full aspect-video">
+      <iframe
+        // 🔁 HOZIRCHA: A-Frame rasmiy demo 360
+        // ⤴️ ERTAga: bu src ni o‘zingizning panorama URL’ingizga almashtirasiz
+        src="https://aframe.io/aframe/examples/boilerplate/360-image/"
+        title="EMC Lab 360 Tour (Demo)"
+        className="absolute inset-0 w-full h-full border-0"
+        allow="accelerometer; gyroscope; fullscreen"
+        allowFullScreen
+        loading="lazy"
+      />
+    </div>
+  </Card>
+
+  <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
+    {lang==="uz"
+      ? "Panoramali rejimda laboratoriya bo‘ylab sayohat qiling. Sichqoncha/barmoqlar bilan aylantiring, to‘liq ekran uchun ↗ belgini bosing."
+      : "Совершите тур по лаборатории в панорамном режиме. Вращайте мышкой/пальцами, для полноэкранного режима нажмите ↗."}
+  </div>
+
+  <div className="mt-3 text-xs text-gray-500">
+    {lang==="uz"
+      ? "Eslatma: bu vaqtincha demo. O‘z panorama havolangiz tayyor bo‘lgach, iframe dagi src qiymatini almashtiring."
+      : "Примечание: это временный демо. Когда будет ваша ссылка на панораму, замените значение src в iframe."}
+  </div>
+</Section>
+
+
 
         {/* TEAM */}
         <Section id="team" title={lang==="uz" ? "Bizning jamoa" : "Наша команда"} subtitle={lang==="uz" ? "11 nafar tajribali mutaxassis" : "11 опытных специалистов"}>
