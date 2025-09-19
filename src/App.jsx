@@ -739,32 +739,35 @@ export default function EMCLabUltra() {
           </div>
         </Section>
 
-{/* EXCURSION */}
+{/* EXCURSION / VIRTUAL TOUR */}
 <Section
   id="excursion"
-  title={lang==="uz" ? "Ekskursiya" : "Экскурсия"}
-  subtitle={lang==="uz" ? "Laboratoriya bo‘ylab 360° sayohat" : "360° тур по лаборатории"}
+  title={lang === "uz" ? "Ekskursiya" : "Экскурсия"}
+  subtitle={
+    lang === "uz"
+      ? "Laboratoriyamiz bo‘ylab 360° virtual sayohat qiling"
+      : "Совершите 360° виртуальную экскурсию по нашей лаборатории"
+  }
 >
-  <Card className="overflow-hidden p-0">
-    <div className="relative w-full aspect-video">
-      <iframe
-        // Hozircha demo panorama (Kuula public)
-        src="https://kuula.co/share/7YZh4?logo=1&info=1&fs=1&vr=1&zoom=1&initload=0&thumbs=1"
-        title="EMC Lab 360 Tour (Demo)"
-        className="absolute inset-0 w-full h-full border-0"
-        allow="xr-spatial-tracking; gyroscope; accelerometer; vr"
-        allowFullScreen
-        loading="lazy"
-      />
-    </div>
-  </Card>
-
-  <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
-    {lang==="uz"
-      ? "Panoramali rejimda laboratoriya bo‘ylab sayohat qiling. Sichqoncha yoki barmoqlar bilan aylantiring, ↗ tugmasi orqali to‘liq ekranga chiqishingiz mumkin."
-      : "Совершите тур по лаборатории в панорамном режиме. Вращайте мышкой или пальцами, для полноэкранного режима нажмите ↗."}
+  <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-lg">
+    <iframe
+      src="https://kuula.co/post/7l69M/collection/7fz3x"
+      title="Virtual Tour Demo"
+      className="absolute inset-0 w-full h-full border-0"
+      allowFullScreen
+      loading="lazy"
+    ></iframe>
   </div>
+
+  <p className="mt-4 text-sm text-gray-600 dark:text-gray-300 max-w-3xl">
+    {lang === "uz"
+      ? "Siz ushbu demo 360° panorama orqali xonalarni ko‘rib chiqishingiz mumkin. "
+        + "Ertaga biz o‘z laboratoriyamizni suratga olib, ushbu havolani almashtiramiz."
+      : "Вы можете посмотреть демо 360° панораму помещений. "
+        + "Завтра мы снимем нашу лабораторию и заменим эту ссылку."}
+  </p>
 </Section>
+
 
 
 
