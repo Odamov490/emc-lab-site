@@ -1,6 +1,5 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import ScrollToTopButton from "./ScrollToTopButton";
-
 
 /********************* CONFIG *********************/
 const NAV = [
@@ -11,9 +10,6 @@ const NAV = [
   { href: "#accreditation", label: { uz: "Akkreditatsiya", ru: "Аккредитация" } },
   { href: "#contact", label: { uz: "Bog‘lanish", ru: "Контакты" } },
 ];
-
-
-
 
 const TESTS = [
   { code: "O’zMSt IEC 61000.4.2-2023", title: "Устойчивость к электростатическим разрядам", note: "Sifat", icon: "⚡" },
@@ -49,46 +45,14 @@ const EQUIPMENT = [
     desc: "Coupling/Decoupling tarmog‘i",
     images: ["/lab/cdn/1.jpg", "/lab/cdn/2.jpg", "/lab/cdn/3.jpg", "/lab/cdn/4.jpg"],
   },
-  {
-    name: "Jihoz 5",
-    desc: "Izoh",
-    images: ["/lab/item5/1.jpg", "/lab/item5/2.jpg", "/lab/item5/3.jpg", "/lab/item5/4.jpg"],
-  },
-  {
-    name: "Jihoz 6",
-    desc: "Izoh",
-    images: ["/lab/item6/1.jpg", "/lab/item6/2.jpg", "/lab/item6/3.jpg", "/lab/item6/4.jpg"],
-  },
-  {
-    name: "Jihoz 7",
-    desc: "Izoh",
-    images: ["/lab/item7/1.jpg", "/lab/item7/2.jpg", "/lab/item7/3.jpg", "/lab/item7/4.jpg"],
-  },
-  {
-    name: "Jihoz 8",
-    desc: "Izoh",
-    images: ["/lab/item8/1.jpg", "/lab/item8/2.jpg", "/lab/item8/3.jpg", "/lab/item8/4.jpg"],
-  },
-  {
-    name: "Jihoz 9",
-    desc: "Izoh",
-    images: ["/lab/item9/1.jpg", "/lab/item9/2.jpg", "/lab/item9/3.jpg", "/lab/item9/4.jpg"],
-  },
-  {
-    name: "Jihoz 10",
-    desc: "Izoh",
-    images: ["/lab/item10/1.jpg", "/lab/item10/2.jpg", "/lab/item10/3.jpg", "/lab/item10/4.jpg"],
-  },
-  {
-    name: "Jihoz 11",
-    desc: "Izoh",
-    images: ["/lab/item11/1.jpg", "/lab/item11/2.jpg", "/lab/item11/3.jpg", "/lab/item11/4.jpg"],
-  },
-  {
-    name: "Jihoz 12",
-    desc: "Izoh",
-    images: ["/lab/item12/1.jpg", "/lab/item12/2.jpg", "/lab/item12/3.jpg", "/lab/item12/4.jpg"],
-  },
+  { name: "Jihoz 5", desc: "Izoh", images: ["/lab/item5/1.jpg", "/lab/item5/2.jpg", "/lab/item5/3.jpg", "/lab/item5/4.jpg"] },
+  { name: "Jihoz 6", desc: "Izoh", images: ["/lab/item6/1.jpg", "/lab/item6/2.jpg", "/lab/item6/3.jpg", "/lab/item6/4.jpg"] },
+  { name: "Jihoz 7", desc: "Izoh", images: ["/lab/item7/1.jpg", "/lab/item7/2.jpg", "/lab/item7/3.jpg", "/lab/item7/4.jpg"] },
+  { name: "Jihoz 8", desc: "Izoh", images: ["/lab/item8/1.jpg", "/lab/item8/2.jpg", "/lab/item8/3.jpg", "/lab/item8/4.jpg"] },
+  { name: "Jihoz 9", desc: "Izoh", images: ["/lab/item9/1.jpg", "/lab/item9/2.jpg", "/lab/item9/3.jpg", "/lab/item9/4.jpg"] },
+  { name: "Jihoz 10", desc: "Izoh", images: ["/lab/item10/1.jpg", "/lab/item10/2.jpg", "/lab/item10/3.jpg", "/lab/item10/4.jpg"] },
+  { name: "Jihoz 11", desc: "Izoh", images: ["/lab/item11/1.jpg", "/lab/item11/2.jpg", "/lab/item11/3.jpg", "/lab/item11/4.jpg"] },
+  { name: "Jihoz 12", desc: "Izoh", images: ["/lab/item12/1.jpg", "/lab/item12/2.jpg", "/lab/item12/3.jpg", "/lab/item12/4.jpg"] },
 ];
 
 // 11 xodim (rasmlarni public/staff/ ichiga joylang)
@@ -144,7 +108,7 @@ function Badge({ children }) {
 
 function Section({ id, title, subtitle, children, bleed = false }) {
   return (
-    <section id={id} className={`py-16 sm:py-24 ${bleed ? "px-0" : ""}`} aria-labelledby={`${id}-title`}>
+    <section id={id} className={`py-16 sm:py-24 scroll-mt-24 ${bleed ? "px-0" : ""}`} aria-labelledby={`${id}-title`}>
       <div className={`mx-auto ${bleed ? "max-w-none" : "max-w-7xl px-4"}`}>
         <div className={`${bleed ? "px-4 max-w-7xl mx-auto" : ""} mb-10`}>
           <h2 id={`${id}-title`} className="text-3xl sm:text-4xl font-semibold tracking-tight">
@@ -297,12 +261,10 @@ export default function EMCLabUltra() {
   const [lang, setLang] = useState("uz");
   const [dark, setDark] = useState(false);
   const [sending, setSending] = useState(false); // kontakt forma holati
+  const [active, setActive] = useState("about"); // 🔥 Scrollspy
+  const [scrollProgress, setScrollProgress] = useState(0); // 🔥 Progress bar
   const t = (uz, ru) => (lang === "uz" ? uz : ru);
   const [aboutTab, setAboutTab] = useState("innovations");
-
-
-
-
 
   // Lightbox holati (faqat jihozlar & galereya uchun)
   const [lbOpen, setLbOpen] = useState(false);
@@ -329,8 +291,70 @@ export default function EMCLabUltra() {
     []
   );
 
+  // 🌟 Global smooth scroll + top progress bar logic
+  useEffect(() => {
+    const onScroll = () => {
+      const doc = document.documentElement;
+      const scrollTop = doc.scrollTop || document.body.scrollTop;
+      const height = doc.scrollHeight - doc.clientHeight;
+      const pct = height > 0 ? (scrollTop / height) * 100 : 0;
+      setScrollProgress(pct);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // 🌟 Scrollspy (active nav link)
+  useEffect(() => {
+    const sectionIds = NAV.map((n) => n.href.replace('#', ''));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActive(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: "-40% 0px -55% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] }
+    );
+
+    sectionIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // ♿ Skip hash-jump behind sticky header on mount
+  useEffect(() => {
+    if (window.location.hash) {
+      const id = window.location.hash.slice(1);
+      const el = document.getElementById(id);
+      if (el) {
+        // scroll-margin-top works, but ensure smooth align
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }, []);
+
   return (
     <div className={dark ? "dark" : ""}>
+      {/* Global smooth scroll */}
+      <style>
+        {`html{scroll-behavior:smooth} ::-webkit-scrollbar{width:10px;height:10px} ::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:8px} ::-webkit-scrollbar-track{background:transparent}`}
+      </style>
+
+      {/* Top scroll progress bar */}
+      <div className="fixed top-0 left-0 right-0 z-[60] h-1 bg-transparent">
+        <div
+          className="h-full bg-gradient-to-r from-sky-500 to-cyan-400 transition-[width] duration-150"
+          style={{ width: `${scrollProgress}%` }}
+          aria-hidden
+        />
+      </div>
+
       <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-gray-900 dark:from-slate-950 dark:to-slate-900 dark:text-slate-100 selection:bg-sky-200/50">
         {/* TOP BAR */}
         <div className="border-b border-black/10 dark:border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur">
@@ -377,7 +401,14 @@ export default function EMCLabUltra() {
 
             <nav className="hidden md:flex items-center gap-7">
               {NAV.map((n) => (
-                <a key={n.href} href={n.href} className="text-sm font-medium hover:opacity-80">
+                <a
+                  key={n.href}
+                  href={n.href}
+                  className={`text-sm font-medium hover:opacity-80 relative after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:rounded-full after:bg-cyan-500 after:transition-all ${
+                    active === n.href.replace('#','') ? 'after:w-full text-cyan-600 dark:text-cyan-300' : 'after:w-0'
+                  }`}
+                  aria-current={active === n.href.replace('#','') ? 'page' : undefined}
+                >
                   {t(n.label.uz, n.label.ru)}
                 </a>
               ))}
@@ -392,7 +423,7 @@ export default function EMCLabUltra() {
         </header>
 
         {/* HERO */}
-        <section className="relative overflow-hidden">
+        <section className="relative overflow-hidden" id="top">
           <div className="absolute inset-0 -z-10" aria-hidden>
             {blobs.map((b, i) => (
               <div key={i} className={`pointer-events-none absolute ${b.pos} ${b.size} ${b.blur} opacity-40 dark:opacity-30 rounded-full ${b.class}`} />
@@ -441,140 +472,128 @@ export default function EMCLabUltra() {
           </div>
         </section>
 
-
-<Section
-  id="about"
-  title={t("Biz haqimizda", "О нас")}
-  subtitle={t(
-    "ISO/IEC 17025 doirasida akkreditatsiyadan o‘tgan EMC laboratoriyasi (O’ZAK.SL.0309). 2021-yildan buyon elektromagnit moslashuvchanlik sinovlarini o‘tkazamiz.",
-    "EMC-лаборатория, аккредитованная по ISO/IEC 17025 (O’ZAK.SL.0309). С 2021 года проводим испытания на электромагнитную совместимость."
-  )}
->
-  <div className="rounded-3xl bg-gradient-to-r from-sky-700 to-cyan-600 text-white shadow-lg p-6 sm:p-8 space-y-6">
-    <div className="space-y-3">
-      <h3 className="text-xl font-semibold">
-        {t("EMC sinovlari — Elektromagnit moslashuvchanlik", "EMC-испытания — Электромагнитная совместимость")}
-      </h3>
-      <p className="opacity-95">
-        {t(
-          "Elektr qurilma yoki komponentni bozorga chiqarishdan avval, u boshqa qurilmalar bilan muvofiq ishlashi shart. Bunga elektromagnit moslashuvchanlik (EMC) deyiladi. Bizning laboratoriya qurilmalaringizning emissiya va immunitet ko‘rsatkichlarini IEC/CISPR talablariga muvofiq tekshiradi — natijada mahsulotlar milliy va xalqaro standartlarga hamda EMC direktivasiga mos keladi.",
-          "Перед выводом электрического изделия или компонента на рынок необходимо убедиться, что оно не мешает работе других устройств и устойчиво к помехам. Это и есть электромагнитная совместимость (EMC). Наша лаборатория проверяет эмиссию и иммунитет по требованиям IEC/CISPR — чтобы продукция соответствовала национальным и международным стандартам и EMC-директиве."
-        )}
-      </p>
-    </div>
-
-    <div className="grid md:grid-cols-3 gap-4">
-      <div className="bg-white/10 rounded-2xl p-4">
-        <h4 className="font-semibold mb-1">{t("Afzalliklar", "Преимущества")}</h4>
-        <ul className="list-disc list-inside text-sm/6 opacity-95">
-          <li>{t("Elektr mahsulotini bozorda sotish uchun majburiy talablar bajariladi.", "Выполнение обязательных требований для вывода продукции на рынок.")}</li>
-          <li>{t("Xalqaro bozorga kirish imkoniyati kengayadi.", "Доступ к международным рынкам.")}</li>
-          <li>{t("Qurilmalar xavfsiz va ishonchli ishlashi ta’minlanadi.", "Гарантируется безопасная и надежная работа устройств.")}</li>
-        </ul>
-      </div>
-
-      <div className="bg-white/10 rounded-2xl p-4">
-        <h4 className="font-semibold mb-1">{t("Biz nima qilamiz", "Что мы проверяем")}</h4>
-        <p className="text-sm opacity-95">
-          {t(
-            "Har qanday elektr qurilma va komponent uchun EMC sinovlari: emissiya (chiqish) va immunitet (barqarorlik) darajalari o‘lchanadi hamda EMC direktivalari talablari bilan taqqoslanadi.",
-            "Проводим EMC-испытания практически для любых электрических устройств и компонентов: измеряем уровни эмиссии и устойчивости к помехам и сопоставляем с требованиями EMC-директив."
+        <Section
+          id="about"
+          title={t("Biz haqimizda", "О нас")}
+          subtitle={t(
+            "ISO/IEC 17025 doirasida akkreditatsiyadan o‘tgan EMC laboratoriyasi (O’ZAK.SL.0309). 2021-yildan buyon elektromagnit moslashuvchanlik sinovlarini o‘tkazamiz.",
+            "EMC-лаборатория, аккредитованная по ISO/IEC 17025 (O’ZAK.SL.0309). С 2021 года проводим испытания на электромагнитную совместимость."
           )}
-        </p>
-      </div>
-
-      <div className="bg-white/10 rounded-2xl p-4">
-        <h4 className="font-semibold mb-1">{t("Natijalar", "Результат")}</h4>
-        <p className="text-sm opacity-95">
-          {t(
-            "Mahsulotlaringiz elektromagnit shovqinlarga bardoshliligi va chiqish darajalari me’yordan pastligi bo‘yicha hujjatli tasdiqqa ega bo‘ladi.",
-            "Вы получаете подтверждение устойчивости к помехам и того, что уровни излучения вашей продукции ниже установленных норм."
-          )}
-        </p>
-      </div>
-    </div>
-
-    <div>
-      <h4 className="font-semibold mb-2">{t("Qo‘llaniladigan qurilmalar", "Области применения")}</h4>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 text-sm">
-        {[
-          t("Aqlli qurilmalar (smart devices)", "Умные устройства (smart devices)"),
-          t("Mobil/wireless mahsulotlar", "Портативные и беспроводные изделия"),
-          t("Sanoat, ilmiy va tibbiyot qurilmalari", "Промышленные, научные и медицинские приборы"),
-          t("O‘lchov va laboratoriya jihozlari", "Измерительное и лабораторное оборудование"),
-          t("Elektr komponentlar (kalit, dimmer va b.)", "Электрокомпоненты (выключатели, диммеры и др.)"),
-          t("Quvvat manbalari, elektronika (UPS, PV-invertor)", "Источники питания, электроника (ИБП, PV-инверторы)"),
-          t("Maishiy texnika", "Бытовая техника"),
-          t("Elektr asboblar", "Электроинструмент"),
-          t("Elektr o‘yinchoqlar", "Электронные игрушки"),
-          t("Yoritish mahsulotlari", "Светотехника"),
-          t("Iste’molchi elektronika", "Потребительская электроника"),
-          t("IT va ofis uskunalari", "IT и офисное оборудование"),
-          t("Audio-video qurilmalar", "Аудио-видео аппаратура"),
-          t("Telekommunikatsiya qurilmalari", "Телекоммуникационное оборудование"),
-        ].map((item, i) => (
-          <div key={i} className="bg-white/10 rounded-xl px-3 py-2">{item}</div>
-        ))}
-      </div>
-    </div>
-
-    <div className="text-xs opacity-80">
-      {t(
-        "Izoh: metodlar va sinov usullari (IEC/CISPR) hamda jihozlar ro‘yxati amaldagi tartib bo‘yicha qo‘llanadi.",
-        "Примечание: методики и процедуры испытаний (IEC/CISPR), а также перечень оборудования применяются в действующей редакции."
-      )}
-    </div>
-  </div>
-</Section>
-
-
-
-
-{/* SERVICES */}
-<Section
-  id="services"
-  title={t("Xizmatlar va sinovlar", "Услуги и испытания")}
-  subtitle={t("IEC/CISPR talablari asosida to‘liq EMC dasturi", "Полный перечень EMC-испытаний по IEC/CISPR")}
->
-  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    {TESTS.map((tst, i) => (
-      <Card
-        key={i}
-        className="p-6 hover:shadow-lg transition bg-gradient-to-r from-sky-700 to-cyan-600 text-white"
-      >
-        {/* ↑ sarlavha qatori: chapda icon+title, o‘ngda badge */}
-        <div className="flex items-start justify-between gap-3">
-          <h3 className="text-base font-semibold flex items-start gap-2 drop-shadow">
-            <span className="text-xl leading-none">{tst.icon}</span>
-            <span>{tst.title}</span>
-          </h3>
-          <span className="shrink-0 inline-flex max-w-[60%] truncate items-center rounded-full px-3 py-1 text-xs font-medium bg-white text-gray-900 shadow-md">
-            {tst.code}
-          </span>
-        </div>
-
-        <p className="mt-3 text-sm text-white/90 drop-shadow">
-          {tst.note}
-        </p>
-
-        <a
-          href="#contact"
-          className="mt-4 inline-block text-sm font-medium underline decoration-white/80 hover:decoration-2"
         >
-          {t("Buyurtma berish", "Заказать")}
-        </a>
-      </Card>
-    ))}
-  </div>
-</Section>
+          <div className="rounded-3xl bg-gradient-to-r from-sky-700 to-cyan-600 text-white shadow-lg p-6 sm:p-8 space-y-6">
+            <div className="space-y-3">
+              <h3 className="text-xl font-semibold">
+                {t("EMC sinovlari — Elektromagnit moslashuvchanlik", "EMC-испытания — Электромагнитная совместимость")}
+              </h3>
+              <p className="opacity-95">
+                {t(
+                  "Elektr qurilma yoki komponentni bozorga chiqarishdan avval, u boshqa qurilmalar bilan muvofiq ishlashi shart. Bunga elektromagnit moslashuvchanlik (EMC) deyiladi. Bizning laboratoriya qurilmalaringizning emissiya va immunitet ko‘rsatkichlarini IEC/CISPR talablariga muvofiq tekshiradi — natijada mahsulotlar milliy va xalqaro standartlarga hamda EMC direktivasiga mos keladi.",
+                  "Перед выводом электрического изделия или компонента на рынок необходимо убедиться, что оно не мешает работе других устройств и устойчиво к помехам. Это и есть электромагнитная совместимость (EMC). Наша лаборатория проверяет эмиссию и иммунитет по требованиям IEC/CISPR — чтобы продукция соответствовала национальным и международным стандартам и EMC-директиве."
+                )}
+              </p>
+            </div>
 
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="bg-white/10 rounded-2xl p-4">
+                <h4 className="font-semibold mb-1">{t("Afzalliklar", "Преимущества")}</h4>
+                <ul className="list-disc list-inside text-sm/6 opacity-95">
+                  <li>{t("Elektr mahsulotini bozorda sotish uchun majburiy talablar bajariladi.", "Выполнение обязательных требований для вывода продукции на рынок.")}</li>
+                  <li>{t("Xalqaro bozorga kirish imkoniyati kengayadi.", "Доступ к международным рынкам.")}</li>
+                  <li>{t("Qurilmalar xavfsiz va ishonchli ishlashi ta’minlanadi.", "Гарантируется безопасная и надежная работа устройств.")}</li>
+                </ul>
+              </div>
 
+              <div className="bg-white/10 rounded-2xl p-4">
+                <h4 className="font-semibold mb-1">{t("Biz nima qilamiz", "Что мы проверяем")}</h4>
+                <p className="text-sm opacity-95">
+                  {t(
+                    "Har qanday elektr qurilma va komponent uchun EMC sinovlari: emissiya (chiqish) va immunitet (barqarorlik) darajalari o‘lchanadi hamda EMC direktivalari talablari bilan taqqoslanadi.",
+                    "Проводим EMC-испытания практически для любых электрических устройств и компонентов: измеряем уровни эмиссии и устойчивости к помехам и сопоставляем с требованиями EMC-директив."
+                  )}
+                </p>
+              </div>
 
+              <div className="bg-white/10 rounded-2xl p-4">
+                <h4 className="font-semibold mb-1">{t("Natijalar", "Результат")}</h4>
+                <p className="text-sm opacity-95">
+                  {t(
+                    "Mahsulotlaringiz elektromagnit shovqinlarga bardoshliligi va chiqish darajalari me’yordan pastligi bo‘yicha hujjatli tasdiqqa ega bo‘ladi.",
+                    "Вы получаете подтверждение устойчивости к помехам и того, что уровни излучения вашей продукции ниже установленных норм."
+                  )}
+                </p>
+              </div>
+            </div>
 
+            <div>
+              <h4 className="font-semibold mb-2">{t("Qo‘llaniladigan qurilmalar", "Области применения")}</h4>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 text-sm">
+                {[
+                  t("Aqlli qurilmalar (smart devices)", "Умные устройства (smart devices)"),
+                  t("Mobil/wireless mahsulotlar", "Портативные и беспроводные изделия"),
+                  t("Sanoat, ilmiy va tibbiyot qurilmalari", "Промышленные, научные и медицинские приборы"),
+                  t("O‘lchov va laboratoriya jihozlari", "Измерительное и лабораторное оборудование"),
+                  t("Elektr komponentlar (kalit, dimmer va b.)", "Электрокомпоненты (выключатели, диммеры и др.)"),
+                  t("Quvvat manbalari, elektronika (UPS, PV-invertor)", "Источники питания, электроника (ИБП, PV-инверторы)"),
+                  t("Maishiy texnika", "Бытовая техника"),
+                  t("Elektr asboblar", "Электроинструмент"),
+                  t("Elektr o‘yinchoqlar", "Электронные игрушки"),
+                  t("Yoritish mahsulotlari", "Светотехника"),
+                  t("Iste’molchi elektronika", "Потребительская электроника"),
+                  t("IT va ofis uskunalari", "IT и офисное оборудование"),
+                  t("Audio-video qurilmalar", "Аудио-видео аппаратура"),
+                  t("Telekommunikatsiya qurilmalari", "Телекоммуникационное оборудование"),
+                ].map((item, i) => (
+                  <div key={i} className="bg-white/10 rounded-xl px-3 py-2">{item}</div>
+                ))}
+              </div>
+            </div>
 
+            <div className="text-xs opacity-80">
+              {t(
+                "Izoh: metodlar va sinov usullari (IEC/CISPR) hamda jihozlar ro‘yxati amaldagi tartib bo‘yicha qo‘llanadi.",
+                "Примечание: методики и процедуры испытаний (IEC/CISPR), а также перечень оборудования применяются в действующей редакции."
+              )}
+            </div>
+          </div>
+        </Section>
 
+        {/* SERVICES */}
+        <Section
+          id="services"
+          title={t("Xizmatlar va sinovlar", "Услуги и испытания")}
+          subtitle={t("IEC/CISPR talablari asosida to‘liq EMC dasturi", "Полный перечень EMC-испытаний по IEC/CISPR")}
+        >
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {TESTS.map((tst, i) => (
+              <Card
+                key={i}
+                className="p-6 hover:shadow-lg transition bg-gradient-to-r from-sky-700 to-cyan-600 text-white"
+              >
+                {/* ↑ sarlavha qatori: chapda icon+title, o‘ngda badge */}
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="text-base font-semibold flex items-start gap-2 drop-shadow">
+                    <span className="text-xl leading-none">{tst.icon}</span>
+                    <span>{tst.title}</span>
+                  </h3>
+                  <span className="shrink-0 inline-flex max-w-[60%] truncate items-center rounded-full px-3 py-1 text-xs font-medium bg-white text-gray-900 shadow-md">
+                    {tst.code}
+                  </span>
+                </div>
 
+                <p className="mt-3 text-sm text-white/90 drop-shadow">
+                  {tst.note}
+                </p>
 
+                <a
+                  href="#contact"
+                  className="mt-4 inline-block text-sm font-medium underline decoration-white/80 hover:decoration-2"
+                >
+                  {t("Buyurtma berish", "Заказать")}
+                </a>
+              </Card>
+            ))}
+          </div>
+        </Section>
 
         {/* EQUIPMENT */}
         <Section id="equipment" title={t("Jihozlar", "Оборудование")} subtitle={t("Asosiy o‘lchash va sinov kompleksi", "Основной комплекс измерений и испытаний")}>
@@ -586,7 +605,7 @@ export default function EMCLabUltra() {
         </Section>
 
         {/* ACCREDITATION CTA */}
-        <div id="accreditation" className="mx-auto max-w-7xl px-4">
+        <div id="accreditation" className="mx-auto max-w-7xl px-4 scroll-mt-24">
           <div className="rounded-3xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white p-6 shadow-md">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
@@ -797,7 +816,7 @@ export default function EMCLabUltra() {
                   <div key={n.href}>
                     <a
                       href={n.href}
-                      className="hover:text-cyan-300 transition-colors"
+                      className={`hover:text-cyan-300 transition-colors ${active === n.href.replace('#','') ? 'font-semibold underline' : ''}`}
                     >
                       {t(n.label.uz, n.label.ru)}
                     </a>
@@ -825,7 +844,7 @@ export default function EMCLabUltra() {
             </div>
           </div>
         </footer>
-         <ScrollToTopButton />
+        <ScrollToTopButton />
       </div>
 
       {/* LIGHTBOX (faqat jihozlar va galereya uchun) */}
@@ -837,8 +856,6 @@ export default function EMCLabUltra() {
         onPrev={() => prevLb(-1)}
         onNext={() => nextLb(1)}
       />
-
     </div>
   );
 }
-
