@@ -751,7 +751,7 @@ export default function EMCLabUltra() {
 >
   <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-lg">
     <iframe
-      src="https://kuula.co/post/7l69M/collection/7fz3x"
+      src="https://kuula.co/embed/collection/7fz3x"
       title="Virtual Tour Demo"
       className="absolute inset-0 w-full h-full border-0"
       allowFullScreen
