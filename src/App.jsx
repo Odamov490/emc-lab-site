@@ -78,6 +78,23 @@ const QUICK_LINKS = [
   },
 ];
 
+
+
+const TESTS = [
+  {
+    code: "O’zMSt IEC 61000.4.2-2023",
+    title: "Устойчивость к электростатическим разрядам",
+    note: "Sifat",
+    icon: "⚡",
+    detailsUz:
+      "Bu yerga uzun-uzun izoh. ESD sinovi bo‘yicha to‘liq ma’lumot: darajalar, usul, o‘lchov sharoitlari, qadamlar, natija talablari va h.k. ...",
+    detailsRu:
+      "Здесь длинное описание. Полная информация по ESD: уровни, методика, условия, шаги измерений, требования к результатам и т.п. ...",
+  },
+  // ... qolgan testlar ...
+];
+
+
 /********************* UI PRIMITIVES *********************/
 function Badge({ children }) {
   return (
@@ -246,6 +263,19 @@ export default function EMCLabUltra() {
   const [active, setActive] = useState("about");
   const [scrollProgress, setScrollProgress] = useState(0);
   const t = (uz, ru) => (lang === "uz" ? uz : ru);
+
+  const [openTestModal, setOpenTestModal] = useState(false);
+const [selectedTest, setSelectedTest] = useState(null);
+
+const openTest = (test) => {
+  setSelectedTest(test);
+  setOpenTestModal(true);
+};
+const closeTest = () => {
+  setOpenTestModal(false);
+  setSelectedTest(null);
+};
+
 
   // Lightbox
   const [lbOpen, setLbOpen] = useState(false);
@@ -521,53 +551,44 @@ export default function EMCLabUltra() {
 {/* SERVICES */}
 <Section
   id="services"
-  title={lang === "uz" ? "Xizmatlar va sinovlar" : "Услуги и испытания"}
-  subtitle={
-    lang === "uz"
-      ? "IEC/CISPR talablari asosida to‘liq EMC dasturi"
-      : "Полный перечень EMC-испытаний по IEC/CISPR"
-  }
+  title={lang==="uz" ? "Xizmatlar va sinovlar" : "Услуги и испытания"}
+  subtitle={lang==="uz" ? "IEC/CISPR talablari asosida to‘liq EMC dasturi" : "Полный перечень EMC-испытаний по IEC/CISPR"}
 >
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
     {TESTS.map((tst, i) => (
-      <Card
-        key={i}
-        className="p-6 hover:shadow-lg transition bg-gradient-to-r from-sky-700 to-cyan-600 text-white"
-      >
-        {/* Sarlavha + Badge qismi */}
+      <Card key={i} className="p-6 hover:shadow-lg transition bg-gradient-to-r from-sky-700 to-cyan-600 text-white">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
           <h3 className="flex-1 min-w-0 text-base font-semibold flex items-start gap-2 drop-shadow leading-tight">
             <span className="text-xl leading-none">{tst.icon}</span>
             <span className="break-words">{tst.title}</span>
           </h3>
-
-          <span
-            className="
-              mt-1 sm:mt-0 self-start sm:self-auto
-              inline-flex items-center rounded-full px-3 py-1 bg-white text-gray-900 shadow-md
-              text-[11px] sm:text-xs
-              whitespace-nowrap truncate
-              max-w-full sm:max-w-[45%] md:max-w-[55%] lg:max-w-[60%]
-            "
-          >
+          <span className="mt-1 sm:mt-0 self-start sm:self-auto inline-flex items-center rounded-full px-3 py-1 bg-white text-gray-900 shadow-md text-[11px] sm:text-xs whitespace-nowrap truncate max-w-full sm:max-w-[45%] md:max-w-[55%] lg:max-w-[60%]">
             {tst.code}
           </span>
         </div>
 
-        {/* Note */}
         <p className="mt-3 text-sm text-white/90 drop-shadow">{tst.note}</p>
 
-        {/* Buyurtma tugmasi */}
-        <a
-          href="#contact"
-          className="mt-4 inline-block text-sm font-medium underline decoration-white/80 hover:decoration-2"
-        >
-          {lang === "uz" ? "Buyurtma berish" : "Заказать"}
-        </a>
+        <div className="mt-4 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => openTest(tst)}
+            className="rounded-xl bg-white/90 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-white"
+          >
+            {lang==="uz" ? "Batafsil" : "Подробнее"}
+          </button>
+          <a
+            href="#contact"
+            className="rounded-xl border border-white/40 px-3 py-2 text-sm font-medium hover:bg-white/10"
+          >
+            {lang==="uz" ? "Maslahat" : "Консультация"}
+          </a>
+        </div>
       </Card>
     ))}
   </div>
 </Section>
+
 
 
         {/* EQUIPMENT */}
@@ -834,3 +855,106 @@ export default function EMCLabUltra() {
     </div>
   );
 }
+
+
+
+
+function TestDetailsModal({ open, onClose, test, t }) {
+  React.useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+
+    // Body scroll lock (modal ochiq payt orqa fon siljimasin)
+    const original = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = original;
+    };
+  }, [open, onClose]);
+
+  if (!open || !test) return null;
+
+  const content =
+    (test.detailsUz || test.detailsRu)
+      ? t(test.detailsUz || "", test.detailsRu || "")
+      : t(
+          "Bu sinov bo‘yicha to‘liq ma’lumot keyinroq joylanadi. Hozircha maslahat uchun biz bilan bog‘laning.",
+          "Полная информация по испытанию будет опубликована позже. Пока свяжитесь с нами для консультации."
+        );
+
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div
+        role="dialog"
+        aria-modal="true"
+        className="relative w-[94vw] max-w-3xl max-h-[85vh] rounded-2xl bg-white text-gray-900 shadow-2xl dark:bg-slate-900 dark:text-slate-100"
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between gap-4 border-b border-black/10 px-5 py-4 dark:border-white/10">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-xl font-semibold">
+              <span className="text-2xl">{test.icon}</span>
+              <span className="truncate">{test.title}</span>
+            </div>
+            <div className="mt-1 inline-flex items-center gap-2">
+              <span className="inline-flex items-center rounded-full bg-sky-100 px-2.5 py-0.5 text-xs font-medium text-sky-700 dark:bg-sky-900/30 dark:text-sky-200">
+                {test.code}
+              </span>
+              {test.note && (
+                <span className="text-xs text-gray-500 dark:text-gray-400">• {test.note}</span>
+              )}
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded-full bg-black/5 px-2 py-1 text-sm hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/20"
+            aria-label="Close"
+            title="Yopish"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Body (scrollable) */}
+        <div className="px-5 py-4 max-h-[58vh] overflow-auto leading-7 text-[15px]">
+          {content.split("\n").map((para, i) => (
+            <p key={i} className="mb-3 whitespace-pre-wrap">{para}</p>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between gap-3 border-t border-black/10 px-5 py-4 dark:border-white/10">
+          <div className="text-xs text-gray-500 dark:text-gray-400">
+            {t("Savollar bo‘lsa — pastdagi tugma orqali bog‘laning.", "Есть вопросы — свяжитесь через кнопку ниже.")}
+          </div>
+          <div className="flex items-center gap-2">
+            <a
+              href="#contact"
+              onClick={onClose}
+              className="rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+            >
+              {t("Maslahat so‘rash", "Запросить консультацию")}
+            </a>
+            <button
+              onClick={onClose}
+              className="rounded-xl border border-black/10 px-4 py-2 text-sm font-medium hover:bg-black/5 dark:border-white/10 dark:hover:bg-white/10"
+            >
+              {t("Yopish", "Закрыть")}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+<TestDetailsModal
+  open={openTestModal}
+  onClose={closeTest}
+  test={selectedTest}
+  t={(uz, ru) => (lang === "uz" ? uz : ru)}
+/>
