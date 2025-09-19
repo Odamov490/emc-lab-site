@@ -518,36 +518,53 @@ export default function EMCLabUltra() {
           </div>
         </Section>
 
-        {/* SERVICES */}
-        <Section
-          id="services"
-          title={lang==="uz" ? "Xizmatlar va sinovlar" : "Услуги и испытания"}
-          subtitle={lang==="uz" ? "IEC/CISPR talablari asosida to‘liq EMC dasturi" : "Полный перечень EMC-испытаний по IEC/CISPR"}
+       {/* SERVICES */}
+<Section
+  id="services"
+  title={lang === "uz" ? "Xizmatlar va sinovlar" : "Услуги и испытания"}
+  subtitle={lang === "uz" ? "IEC/CISPR talablari asosida to‘liq EMC dasturi" : "Полный перечень EMC-испытаний по IEC/CISPR"}
+>
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+    {TESTS.map((tst, i) => (
+      <Card
+        key={i}
+        className="p-6 hover:shadow-lg transition bg-gradient-to-r from-sky-700 to-cyan-600 text-white"
+      >
+        {/* sarlavha + badge */}
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+          <h3 className="text-base font-semibold flex items-start gap-2 drop-shadow leading-tight">
+            <span className="text-xl leading-none">{tst.icon}</span>
+            <span className="break-words">{tst.title}</span>
+          </h3>
+
+          {/* Mobil: to‘liq ko‘rsatish; sm+: 60% gacha va truncate */}
+          <span
+            className="
+              inline-flex items-center rounded-full px-3 py-1 bg-white text-gray-900 shadow-md
+              text-[11px] sm:text-xs
+              max-w-full sm:max-w-[60%]
+              sm:truncate
+            "
+          >
+            {tst.code}
+          </span>
+        </div>
+
+        <p className="mt-3 text-sm text-white/90 drop-shadow">
+          {tst.note}
+        </p>
+
+        <a
+          href="#contact"
+          className="mt-4 inline-block text-sm font-medium underline decoration-white/80 hover:decoration-2"
         >
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {TESTS.map((tst, i) => (
-              <Card key={i} className="p-6 hover:shadow-lg transition bg-gradient-to-r from-sky-700 to-cyan-600 text-white">
-                <div className="flex items-start justify-between gap-3">
-                  <h3 className="text-base font-semibold flex items-start gap-2 drop-shadow">
-                    <span className="text-xl leading-none">{tst.icon}</span>
-                    <span>{tst.title}</span>
-                  </h3>
-                  <span className="shrink-0 inline-flex max-w-[60%] truncate items-center rounded-full px-3 py-1 text-xs font-medium bg-white text-gray-900 shadow-md">
-                    {tst.code}
-                  </span>
-                </div>
+          {lang === "uz" ? "Buyurtma berish" : "Заказать"}
+        </a>
+      </Card>
+    ))}
+  </div>
+</Section>
 
-                <p className="mt-3 text-sm text-white/90 drop-shadow">
-                  {tst.note}
-                </p>
-
-                <a href="#contact" className="mt-4 inline-block text-sm font-medium underline decoration-white/80 hover:decoration-2">
-                  {lang==="uz" ? "Buyurtma berish" : "Заказать"}
-                </a>
-              </Card>
-            ))}
-          </div>
-        </Section>
 
         {/* EQUIPMENT */}
         <Section id="equipment" title={lang==="uz" ? "Jihozlar" : "Оборудование"} subtitle={lang==="uz" ? "Asosiy o‘lchash va sinov kompleksi" : "Основной комплекс измерений и испытаний"}>
