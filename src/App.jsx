@@ -843,12 +843,8 @@ export default function EMCLabUltra() {
               </div>
             </div>
           </div>
-       <footer className="bg-gradient-to-r from-sky-700 to-cyan-600">
-  ...
-</footer>
-
-{/* shu yerda qo‘yiladi */}
-<ScrollToTopButton offset={300} />
+        </footer>
+        <ScrollToTopButton />
       </div>
 
       {/* LIGHTBOX (faqat jihozlar va galereya uchun) */}
