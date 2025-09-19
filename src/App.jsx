@@ -78,22 +78,55 @@ const QUICK_LINKS = [
   },
 ];
 
+/********************* DETAILS for modal (short examples; kengaytirib borishingiz mumkin) *********************/
+const TEST_DETAILS = {
+  "O’zMSt IEC 61000.4.2-2023": {
+    uz: `
+Elektrostatik razryad (ESD) sinovi qurilmaning inson/atrof-muhitdan keladigan statik zaryadga barqarorligini baholaydi.
 
+• Sinov darajalari: ±2…±15 kV (havo va bevosita kontakt)
+• Qo‘llanishi: maishiy, sanoat va IT qurilmalari
+• Natija: qurilma ishi uzluksizligi va tiklanish mezonlari (A/B/C/D)
 
-const TESTS = [
-  {
-    code: "O’zMSt IEC 61000.4.2-2023",
-    title: "Устойчивость к электростатическим разрядам",
-    note: "Sifat",
-    icon: "⚡",
-    detailsUz:
-      "Bu yerga uzun-uzun izoh. ESD sinovi bo‘yicha to‘liq ma’lumot: darajalar, usul, o‘lchov sharoitlari, qadamlar, natija talablari va h.k. ...",
-    detailsRu:
-      "Здесь длинное описание. Полная информация по ESD: уровни, методика, условия, шаги измерений, требования к результатам и т.п. ...",
+Tayyorlash: yerga ulash, plastik korpus, ochiq portlar, devorga o‘rnatish sharoitlari va h.k.
+    `,
+    ru: `
+Испытание на электростатический разряд (ESD) оценивает устойчивость оборудования к статическим зарядам от человека/окружения.
+
+• Уровни: ±2…±15 кВ (контакт/воздух)
+• Область: бытовые, промышленные и IT-устройства
+• Результат: критерии функционирования A/B/C/D
+
+Подготовка: заземление, пластиковый корпус, открытые порты, настенное крепление и т.д.
+    `,
   },
-  // ... qolgan testlar ...
-];
+  "O‘z MSt IEC 61000-4-4:2023": {
+    uz: `
+Tez o‘tuvchi o‘tish jarayonlari (EFT/Burst) – tarmoq hamda signal liniyalaridagi kalitlash jarayonlaridan paydo bo‘ladigan impulslar ta'siriga barqarorlik.
 
+• Impuls paketi: 5/50 ns, takrorlanish 5 kHz – 100 kHz
+• Kiritish: quvvat liniyasi, signal/muloqot portlari (CDN orqali)
+• Maqsad: nazorat tizimlari, invertorlar, boshqaruv modullari
+    `,
+    ru: `
+EFT/Burst – устойчивость к быстропеременным переходным процессам от коммутаций в сетях.
+
+• Пакет: 5/50 нс, повторение 5–100 кГц
+• Ввод: питание, сигнальные/коммуникационные порты (через CDN)
+• Цель: контроллеры, инверторы, управляющие модули
+    `,
+  },
+  "default": {
+    uz: `
+Ushbu sinov bo‘yicha batafsil texnik ma’lumotlar: sinov darajalari, joylashtirish, portlar, mezonlar va protokol misollari. Zarur bo‘lsa,
+mijozga mos individual dastur tuziladi. Qo‘shimcha ma’lumot uchun "Bog‘lanish" bo‘limidan ariza qoldiring.
+    `,
+    ru: `
+Подробные технические сведения по испытанию: уровни, размещение, порты, критерии и примеры протоколов. При необходимости
+формируем индивидуальную программу под изделие. Для уточнения оставьте заявку в разделе «Контакты».
+    `,
+  }
+};
 
 /********************* UI PRIMITIVES *********************/
 function Badge({ children }) {
@@ -183,6 +216,71 @@ function Lightbox({ open, images, index, onClose, onPrev, onNext }) {
   );
 }
 
+/********************* TEST DETAILS MODAL *********************/
+function TestDetailsModal({ open, onClose, test, lang = "uz" }) {
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!open || !test) return null;
+
+  const details =
+    TEST_DETAILS[test.code]?.[lang] ||
+    TEST_DETAILS["default"][lang];
+
+  return (
+    <div
+      className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-black/10 dark:border-white/10"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start gap-3 p-4 sm:p-5 border-b border-black/10 dark:border-white/10">
+          <div className="text-2xl">{test.icon}</div>
+          <div className="flex-1 min-w-0">
+            <div className="text-lg sm:text-xl font-semibold leading-tight">{test.title}</div>
+            <div className="mt-1">
+              <span className="inline-flex items-center rounded-full bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-200 px-3 py-1 text-[11px] sm:text-xs">
+                {test.code}
+              </span>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="ml-2 rounded-full bg-white/70 dark:bg-white/10 border border-black/10 px-3 py-1 text-sm shadow hover:opacity-80"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className="p-4 sm:p-6 text-sm sm:text-[15px] leading-6 text-slate-700 dark:text-slate-200 whitespace-pre-wrap">
+          {details}
+        </div>
+
+        <div className="p-4 sm:p-5 border-t border-black/10 dark:border-white/10 flex items-center justify-end gap-3">
+          <a
+            href="#contact"
+            className="rounded-xl bg-gray-900 text-white px-3 py-2 text-sm hover:opacity-90"
+          >
+            {lang === "uz" ? "Sinovga buyurtma" : "Заявка на испытание"}
+          </a>
+          <button
+            onClick={onClose}
+            className="rounded-xl border border-black/10 px-3 py-2 text-sm hover:bg-black/5"
+          >
+            {lang === "uz" ? "Yopish" : "Закрыть"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /********************* EQUIPMENT CARD (multi image + thumbs) *********************/
 function EquipmentCard({ eq, onOpenLightbox }) {
   const [idx, setIdx] = useState(0);
@@ -262,20 +360,6 @@ export default function EMCLabUltra() {
   const [sending, setSending] = useState(false);
   const [active, setActive] = useState("about");
   const [scrollProgress, setScrollProgress] = useState(0);
-  const t = (uz, ru) => (lang === "uz" ? uz : ru);
-
-  const [openTestModal, setOpenTestModal] = useState(false);
-const [selectedTest, setSelectedTest] = useState(null);
-
-const openTest = (test) => {
-  setSelectedTest(test);
-  setOpenTestModal(true);
-};
-const closeTest = () => {
-  setOpenTestModal(false);
-  setSelectedTest(null);
-};
-
 
   // Lightbox
   const [lbOpen, setLbOpen] = useState(false);
@@ -285,6 +369,12 @@ const closeTest = () => {
   const closeLightbox = () => setLbOpen(false);
   const prevLb = (delta = -1) => setLbIndex((p) => (p + delta + lbImages.length) % lbImages.length);
   const nextLb = (delta = 1) => setLbIndex((p) => (p + delta + lbImages.length) % lbImages.length);
+
+  // Test details modal
+  const [openTestModal, setOpenTestModal] = useState(false);
+  const [selectedTest, setSelectedTest] = useState(null);
+  const openTest = (t) => { setSelectedTest(t); setOpenTestModal(true); };
+  const closeTest = () => setOpenTestModal(false);
 
   // dekor blobs
   const blobs = useMemo(
@@ -408,10 +498,7 @@ const closeTest = () => {
         {/* HERO */}
         <section className="relative overflow-hidden" id="top">
           <div className="absolute inset-0 -z-10" aria-hidden>
-            {[
-              { class: "bg-gradient-to-tr from-sky-500 to-cyan-400", size: "h-[42rem] w-[42rem]", blur: "blur-3xl", pos: "-top-40 -left-20" },
-              { class: "bg-gradient-to-br from-indigo-400 to-sky-400", size: "h-[32rem] w-[32rem]", blur: "blur-3xl", pos: "top-20 -right-16" },
-            ].map((b, i) => (
+            {blobs.map((b, i) => (
               <div key={i} className={`pointer-events-none absolute ${b.pos} ${b.size} ${b.blur} opacity-40 dark:opacity-30 rounded-full ${b.class}`} />
             ))}
           </div>
@@ -548,48 +635,66 @@ const closeTest = () => {
           </div>
         </Section>
 
-{/* SERVICES */}
-<Section
-  id="services"
-  title={lang==="uz" ? "Xizmatlar va sinovlar" : "Услуги и испытания"}
-  subtitle={lang==="uz" ? "IEC/CISPR talablari asosida to‘liq EMC dasturi" : "Полный перечень EMC-испытаний по IEC/CISPR"}
->
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-    {TESTS.map((tst, i) => (
-      <Card key={i} className="p-6 hover:shadow-lg transition bg-gradient-to-r from-sky-700 to-cyan-600 text-white">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-          <h3 className="flex-1 min-w-0 text-base font-semibold flex items-start gap-2 drop-shadow leading-tight">
-            <span className="text-xl leading-none">{tst.icon}</span>
-            <span className="break-words">{tst.title}</span>
-          </h3>
-          <span className="mt-1 sm:mt-0 self-start sm:self-auto inline-flex items-center rounded-full px-3 py-1 bg-white text-gray-900 shadow-md text-[11px] sm:text-xs whitespace-nowrap truncate max-w-full sm:max-w-[45%] md:max-w-[55%] lg:max-w-[60%]">
-            {tst.code}
-          </span>
-        </div>
+        {/* SERVICES */}
+        <Section
+          id="services"
+          title={lang === "uz" ? "Xizmatlar va sinovlar" : "Услуги и испытания"}
+          subtitle={
+            lang === "uz"
+              ? "IEC/CISPR talablari asosida to‘liq EMC dasturi"
+              : "Полный перечень EMC-испытаний по IEC/CISPR"
+          }
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {TESTS.map((tst, i) => (
+              <Card
+                key={i}
+                className="p-6 hover:shadow-lg transition bg-gradient-to-r from-sky-700 to-cyan-600 text-white"
+              >
+                {/* Sarlavha + Badge qismi */}
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                  <h3 className="flex-1 min-w-0 text-base font-semibold flex items-start gap-2 drop-shadow leading-tight">
+                    <span className="text-xl leading-none">{tst.icon}</span>
+                    <span className="break-words">{tst.title}</span>
+                  </h3>
 
-        <p className="mt-3 text-sm text-white/90 drop-shadow">{tst.note}</p>
+                  <span
+                    className="
+                      mt-1 sm:mt-0 self-start sm:self-auto
+                      inline-flex items-center rounded-full px-3 py-1 bg-white text-gray-900 shadow-md
+                      text-[11px] sm:text-xs
+                      whitespace-nowrap truncate
+                      max-w-full sm:max-w-[45%] md:max-w-[55%] lg:max-w-[60%]
+                    "
+                  >
+                    {tst.code}
+                  </span>
+                </div>
 
-        <div className="mt-4 flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => openTest(tst)}
-            className="rounded-xl bg-white/90 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-white"
-          >
-            {lang==="uz" ? "Batafsil" : "Подробнее"}
-          </button>
-          <a
-            href="#contact"
-            className="rounded-xl border border-white/40 px-3 py-2 text-sm font-medium hover:bg-white/10"
-          >
-            {lang==="uz" ? "Maslahat" : "Консультация"}
-          </a>
-        </div>
-      </Card>
-    ))}
-  </div>
-</Section>
+                {/* Note */}
+                <p className="mt-3 text-sm text-white/90 drop-shadow">{tst.note}</p>
 
+                {/* Tugmalar */}
+                <div className="mt-4 flex flex-wrap items-center gap-3">
+                  <button
+                    onClick={() => openTest(tst)}
+                    className="rounded-xl bg-white text-gray-900 px-3 py-1.5 text-sm font-medium shadow hover:opacity-90"
+                  >
+                    {lang === "uz" ? "Batafsil" : "Подробнее"}
+                  </button>
 
+                  {/* Istasangiz pastdagini qoldirasiz yoki olib tashlaysiz */}
+                  <a
+                    href="#contact"
+                    className="rounded-xl border border-white/60 text-white px-3 py-1.5 text-sm font-medium hover:bg-white/10"
+                  >
+                    {lang === "uz" ? "Buyurtma" : "Заказать"}
+                  </a>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </Section>
 
         {/* EQUIPMENT */}
         <Section id="equipment" title={lang==="uz" ? "Jihozlar" : "Оборудование"} subtitle={lang==="uz" ? "Asosiy o‘lchash va sinov kompleksi" : "Основной комплекс измерений и испытаний"}>
@@ -636,7 +741,7 @@ const closeTest = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {STAFF.map((p, i) => (
               <Card key={i} className="p-5 text-center">
-                <img src={p.img} alt={p.name} className="w-24 h-24 mx-auto rounded-full object-cover border" onError={(e)=>{ e.currentTarget.src="/placeholder-avatar.jpg"; }} />
+                <img src={p.img} alt={p.name} className="w-28 h-28 sm:w-32 sm:h-32 mx-auto rounded-full object-cover border" onError={(e)=>{ e.currentTarget.src="/placeholder-avatar.jpg"; }} />
                 <div className="mt-3 text-lg font-semibold">{p.name}</div>
                 <div className="text-sm text-gray-600 dark:text-gray-300">{p.role}</div>
               </Card>
@@ -852,109 +957,14 @@ const closeTest = () => {
         onPrev={() => prevLb(-1)}
         onNext={() => nextLb(1)}
       />
+
+      {/* TEST MODAL */}
+      <TestDetailsModal
+        open={openTestModal}
+        onClose={closeTest}
+        test={selectedTest}
+        lang={lang}
+      />
     </div>
   );
 }
-
-
-
-
-function TestDetailsModal({ open, onClose, test, t }) {
-  React.useEffect(() => {
-    if (!open) return;
-    const onKey = (e) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-
-    // Body scroll lock (modal ochiq payt orqa fon siljimasin)
-    const original = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = original;
-    };
-  }, [open, onClose]);
-
-  if (!open || !test) return null;
-
-  const content =
-    (test.detailsUz || test.detailsRu)
-      ? t(test.detailsUz || "", test.detailsRu || "")
-      : t(
-          "Bu sinov bo‘yicha to‘liq ma’lumot keyinroq joylanadi. Hozircha maslahat uchun biz bilan bog‘laning.",
-          "Полная информация по испытанию будет опубликована позже. Пока свяжитесь с нами для консультации."
-        );
-
-  return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div
-        role="dialog"
-        aria-modal="true"
-        className="relative w-[94vw] max-w-3xl max-h-[85vh] rounded-2xl bg-white text-gray-900 shadow-2xl dark:bg-slate-900 dark:text-slate-100"
-      >
-        {/* Header */}
-        <div className="flex items-start justify-between gap-4 border-b border-black/10 px-5 py-4 dark:border-white/10">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 text-xl font-semibold">
-              <span className="text-2xl">{test.icon}</span>
-              <span className="truncate">{test.title}</span>
-            </div>
-            <div className="mt-1 inline-flex items-center gap-2">
-              <span className="inline-flex items-center rounded-full bg-sky-100 px-2.5 py-0.5 text-xs font-medium text-sky-700 dark:bg-sky-900/30 dark:text-sky-200">
-                {test.code}
-              </span>
-              {test.note && (
-                <span className="text-xs text-gray-500 dark:text-gray-400">• {test.note}</span>
-              )}
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="rounded-full bg-black/5 px-2 py-1 text-sm hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/20"
-            aria-label="Close"
-            title="Yopish"
-          >
-            ✕
-          </button>
-        </div>
-
-        {/* Body (scrollable) */}
-        <div className="px-5 py-4 max-h-[58vh] overflow-auto leading-7 text-[15px]">
-          {content.split("\n").map((para, i) => (
-            <p key={i} className="mb-3 whitespace-pre-wrap">{para}</p>
-          ))}
-        </div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-between gap-3 border-t border-black/10 px-5 py-4 dark:border-white/10">
-          <div className="text-xs text-gray-500 dark:text-gray-400">
-            {t("Savollar bo‘lsa — pastdagi tugma orqali bog‘laning.", "Есть вопросы — свяжитесь через кнопку ниже.")}
-          </div>
-          <div className="flex items-center gap-2">
-            <a
-              href="#contact"
-              onClick={onClose}
-              className="rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
-            >
-              {t("Maslahat so‘rash", "Запросить консультацию")}
-            </a>
-            <button
-              onClick={onClose}
-              className="rounded-xl border border-black/10 px-4 py-2 text-sm font-medium hover:bg-black/5 dark:border-white/10 dark:hover:bg-white/10"
-            >
-              {t("Yopish", "Закрыть")}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-
-<TestDetailsModal
-  open={openTestModal}
-  onClose={closeTest}
-  test={selectedTest}
-  t={(uz, ru) => (lang === "uz" ? uz : ru)}
-/>
