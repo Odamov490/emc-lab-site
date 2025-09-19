@@ -518,11 +518,15 @@ export default function EMCLabUltra() {
           </div>
         </Section>
 
-       {/* SERVICES */}
+{/* SERVICES */}
 <Section
   id="services"
   title={lang === "uz" ? "Xizmatlar va sinovlar" : "Услуги и испытания"}
-  subtitle={lang === "uz" ? "IEC/CISPR talablari asosida to‘liq EMC dasturi" : "Полный перечень EMC-испытаний по IEC/CISPR"}
+  subtitle={
+    lang === "uz"
+      ? "IEC/CISPR talablari asosida to‘liq EMC dasturi"
+      : "Полный перечень EMC-испытаний по IEC/CISPR"
+  }
 >
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
     {TESTS.map((tst, i) => (
@@ -530,30 +534,30 @@ export default function EMCLabUltra() {
         key={i}
         className="p-6 hover:shadow-lg transition bg-gradient-to-r from-sky-700 to-cyan-600 text-white"
       >
-        {/* sarlavha + badge */}
+        {/* Sarlavha + Badge qismi */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-          <h3 className="text-base font-semibold flex items-start gap-2 drop-shadow leading-tight">
+          <h3 className="flex-1 min-w-0 text-base font-semibold flex items-start gap-2 drop-shadow leading-tight">
             <span className="text-xl leading-none">{tst.icon}</span>
             <span className="break-words">{tst.title}</span>
           </h3>
 
-          {/* Mobil: to‘liq ko‘rsatish; sm+: 60% gacha va truncate */}
           <span
             className="
+              mt-1 sm:mt-0 self-start sm:self-auto
               inline-flex items-center rounded-full px-3 py-1 bg-white text-gray-900 shadow-md
               text-[11px] sm:text-xs
-              max-w-full sm:max-w-[60%]
-              sm:truncate
+              whitespace-nowrap truncate
+              max-w-full sm:max-w-[45%] md:max-w-[55%] lg:max-w-[60%]
             "
           >
             {tst.code}
           </span>
         </div>
 
-        <p className="mt-3 text-sm text-white/90 drop-shadow">
-          {tst.note}
-        </p>
+        {/* Note */}
+        <p className="mt-3 text-sm text-white/90 drop-shadow">{tst.note}</p>
 
+        {/* Buyurtma tugmasi */}
         <a
           href="#contact"
           className="mt-4 inline-block text-sm font-medium underline decoration-white/80 hover:decoration-2"
