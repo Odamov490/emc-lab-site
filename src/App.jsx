@@ -751,8 +751,8 @@ export default function EMCLabUltra() {
 >
   <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-lg">
     <iframe
-      src="https://kuula.co/embed/collection/7fz3x"
-      title="Virtual Tour Demo"
+      src="https://www.google.com/maps/embed?pb=!4v1700000000000!6m8!1m7!1sCAoSLEFGMVFpcE9Sdl9lYl9QeS1zN0pPSldCdmRkM1lDa0x4U3pNa2RjNEF4QlBF!2m2!1d41.311151!2d69.279737!3f0!4f0!5f0.7820865974627469"
+      title="Google Street View"
       className="absolute inset-0 w-full h-full border-0"
       allowFullScreen
       loading="lazy"
@@ -761,9 +761,9 @@ export default function EMCLabUltra() {
 
   <p className="mt-4 text-sm text-gray-600 dark:text-gray-300 max-w-3xl">
     {lang === "uz"
-      ? "Siz ushbu demo 360° panorama orqali xonalarni ko‘rib chiqishingiz mumkin. "
+      ? "Hozircha demo 360° panorama joylashtirildi (Google Street View orqali). "
         + "Ertaga biz o‘z laboratoriyamizni suratga olib, ushbu havolani almashtiramiz."
-      : "Вы можете посмотреть демо 360° панораму помещений. "
+      : "Сейчас вставлена демо 360° панорама (через Google Street View). "
         + "Завтра мы снимем нашу лабораторию и заменим эту ссылку."}
   </p>
 </Section>
