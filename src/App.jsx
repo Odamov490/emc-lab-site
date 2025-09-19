@@ -739,8 +739,7 @@ export default function EMCLabUltra() {
           </div>
         </Section>
 
-
-        {/* EXCURSION */}
+{/* EXCURSION */}
 <Section
   id="excursion"
   title={lang==="uz" ? "Ekskursiya" : "Экскурсия"}
@@ -749,12 +748,11 @@ export default function EMCLabUltra() {
   <Card className="overflow-hidden p-0">
     <div className="relative w-full aspect-video">
       <iframe
-        // 🔁 HOZIRCHA: A-Frame rasmiy demo 360
-        // ⤴️ ERTAga: bu src ni o‘zingizning panorama URL’ingizga almashtirasiz
-        src="https://aframe.io/aframe/examples/boilerplate/360-image/"
+        // Hozircha demo panorama (Kuula public)
+        src="https://kuula.co/share/7YZh4?logo=1&info=1&fs=1&vr=1&zoom=1&initload=0&thumbs=1"
         title="EMC Lab 360 Tour (Demo)"
         className="absolute inset-0 w-full h-full border-0"
-        allow="accelerometer; gyroscope; fullscreen"
+        allow="xr-spatial-tracking; gyroscope; accelerometer; vr"
         allowFullScreen
         loading="lazy"
       />
@@ -763,16 +761,11 @@ export default function EMCLabUltra() {
 
   <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
     {lang==="uz"
-      ? "Panoramali rejimda laboratoriya bo‘ylab sayohat qiling. Sichqoncha/barmoqlar bilan aylantiring, to‘liq ekran uchun ↗ belgini bosing."
-      : "Совершите тур по лаборатории в панорамном режиме. Вращайте мышкой/пальцами, для полноэкранного режима нажмите ↗."}
-  </div>
-
-  <div className="mt-3 text-xs text-gray-500">
-    {lang==="uz"
-      ? "Eslatma: bu vaqtincha demo. O‘z panorama havolangiz tayyor bo‘lgach, iframe dagi src qiymatini almashtiring."
-      : "Примечание: это временный демо. Когда будет ваша ссылка на панораму, замените значение src в iframe."}
+      ? "Panoramali rejimda laboratoriya bo‘ylab sayohat qiling. Sichqoncha yoki barmoqlar bilan aylantiring, ↗ tugmasi orqali to‘liq ekranga chiqishingiz mumkin."
+      : "Совершите тур по лаборатории в панорамном режиме. Вращайте мышкой или пальцами, для полноэкранного режима нажмите ↗."}
   </div>
 </Section>
+
 
 
 
