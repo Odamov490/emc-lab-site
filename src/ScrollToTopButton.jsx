@@ -42,17 +42,14 @@ export default function ScrollToTopButton({ offset = 300 }) {
       title="Tepaga chiqish"
       onClick={scrollToTop}
       onKeyDown={onKey}
-     className={`
-  fixed z-50 
-  bottom-20 right-8   // ⬅️ pastdan 80px, o‘ngdan 32px
-  h-12 w-12 rounded-full shadow-lg border border-black/10
-  bg-gradient-to-br from-sky-600 to-cyan-500 text-white text-xl
-  flex items-center justify-center select-none
-  transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-cyan-300/50
-  hover:translate-y-[-2px]
-  ${visible ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-90 pointer-events-none"}
-`}
-
+      className={`fixed z-50 bottom-20 right-8   // ⬅️ pastdan 80px, o‘ngdan 32px
+        h-12 w-12 rounded-full shadow-lg border border-black/10
+        bg-gradient-to-br from-sky-600 to-cyan-500 text-white text-xl
+        flex items-center justify-center select-none
+        transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-cyan-300/50
+        hover:translate-y-[-2px]
+        ${visible ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-90 pointer-events-none"}
+      `}
     >
       {/* yuqoriga o'qcha */}
       <span aria-hidden>↑</span>
