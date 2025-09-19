@@ -43,15 +43,15 @@ const EQUIPMENT = [
 const STAFF = [
   { name: "Xakimov Aziz", role: "Laboratoriya rahbari", img: "/staff/1.png" },
   { name: "Tillayev Anvar", role: "Boshliq o'rinbosari", img: "/staff/2.png" },
-  { name: "Abdurashidov Davron", role: "Sektor boshlig'i", img: "/staff/3.jpg" },
+  { name: "Abdurashidov Davron", role: "Sektor boshlig'i", img: "/staff/3.png" },
   { name: "Odamov G‘ulomjon", role: "Bosh mutaxassis", img: "/staff/4.jpg" },
-  { name: "Reimbayev Xushnud", role: "1-toifali mutaxassis", img: "/staff/5.jpg" },
-  { name: "Alekseyev Andrey", role: "1-toifali mutaxassis", img: "/staff/6.jpg" },
-  { name: "Abduvohobov Ravshan", role: "2-toifali mutaxassis", img: "/staff/7.jpg" },
+  { name: "Reimbayev Xushnud", role: "1-toifali mutaxassis", img: "/staff/5.png" },
+  { name: "Alekseyev Andrey", role: "1-toifali mutaxassis", img: "/staff/6.png" },
+  { name: "Abduvohobov Ravshan", role: "2-toifali mutaxassis", img: "/staff/7.png" },
   { name: "Joldasbaev Dastanbek", role: "2-toifali mutaxassis", img: "/staff/8.jpg" },
-  { name: "Sobirov Doston", role: "Texnik xodim", img: "/staff/9.jpg" },
-  { name: "Karimov Suxrob", role: "Texnik xodim", img: "/staff/10.jpg" },
-  { name: "Sharofiddinov Najmiddin", role: "Texnik xodim", img: "/staff/11.jpg" },
+  { name: "Sobirov Doston", role: "Texnik xodim", img: "/staff/9.png" },
+  { name: "Karimov Suxrob", role: "Texnik xodim", img: "/staff/10.png" },
+  { name: "Sharofiddinov Najmiddin", role: "Texnik xodim", img: "/staff/11.png" },
 ];
 
 const GALLERY = ["/gallery/1.jpg", "/gallery/2.jpg", "/gallery/3.jpg", "/gallery/4.jpg", "/gallery/5.jpg", "/gallery/6.jpg"];
