@@ -41,8 +41,8 @@ const EQUIPMENT = [
 
 // 11 xodim
 const STAFF = [
-  { name: "Xakimov Aziz", role: "Laboratoriya rahbari", img: "/staff/1.jpg" },
-  { name: "Tillayev Anvar", role: "Boshliq o'rinbosari", img: "/staff/2.jpg" },
+  { name: "Xakimov Aziz", role: "Laboratoriya rahbari", img: "/staff/1.png" },
+  { name: "Tillayev Anvar", role: "Boshliq o'rinbosari", img: "/staff/2.png" },
   { name: "Abdurashidov Davron", role: "Sektor boshlig'i", img: "/staff/3.jpg" },
   { name: "Odamov G‘ulomjon", role: "Bosh mutaxassis", img: "/staff/4.jpg" },
   { name: "Reimbayev Xushnud", role: "1-toifali mutaxassis", img: "/staff/5.jpg" },
