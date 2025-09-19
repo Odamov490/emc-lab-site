@@ -609,35 +609,19 @@ export default function EMCLabUltra() {
             ))}
           </div>
         </Section>
-        
-{/* TEAM */}
-<Section
-  id="team"
-  title={lang === "uz" ? "Bizning jamoa" : "Наша команда"}
-  subtitle={lang === "uz" ? "11 nafar tajribali mutaxassis" : "11 опытных специалистов"}
->
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-    {STAFF.map((p, i) => (
-      <Card key={i} className="p-5 text-center">
-        {/* Avatar – kattalashtirilgan va siqilmaydi */}
-        <div className="mx-auto rounded-full overflow-hidden
-                        w-28 h-28 sm:w-32 sm:h-32 lg:w-36 lg:h-36
-                        ring-1 ring-black/5 border border-white/50 shadow">
-          <img
-            src={p.img}
-            alt={p.name}
-            className="w-full h-full object-cover object-center"
-            onError={(e) => { e.currentTarget.src = "/placeholder-avatar.jpg"; }}
-          />
-        </div>
 
-        <div className="mt-3 text-lg font-semibold">{p.name}</div>
-        <div className="text-sm text-gray-600 dark:text-gray-300">{p.role}</div>
-      </Card>
-    ))}
-  </div>
-</Section>
-
+        {/* TEAM */}
+        <Section id="team" title={lang==="uz" ? "Bizning jamoa" : "Наша команда"} subtitle={lang==="uz" ? "11 nafar tajribali mutaxassis" : "11 опытных специалистов"}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {STAFF.map((p, i) => (
+              <Card key={i} className="p-5 text-center">
+                <img src={p.img} alt={p.name} className="w-24 h-24 mx-auto rounded-full object-cover border" onError={(e)=>{ e.currentTarget.src="/placeholder-avatar.jpg"; }} />
+                <div className="mt-3 text-lg font-semibold">{p.name}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">{p.role}</div>
+              </Card>
+            ))}
+          </div>
+        </Section>
 
         {/* PRICING */}
         <Section id="pricing" title={lang==="uz" ? "Narxlar" : "Цены"} subtitle={lang==="uz" ? "Individual kalkulyatsiya" : "Индивидуальный расчет"}>
