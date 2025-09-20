@@ -262,20 +262,15 @@ function TestDetailsModal({ open, onClose, test, lang = "uz" }) {
           {details}
         </div>
 
-        <div className="p-4 sm:p-5 border-t border-black/10 dark:border-white/10 flex items-center justify-end gap-3">
-          <a
-            href="#contact"
-            className="rounded-xl bg-gray-900 text-white px-3 py-2 text-sm hover:opacity-90"
-          >
-            {lang === "uz" ? "Sinovga buyurtma" : "Заявка на испытание"}
-          </a>
-          <button
-            onClick={onClose}
-            className="rounded-xl border border-black/10 px-3 py-2 text-sm hover:bg-black/5"
-          >
-            {lang === "uz" ? "Yopish" : "Закрыть"}
-          </button>
-        </div>
+     <div className="p-4 sm:p-5 border-t border-black/10 dark:border-white/10 flex items-center justify-end">
+  <button
+    onClick={onClose}
+    className="rounded-xl border border-black/10 px-3 py-2 text-sm hover:bg-black/5"
+  >
+    {lang === "uz" ? "Yopish" : "Закрыть"}
+  </button>
+</div>
+
       </div>
     </div>
   );
@@ -785,20 +780,15 @@ export default function EMCLabUltra() {
                 <p className="mt-3 text-sm text-white/90 drop-shadow">{tst.note}</p>
 
                 {/* Tugmalar */}
-                <div className="mt-4 flex flex-wrap items-center gap-3">
-                  <button
-                    onClick={() => openTest(tst)}
-                    className="rounded-xl bg-white text-gray-900 px-3 py-1.5 text-sm font-medium shadow hover:opacity-90"
-                  >
-                    {lang === "uz" ? "Batafsil" : "Подробнее"}
-                  </button>
-                  <a
-                    href="#contact"
-                    className="rounded-xl border border-white/60 text-white px-3 py-1.5 text-sm font-medium hover:bg-white/10"
-                  >
-                    {lang === "uz" ? "Buyurtma" : "Заказать"}
-                  </a>
-                </div>
+               <div className="mt-4">
+  <button
+    onClick={() => openTest(tst)}
+    className="rounded-xl bg-white text-gray-900 px-3 py-1.5 text-sm font-medium shadow hover:opacity-90"
+  >
+    {lang === "uz" ? "Batafsil" : "Подробнее"}
+  </button>
+</div>
+
               </Card>
             ))}
           </div>
