@@ -271,10 +271,6 @@ function TestDetailsModal({ open, onClose, test, lang = "uz" }) {
   </button>
 </div>
 
-      </div>
-    </div>
-  );
-}
 
 /********************* EQUIPMENT DETAILS MODAL (YANGI) *********************/
 function EquipmentDetailsModal({ open, onClose, equipment, lang = "uz" }) {
