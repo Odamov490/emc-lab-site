@@ -8,9 +8,10 @@ const NAV = [
   { href: "#equipment", label: { uz: "Jihozlar", ru: "Оборудование" } },
   { href: "#accreditation", label: { uz: "Akkreditatsiya", ru: "Аккредитация" } },
   { href: "#gallery", label: { uz: "Galereya", ru: "Галерея" } },
-  { href: "#excursion", label: { uz: "Ekskursiya", ru: "Экскурсия" } },
+   { href: "#excursion", label: { uz: "Ekskursiya", ru: "Экскурсия" } },
   { href: "#team", label: { uz: "Jamoa", ru: "Команда" } },
   { href: "#contact", label: { uz: "Bog‘lanish", ru: "Контакты" } },
+ 
 ];
 
 const TESTS = [
@@ -80,7 +81,7 @@ const QUICK_LINKS = [
   },
 ];
 
-/********************* DETAILS for modal (tests) *********************/
+/********************* DETAILS for modal (short examples; kengaytirib borishingiz mumkin) *********************/
 const TEST_DETAILS = {
   "O’zMSt IEC 61000.4.2-2023": {
     uz: `
@@ -118,7 +119,7 @@ EFT/Burst – устойчивость к быстропеременным пе�
 • Цель: контроллеры, инверторы, управляющие модули
     `,
   },
-  default: {
+  "default": {
     uz: `
 Ushbu sinov bo‘yicha batafsil texnik ma’lumotlar: sinov darajalari, joylashtirish, portlar, mezonlar va protokol misollari. Zarur bo‘lsa,
 mijozga mos individual dastur tuziladi. Qo‘shimcha ma’lumot uchun "Bog‘lanish" bo‘limidan ariza qoldiring.
@@ -127,7 +128,7 @@ mijozga mos individual dastur tuziladi. Qo‘shimcha ma’lumot uchun "Bog‘lan
 Подробные технические сведения по испытанию: уровни, размещение, порты, критерии и примеры протоколов. При необходимости
 формируем индивидуальную программу под изделие. Для уточнения оставьте заявку в разделе «Контакты».
     `,
-  },
+  }
 };
 
 /********************* UI PRIMITIVES *********************/
@@ -229,7 +230,9 @@ function TestDetailsModal({ open, onClose, test, lang = "uz" }) {
 
   if (!open || !test) return null;
 
-  const details = TEST_DETAILS[test.code]?.[lang] || TEST_DETAILS.default[lang];
+  const details =
+    TEST_DETAILS[test.code]?.[lang] ||
+    TEST_DETAILS["default"][lang];
 
   return (
     <div
@@ -281,96 +284,8 @@ function TestDetailsModal({ open, onClose, test, lang = "uz" }) {
   );
 }
 
-/********************* EQUIPMENT DETAILS MODAL (YANGI) *********************/
-function EquipmentDetailsModal({ open, onClose, equipment, lang = "uz" }) {
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
-
-  if (!open || !equipment) return null;
-
-  const imgs = Array.isArray(equipment.images) && equipment.images.length
-    ? equipment.images
-    : ["/placeholder-equipment.jpg"];
-
-  const detailsText =
-    equipment.details?.[lang] ||
-    equipment.details ||
-    (lang === "uz"
-      ? "Ushbu jihoz bo‘yicha batafsil ma’lumot tez orada qo‘shiladi. Kontakt bo‘limidan yozib yuboring — to‘liq spetsifikatsiyani jo‘natamiz."
-      : "Подробная информация об оборудовании будет добавлена позже. Напишите нам через раздел Контакты — вышлем полную спецификацию.");
-
-  return (
-    <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
-      <div
-        className="w-full max-w-4xl max-h-[85vh] overflow-y-auto rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-black/10 dark:border-white/10"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-start gap-3 p-4 sm:p-5 border-b border-black/10 dark:border-white/10">
-          <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-sky-500 to-cyan-500 text-white flex items-center justify-center font-semibold">
-            {equipment.name?.[0] || "E"}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-lg sm:text-xl font-semibold">{equipment.name}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">{equipment.desc}</div>
-          </div>
-          <button className="rounded-md px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-800" onClick={onClose}>
-            ✕
-          </button>
-        </div>
-
-        {/* Body */}
-        <div className="p-4 sm:p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-1">
-              <img
-                src={imgs[0]}
-                alt={equipment.name}
-                className="w-full h-48 object-cover rounded-lg shadow-sm"
-                onError={(e)=>{ e.currentTarget.src="/placeholder-equipment.jpg"; }}
-              />
-              {imgs.length > 1 && (
-                <div className="mt-3 grid grid-cols-4 gap-2">
-                  {imgs.map((s, i) => (
-                    <img
-                      key={i}
-                      src={s}
-                      alt={`${i}`}
-                      className="h-16 w-full object-cover rounded-md"
-                      onError={(e)=>{ e.currentTarget.src="/placeholder-equipment.jpg"; }}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="md:col-span-2">
-              <div className="text-sm sm:text-[15px] leading-6 text-slate-700 dark:text-slate-200 whitespace-pre-wrap">
-                {detailsText}
-              </div>
-
-              <div className="mt-4 flex items-center gap-3">
-                <a href="#contact" onClick={onClose} className="rounded-md bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm">
-                  {lang === "uz" ? "Ariza qoldirish" : "Оставить заявку"}
-                </a>
-                <button onClick={onClose} className="rounded-md border px-4 py-2 text-sm">
-                  {lang === "uz" ? "Yopish" : "Закрыть"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /********************* EQUIPMENT CARD (multi image + thumbs) *********************/
-function EquipmentCard({ eq, onOpenLightbox, onDetails }) {
+function EquipmentCard({ eq, onOpenLightbox }) {
   const [idx, setIdx] = useState(0);
 
   const imgs = Array.isArray(eq.images) && eq.images.length
@@ -436,22 +351,6 @@ function EquipmentCard({ eq, onOpenLightbox, onDetails }) {
       <div className="p-5">
         <div className="text-lg font-semibold">{eq.name}</div>
         <div className="mt-1 text-sm text-gray-600 dark:text-gray-300">{eq.desc}</div>
-
-        <div className="mt-4 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => onDetails && onDetails(eq)}
-            className="rounded-md bg-white/90 text-gray-900 px-3 py-1.5 text-sm shadow hover:shadow-md"
-          >
-            Batafsil
-          </button>
-          <a
-            href="#contact"
-            className="ml-auto inline-block rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-3 py-1.5 text-sm shadow"
-          >
-            Ariza
-          </a>
-        </div>
       </div>
     </Card>
   );
@@ -468,7 +367,6 @@ export default function EMCLabUltra() {
   // Lightbox
   const [lbOpen, setLbOpen] = useState(false);
   const [lbImages, setLbImages] = useState([]);
-  the
   const [lbIndex, setLbIndex] = useState(0);
   const openLightbox = (images, startIndex = 0) => { setLbImages(images); setLbIndex(startIndex); setLbOpen(true); };
   const closeLightbox = () => setLbOpen(false);
@@ -480,12 +378,6 @@ export default function EMCLabUltra() {
   const [selectedTest, setSelectedTest] = useState(null);
   const openTest = (t) => { setSelectedTest(t); setOpenTestModal(true); };
   const closeTest = () => setOpenTestModal(false);
-
-  // Equipment details modal (YANGI)
-  const [equipModalOpen, setEquipModalOpen] = useState(false);
-  const [selectedEquipment, setSelectedEquipment] = useState(null);
-  const openEquipmentModal = (eq) => { setSelectedEquipment(eq); setEquipModalOpen(true); };
-  const closeEquipmentModal = () => { setSelectedEquipment(null); setEquipModalOpen(false); };
 
   // dekor blobs
   const blobs = useMemo(
@@ -670,7 +562,7 @@ export default function EMCLabUltra() {
           title={lang==="uz" ? "Biz haqimizda" : "О нас"}
           subtitle={lang==="uz"
             ? "ISO/IEC 17025 doirasida akkreditatsiyadan o‘tgan EMC laboratoriyasi (O’ZAK.SL.0309). 2021-yildan buyon elektromagnit moslashuvchanlik sinovlarini o‘tkazamiz."
-            : "EMC-лаборатория, аккредитованная по ISO/IEC 17025 (О’ЗАК.SL.0309). С 2021 года проводим испытания на электромагнитную совместимость."
+            : "EMC-лаборатория, аккредитованная по ISO/IEC 17025 (O’ZAK.SL.0309). С 2021 года проводим испытания на электромагнитную совместимость."
           }
         >
           <div className="rounded-3xl bg-gradient-to-r from-sky-700 to-cyan-600 text-white shadow-lg p-6 sm:p-8 space-y-6">
@@ -793,6 +685,8 @@ export default function EMCLabUltra() {
                   >
                     {lang === "uz" ? "Batafsil" : "Подробнее"}
                   </button>
+
+                  {/* Istasangiz pastdagini qoldirasiz yoki olib tashlaysiz */}
                   <a
                     href="#contact"
                     className="rounded-xl border border-white/60 text-white px-3 py-1.5 text-sm font-medium hover:bg-white/10"
@@ -809,7 +703,7 @@ export default function EMCLabUltra() {
         <Section id="equipment" title={lang==="uz" ? "Jihozlar" : "Оборудование"} subtitle={lang==="uz" ? "Asosiy o‘lchash va sinov kompleksi" : "Основной комплекс измерений и испытаний"}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {EQUIPMENT.map((eq, i) => (
-              <EquipmentCard key={i} eq={eq} onOpenLightbox={openLightbox} onDetails={openEquipmentModal} />
+              <EquipmentCard key={i} eq={eq} onOpenLightbox={openLightbox} />
             ))}
           </div>
         </Section>
@@ -845,32 +739,38 @@ export default function EMCLabUltra() {
           </div>
         </Section>
 
-        {/* EXCURSION */}
-        <Section
-          id="excursion"
-          title={lang === "uz" ? "Ekskursiya" : "Экскурсия"}
-          subtitle={
-            lang === "uz"
-              ? "Laboratoriyamiz bo‘ylab 360° virtual sayohat qiling"
-              : "Совершите 360° виртуальную экскурсию по нашей лаборатории"
-          }
-        >
-          <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-lg">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!4v1700000000000!6m8!1m7!1sCAoSLEFGMVFpcE9Sdl9lYl9QeS1zN0pPSldCdmRkM1lDa0x4U3pNa2RjNEF4QlBF!2m2!1d41.311151!2d69.279737!3f0!4f0!5f0.7820865974627469"
-              title="Google Street View"
-              className="absolute inset-0 w-full h-full border-0"
-              allowFullScreen
-              loading="lazy"
-            ></iframe>
-          </div>
+{/* EXCURSION / VIRTUAL TOUR */}
+<Section
+  id="excursion"
+  title={lang === "uz" ? "Ekskursiya" : "Экскурсия"}
+  subtitle={
+    lang === "uz"
+      ? "Laboratoriyamiz bo‘ylab 360° virtual sayohat qiling"
+      : "Совершите 360° виртуальную экскурсию по нашей лаборатории"
+  }
+>
+  <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-lg">
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!4v1700000000000!6m8!1m7!1sCAoSLEFGMVFpcE9Sdl9lYl9QeS1zN0pPSldCdmRkM1lDa0x4U3pNa2RjNEF4QlBF!2m2!1d41.311151!2d69.279737!3f0!4f0!5f0.7820865974627469"
+      title="Google Street View"
+      className="absolute inset-0 w-full h-full border-0"
+      allowFullScreen
+      loading="lazy"
+    ></iframe>
+  </div>
 
-          <p className="mt-4 text-sm text-gray-600 dark:text-gray-300 max-w-3xl">
-            {lang === "uz"
-              ? "Hozircha demo 360° panorama joylashtirildi (Google Street View orqali). Ertaga biz o‘z laboratoriyamizni suratga olib, ushbu havolani almashtiramiz."
-              : "Сейчас вставлена демо 360° панорама (через Google Street View). Завтра снимем нашу лабораторию и заменим эту ссылку."}
-          </p>
-        </Section>
+  <p className="mt-4 text-sm text-gray-600 dark:text-gray-300 max-w-3xl">
+    {lang === "uz"
+      ? "Hozircha demo 360° panorama joylashtirildi (Google Street View orqali). "
+        + "Ertaga biz o‘z laboratoriyamizni suratga olib, ushbu havolani almashtiramiz."
+      : "Сейчас вставлена демо 360° панорама (через Google Street View). "
+        + "Завтра мы снимем нашу лабораторию и заменим эту ссылку."}
+  </p>
+</Section>
+
+
+
+
 
         {/* TEAM */}
         <Section id="team" title={lang==="uz" ? "Bizning jamoa" : "Наша команда"} subtitle={lang==="uz" ? "11 nafar tajribali mutaxassis" : "11 опытных специалистов"}>
@@ -1101,15 +1001,6 @@ export default function EMCLabUltra() {
         test={selectedTest}
         lang={lang}
       />
-
-      {/* EQUIPMENT MODAL (YANGI) */}
-      <EquipmentDetailsModal
-        open={equipModalOpen}
-        onClose={closeEquipmentModal}
-        equipment={selectedEquipment}
-        lang={lang}
-      />
     </div>
   );
 }
-import { useEffect, useState } from "react";
