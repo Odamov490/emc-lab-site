@@ -27,18 +27,18 @@ const TESTS = [
 ];
 
 const EQUIPMENT = [
-  { name: "R&S ESW8", desc: "EMI qabul qilgich / Receiver", images: ["/lab/esw8/1.jpg", "/lab/esw8/2.jpg", "/lab/esw8/3.jpg", "/lab/esw8/4.jpg"] },
-  { name: "R&S ESR3", desc: "EMI qabul qilgich / Receiver", images: ["/lab/esr3/1.jpg", "/lab/esr3/2.jpg", "/lab/esr3/3.jpg", "/lab/esr3/4.jpg"] },
-  { name: "Schaffner NX5", desc: "ESD/EFT/Surge generator", images: ["/lab/nx5/1.jpg", "/lab/nx5/2.jpg", "/lab/nx5/3.jpg", "/lab/nx5/4.jpg"] },
-  { name: "CDN M216-10", desc: "Coupling/Decoupling tarmog‘i", images: ["/lab/cdn/1.jpg", "/lab/cdn/2.jpg", "/lab/cdn/3.jpg", "/lab/cdn/4.jpg"] },
-  { name: "Jihoz 5", desc: "Izoh", images: ["/lab/item5/1.jpg", "/lab/item5/2.jpg", "/lab/item5/3.jpg", "/lab/item5/4.jpg"] },
-  { name: "Jihoz 6", desc: "Izoh", images: ["/lab/item6/1.jpg", "/lab/item6/2.jpg", "/lab/item6/3.jpg", "/lab/item6/4.jpg"] },
-  { name: "Jihoz 7", desc: "Izoh", images: ["/lab/item7/1.jpg", "/lab/item7/2.jpg", "/lab/item7/3.jpg", "/lab/item7/4.jpg"] },
-  { name: "Jihoz 8", desc: "Izoh", images: ["/lab/item8/1.jpg", "/lab/item8/2.jpg", "/lab/item8/3.jpg", "/lab/item8/4.jpg"] },
-  { name: "Jihoz 9", desc: "Izoh", images: ["/lab/item9/1.jpg", "/lab/item9/2.jpg", "/lab/item9/3.jpg", "/lab/item9/4.jpg"] },
-  { name: "Jihoz 10", desc: "Izoh", images: ["/lab/item10/1.jpg", "/lab/item10/2.jpg", "/lab/item10/3.jpg", "/lab/item10/4.jpg"] },
-  { name: "Jihoz 11", desc: "Izoh", images: ["/lab/item11/1.jpg", "/lab/item11/2.jpg", "/lab/item11/3.jpg", "/lab/item11/4.jpg"] },
-  { name: "Jihoz 12", desc: "Izoh", images: ["/lab/item12/1.jpg", "/lab/item12/2.jpg", "/lab/item12/3.jpg", "/lab/item12/4.jpg"] },
+  { name: "R&S ESW8", desc: "Приемник", images: ["/lab/esw8/1.jpg", "/lab/esw8/2.jpg", "/lab/esw8/3.jpg", "/lab/esw8/4.jpg"] },
+  { name: "R&S DPA 500N", desc: "Анализатор гармоник и фликера (мерцания) ", images: ["/lab/dpa/1.jpg", "/lab/dpa/2.jpg", "/lab/dpa/3.jpg", "/lab/dpa/4.jpg"] },
+  { name: "R&S ESR3", desc: "Приемник", images: ["/lab/esr3/1.jpg", "/lab/esr3/2.jpg", "/lab/esr3/3.jpg", "/lab/esr3/4.jpg"] },
+  { name: "R&S HL562E", desc: "Комбинированная биконическая и логорифмически-периодическая антенна", images: ["/lab/hl562e/1.jpg", "/lab/hl562e/2.jpg", "/lab/hl562e/3.jpg", "/lab/hl562e/4.jpg"] },
+  { name: "R&S DITO", desc: "Генератор электростатических разрядов", images: ["/lab/dito/1.jpg", "/lab/dito/2.jpg", "/lab/dito/3.jpg", "/lab/dito/4.jpg"] },
+  { name: "R&S NX5", desc: "Многофункциональный испытательный генератор переходных процессов ", images: ["/lab/nx5/1.jpg", "/lab/nx5/2.jpg", "/lab/nx5/3.jpg", "/lab/nx5/4.jpg"] },
+  { name: "R&S SMB100В", desc: "Генератор сигналов", images: ["/lab/smb100b/1.jpg", "/lab/smb100b/2.jpg", "/lab/smb100b/3.jpg", "/lab/smb100b/4.jpg"] },
+  { name: "R&S ENV216", desc: "Эквивалент сети", images: ["/lab/env216/1.jpg", "/lab/env216/2.jpg", "/lab/env216/3.jpg", "/lab/env216/4.jpg"] },
+  { name: "R&S  ENV432", desc: "Эквивалент сети", images: ["/lab/env432/1.jpg", "/lab/env432/2.jpg", "/lab/env432/3.jpg", "/lab/env432/4.jpg"] },
+  { name: "KEMZ 801", desc: "Электромагнитные клещи связи ", images: ["/lab/kemz801/1.jpg", "/lab/kemz801/2.jpg", "/lab/kemz801/3.jpg", "/lab/kemz801/4.jpg"] },
+  { name: "R&S HF907", desc: "Рупорная антенна", images: ["/lab/hf907/1.jpg", "/lab/hf907/2.jpg", "/lab/hf907/3.jpg", "/lab/hf907/4.jpg"] },
+  { name: "CDN-M216-10", desc: "Устройство связи/развязки", images: ["/lab/cdn216/1.jpg", "/lab/cdn216/2.jpg", "/lab/cdn216/3.jpg", "/lab/cdn216/4.jpg"] },
 ];
 
 // 11 xodim
