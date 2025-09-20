@@ -80,7 +80,7 @@ const QUICK_LINKS = [
   },
 ];
 
-/********************* DETAILS for modal (tests) *********************/
+/********************* DETAILS for modal *********************/
 const TEST_DETAILS = {
   "O’zMSt IEC 61000.4.2-2023": {
     uz: `
@@ -229,7 +229,9 @@ function TestDetailsModal({ open, onClose, test, lang = "uz" }) {
 
   if (!open || !test) return null;
 
-  const details = TEST_DETAILS[test.code]?.[lang] || TEST_DETAILS.default[lang];
+  const details =
+    TEST_DETAILS[test.code]?.[lang] ||
+    TEST_DETAILS["default"][lang];
 
   return (
     <div
@@ -262,98 +264,14 @@ function TestDetailsModal({ open, onClose, test, lang = "uz" }) {
           {details}
         </div>
 
-     <div className="p-4 sm:p-5 border-t border-black/10 dark:border-white/10 flex items-center justify-end">
-  <button
-    onClick={onClose}
-    className="rounded-xl border border-black/10 px-3 py-2 text-sm hover:bg-black/5"
-  >
-    {lang === "uz" ? "Yopish" : "Закрыть"}
-  </button>
-</div>
-
-
-/********************* EQUIPMENT DETAILS MODAL (YANGI) *********************/
-function EquipmentDetailsModal({ open, onClose, equipment, lang = "uz" }) {
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
-
-  if (!open || !equipment) return null;
-
-  const imgs = Array.isArray(equipment.images) && equipment.images.length
-    ? equipment.images
-    : ["/placeholder-equipment.jpg"];
-
-  const detailsText =
-    equipment.details?.[lang] ||
-    equipment.details ||
-    (lang === "uz"
-      ? "Ushbu jihoz bo‘yicha batafsil ma’lumot tez orada qo‘shiladi. Kontakt bo‘limidan yozib yuboring — to‘liq spetsifikatsiyani jo‘natamiz."
-      : "Подробная информация об оборудовании будет добавлена позже. Напишите нам через раздел Контакты — вышлем полную спецификацию.");
-
-  return (
-    <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
-      <div
-        className="w-full max-w-4xl max-h-[85vh] overflow-y-auto rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-black/10 dark:border-white/10"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-start gap-3 p-4 sm:p-5 border-b border-black/10 dark:border-white/10">
-          <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-sky-500 to-cyan-500 text-white flex items-center justify-center font-semibold">
-            {equipment.name?.[0] || "E"}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-lg sm:text-xl font-semibold">{equipment.name}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">{equipment.desc}</div>
-          </div>
-          <button className="rounded-md px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-800" onClick={onClose}>
-            ✕
+        {/* Pastki panel — faqat Yopish */}
+        <div className="p-4 sm:p-5 border-t border-black/10 dark:border-white/10 flex items-center justify-end">
+          <button
+            onClick={onClose}
+            className="rounded-xl border border-black/10 px-3 py-2 text-sm hover:bg-black/5"
+          >
+            {lang === "uz" ? "Yopish" : "Закрыть"}
           </button>
-        </div>
-
-        {/* Body */}
-        <div className="p-4 sm:p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-1">
-              <img
-                src={imgs[0]}
-                alt={equipment.name}
-                className="w-full h-48 object-cover rounded-lg shadow-sm"
-                onError={(e)=>{ e.currentTarget.src="/placeholder-equipment.jpg"; }}
-              />
-              {imgs.length > 1 && (
-                <div className="mt-3 grid grid-cols-4 gap-2">
-                  {imgs.map((s, i) => (
-                    <img
-                      key={i}
-                      src={s}
-                      alt={`${i}`}
-                      className="h-16 w-full object-cover rounded-md"
-                      onError={(e)=>{ e.currentTarget.src="/placeholder-equipment.jpg"; }}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="md:col-span-2">
-              <div className="text-sm sm:text-[15px] leading-6 text-slate-700 dark:text-slate-200 whitespace-pre-wrap">
-                {detailsText}
-              </div>
-
-              <div className="mt-4 flex items-center gap-3">
-                <a href="#contact" onClick={onClose} className="rounded-md bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm">
-                  {lang === "uz" ? "Ariza qoldirish" : "Оставить заявку"}
-                </a>
-                <button onClick={onClose} className="rounded-md border px-4 py-2 text-sm">
-                  {lang === "uz" ? "Yopish" : "Закрыть"}
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -361,7 +279,7 @@ function EquipmentDetailsModal({ open, onClose, equipment, lang = "uz" }) {
 }
 
 /********************* EQUIPMENT CARD (multi image + thumbs) *********************/
-function EquipmentCard({ eq, onOpenLightbox, onDetails }) {
+function EquipmentCard({ eq, onOpenLightbox }) {
   const [idx, setIdx] = useState(0);
 
   const imgs = Array.isArray(eq.images) && eq.images.length
@@ -427,22 +345,6 @@ function EquipmentCard({ eq, onOpenLightbox, onDetails }) {
       <div className="p-5">
         <div className="text-lg font-semibold">{eq.name}</div>
         <div className="mt-1 text-sm text-gray-600 dark:text-gray-300">{eq.desc}</div>
-
-        <div className="mt-4 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => onDetails && onDetails(eq)}
-            className="rounded-md bg-white/90 text-gray-900 px-3 py-1.5 text-sm shadow hover:shadow-md"
-          >
-            Batafsil
-          </button>
-          <a
-            href="#contact"
-            className="ml-auto inline-block rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-3 py-1.5 text-sm shadow"
-          >
-            Ariza
-          </a>
-        </div>
       </div>
     </Card>
   );
@@ -470,12 +372,6 @@ export default function EMCLabUltra() {
   const [selectedTest, setSelectedTest] = useState(null);
   const openTest = (t) => { setSelectedTest(t); setOpenTestModal(true); };
   const closeTest = () => setOpenTestModal(false);
-
-  // Equipment details modal (YANGI)
-  const [equipModalOpen, setEquipModalOpen] = useState(false);
-  const [selectedEquipment, setSelectedEquipment] = useState(null);
-  const openEquipmentModal = (eq) => { setSelectedEquipment(eq); setEquipModalOpen(true); };
-  const closeEquipmentModal = () => { setSelectedEquipment(null); setEquipModalOpen(false); };
 
   // dekor blobs
   const blobs = useMemo(
@@ -775,16 +671,15 @@ export default function EMCLabUltra() {
                 {/* Note */}
                 <p className="mt-3 text-sm text-white/90 drop-shadow">{tst.note}</p>
 
-                {/* Tugmalar */}
-               <div className="mt-4">
-  <button
-    onClick={() => openTest(tst)}
-    className="rounded-xl bg-white text-gray-900 px-3 py-1.5 text-sm font-medium shadow hover:opacity-90"
-  >
-    {lang === "uz" ? "Batafsil" : "Подробнее"}
-  </button>
-</div>
-
+                {/* Faqat “Batafsil” tugmasi */}
+                <div className="mt-4">
+                  <button
+                    onClick={() => openTest(tst)}
+                    className="rounded-xl bg-white text-gray-900 px-3 py-1.5 text-sm font-medium shadow hover:opacity-90"
+                  >
+                    {lang === "uz" ? "Batafsil" : "Подробнее"}
+                  </button>
+                </div>
               </Card>
             ))}
           </div>
@@ -794,7 +689,7 @@ export default function EMCLabUltra() {
         <Section id="equipment" title={lang==="uz" ? "Jihozlar" : "Оборудование"} subtitle={lang==="uz" ? "Asosiy o‘lchash va sinov kompleksi" : "Основной комплекс измерений и испытаний"}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {EQUIPMENT.map((eq, i) => (
-              <EquipmentCard key={i} eq={eq} onOpenLightbox={openLightbox} onDetails={openEquipmentModal} />
+              <EquipmentCard key={i} eq={eq} onOpenLightbox={openLightbox} />
             ))}
           </div>
         </Section>
@@ -807,7 +702,7 @@ export default function EMCLabUltra() {
                 <div className="text-sm/5 opacity-90">{lang==="uz" ? "Akkreditatsiya va doira" : "Аккредитация и область"}</div>
                 <div className="text-xl font-semibold">O’ZAK.SL.0309 • ISO/IEC 17025</div>
               </div>
-              <a href="#contact" className="rounded-xl bg-white/15 px-4 py-2 text-sm font-medium hover:bg-white/20">
+              <a href="#contact" className="rounded-xl bg-white/15 px-4 py-2 text-sm font-medium hover:bg_white/20">
                 {lang==="uz" ? "Hujjatlarni ko‘rish" : "Просмотреть документы"}
               </a>
             </div>
@@ -830,7 +725,7 @@ export default function EMCLabUltra() {
           </div>
         </Section>
 
-        {/* EXCURSION */}
+        {/* EXCURSION / VIRTUAL TOUR */}
         <Section
           id="excursion"
           title={lang === "uz" ? "Ekskursiya" : "Экскурсия"}
@@ -852,8 +747,8 @@ export default function EMCLabUltra() {
 
           <p className="mt-4 text-sm text-gray-600 dark:text-gray-300 max-w-3xl">
             {lang === "uz"
-              ? "Hozircha demo 360° panorama joylashtirildi (Google Street View orqali). Ertaga biz o‘z laboratoriyamizni suratga olib, ushbu havolani almashtiramiz."
-              : "Сейчас вставлена демо 360° панорама (через Google Street View). Завтра снимем нашу лабораторию и заменим эту ссылку."}
+              ? "Hozircha demo 360° panorama joylashtirildi (Google Street View orqali). Ertaga o‘z laboratoriyamizni suratga olib, havolani almashtiramiz."
+              : "Сейчас вставлена демо 360° панорама (через Google Street View). Завтра снимем нашу лабораторию и заменим ссылку."}
           </p>
         </Section>
 
@@ -1084,14 +979,6 @@ export default function EMCLabUltra() {
         open={openTestModal}
         onClose={closeTest}
         test={selectedTest}
-        lang={lang}
-      />
-
-      {/* EQUIPMENT MODAL (YANGI) */}
-      <EquipmentDetailsModal
-        open={equipModalOpen}
-        onClose={closeEquipmentModal}
-        equipment={selectedEquipment}
         lang={lang}
       />
     </div>
