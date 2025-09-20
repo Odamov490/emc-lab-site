@@ -130,6 +130,48 @@ mijozga mos individual dastur tuziladi. Qo‘shimcha ma’lumot uchun "Bog‘lan
   },
 };
 
+/********************* NEW: EQUIPMENT DETAILS (o‘zingiz to‘ldirasiz) *********************/
+const EQUIPMENT_DETAILS = {
+  default: {
+    uz: `
+Ushbu jihoz bo‘yicha batafsil ma’lumot: asosiy texnik ko‘rsatkichlar, qo‘llanilishi, kalibrlash va foydalanish sharoitlari.
+Savollar bo‘lsa, "Bog‘lanish" bo‘limidan murojaat qiling.`,
+    ru: `
+Подробная информация об оборудовании: ключевые характеристики, область применения, калибровка и условия эксплуатации.
+При вопросах свяжитесь через раздел «Контакты».`,
+  },
+
+  "R&S ESW8": {
+    uz: `
+R&S ESW8 — EMI qabul qilgich (Receiver).
+• Chastota: 2 Hz — 8 GHz
+• Standartlar: CISPR, ANSI, MIL-STD
+• Qo‘llanish: emissiya o‘lchovi, pre-kompliance va akkreditatsiyali sinovlar
+• Eslatma: kalibrlash muddati ko‘rsatilgan protokol asosida`,
+    ru: `
+R&S ESW8 — EMI-приемник.
+• Диапазон: 2 Гц — 8 ГГц
+• Стандарты: CISPR, ANSI, MIL-STD
+• Применение: измерения эмиссии, pre-compliance и аккредитованные испытания
+• Примечание: калибровка согласно протоколу`,
+  },
+
+  "Schaffner NX5": {
+    uz: `
+Schaffner NX5 — ESD/EFT/Surge generatori.
+• ESD: ±2…±30 kV (kontakt/havo)
+• EFT/Burst: 5/50 ns, 5–100 kHz
+• Surge: 1.2/50 µs, 0.5–6 kV
+• Aksesuarlar: CDN, coupling clamp, ESD qurol`,
+    ru: `
+Schaffner NX5 — генератор ESD/EFT/Surge.
+• ESD: ±2…±30 кВ (контакт/воздух)
+• EFT/Burst: 5/50 нс, 5–100 кГц
+• Surge: 1.2/50 мкс, 0.5–6 кВ
+• Аксессуары: CDN, coupling clamp, ESD gun`,
+  },
+};
+
 /********************* UI PRIMITIVES *********************/
 function Badge({ children }) {
   return (
@@ -278,6 +320,60 @@ function TestDetailsModal({ open, onClose, test, lang = "uz" }) {
   );
 }
 
+/********************* NEW: EQUIPMENT DETAILS MODAL *********************/
+function EquipmentDetailsModal({ open, onClose, equipment, lang = "uz" }) {
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!open || !equipment) return null;
+
+  const details =
+    EQUIPMENT_DETAILS[equipment.name]?.[lang] ||
+    EQUIPMENT_DETAILS.default[lang];
+
+  return (
+    <div
+      className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-black/10 dark:border-white/10"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start gap-3 p-4 sm:p-5 border-b border-black/10 dark:border-white/10">
+          <div className="flex-1 min-w-0">
+            <div className="text-lg sm:text-xl font-semibold leading-tight">{equipment.name}</div>
+            <div className="mt-1 text-sm text-slate-600 dark:text-slate-300">{equipment.desc}</div>
+          </div>
+          <button
+            onClick={onClose}
+            className="ml-2 rounded-full bg-white/70 dark:bg-white/10 border border-black/10 px-3 py-1 text-sm shadow hover:opacity-80"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className="p-4 sm:p-6 text-sm sm:text-[15px] leading-6 text-slate-700 dark:text-slate-200 whitespace-pre-wrap">
+          {details}
+        </div>
+
+        <div className="p-4 sm:p-5 border-t border-black/10 dark:border-white/10 flex items-center justify-end">
+          <button
+            onClick={onClose}
+            className="rounded-xl border border-black/10 px-3 py-2 text-sm hover:bg-black/5"
+          >
+            {lang === "uz" ? "Yopish" : "Закрыть"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /********************* EQUIPMENT CARD (multi image + thumbs) *********************/
 function EquipmentCard({ eq, onOpenLightbox }) {
   const [idx, setIdx] = useState(0);
@@ -345,10 +441,32 @@ function EquipmentCard({ eq, onOpenLightbox }) {
       <div className="p-5">
         <div className="text-lg font-semibold">{eq.name}</div>
         <div className="mt-1 text-sm text-gray-600 dark:text-gray-300">{eq.desc}</div>
+
+        {/* NEW: Batafsil tugma */}
+        <div className="mt-4">
+          <EquipmentDetailsButton equipment={eq} />
+        </div>
       </div>
     </Card>
   );
 }
+
+/********************* NEW: Small helper to open equipment modal via context *********************/
+/* Bu kichik komponent parentdagi ochish funksiyasiga ulanishi uchun context-ga tayyor emas.
+   Shuning uchun uni pastda EMCLabUltra ichida override qilamiz. */
+let _openEquipFromChild = null;
+function EquipmentDetailsButton({ equipment }) {
+  return (
+    <button
+      onClick={() => _openEquipFromChild && _openEquipFromChild(equipment)}
+      className="rounded-xl border border-black/10 px-3 py-1.5 text-sm font-medium hover:bg-black/5"
+    >
+      {/* Tilda avtomatik qaytadi (EMCLabUltra ichida sozlaymiz) */}
+      {_btnLabelGetter ? _btnLabelGetter() : "Batafsil"}
+    </button>
+  );
+}
+let _btnLabelGetter = null;
 
 /********************* PAGE *********************/
 export default function EMCLabUltra() {
@@ -372,6 +490,16 @@ export default function EMCLabUltra() {
   const [selectedTest, setSelectedTest] = useState(null);
   const openTest = (t) => { setSelectedTest(t); setOpenTestModal(true); };
   const closeTest = () => setOpenTestModal(false);
+
+  // NEW: Equipment details modal
+  const [openEquipModal, setOpenEquipModal] = useState(false);
+  const [selectedEquip, setSelectedEquip] = useState(null);
+  const openEquip = (e) => { setSelectedEquip(e); setOpenEquipModal(true); };
+  const closeEquip = () => setOpenEquipModal(false);
+
+  // Child helper-larga handler va label beramiz
+  _openEquipFromChild = openEquip;
+  _btnLabelGetter = () => (lang === "uz" ? "Batafsil" : "Подробнее");
 
   // dekor blobs
   const blobs = useMemo(
@@ -979,6 +1107,14 @@ export default function EMCLabUltra() {
         open={openTestModal}
         onClose={closeTest}
         test={selectedTest}
+        lang={lang}
+      />
+
+      {/* NEW: EQUIPMENT MODAL */}
+      <EquipmentDetailsModal
+        open={openEquipModal}
+        onClose={closeEquip}
+        equipment={selectedEquip}
         lang={lang}
       />
     </div>
