@@ -28,17 +28,17 @@ const TESTS = [
 
 const EQUIPMENT = [
   { name: "R&S ESW8", desc: "Приемник", images: ["/lab/esw8/1.jpg", "/lab/esw8/2.jpg", "/lab/esw8/3.jpg", "/lab/esw8/4.jpg"] },
-  { name: "R&S DPA 500N", desc: "Анализатор гармоник и фликера (мерцания) ", images: ["/lab/dpa/1.jpg", "/lab/dpa/2.jpg", "/lab/dpa/3.jpg", "/lab/dpa/4.jpg"] },
+  { name: "Ametek DPA 500N", desc: "Анализатор гармоник и фликера (мерцания) ", images: ["/lab/dpa/1.png", "/lab/dpa/2.png", "/lab/dpa/3.png", "/lab/dpa/4.jpg"] },
   { name: "R&S ESR3", desc: "Приемник", images: ["/lab/esr3/1.jpg", "/lab/esr3/2.jpg", "/lab/esr3/3.jpg", "/lab/esr3/4.jpg"] },
   { name: "R&S HL562E", desc: "Комбинированная биконическая и логорифмически-периодическая антенна", images: ["/lab/hl562e/1.jpg", "/lab/hl562e/2.jpg", "/lab/hl562e/3.jpg", "/lab/hl562e/4.jpg"] },
-  { name: "R&S DITO", desc: "Генератор электростатических разрядов", images: ["/lab/dito/1.jpg", "/lab/dito/2.jpg", "/lab/dito/3.jpg", "/lab/dito/4.jpg"] },
-  { name: "R&S NX5", desc: "Многофункциональный испытательный генератор переходных процессов ", images: ["/lab/nx5/1.jpg", "/lab/nx5/2.jpg", "/lab/nx5/3.jpg", "/lab/nx5/4.jpg"] },
+  { name: "Ametek DITO", desc: "Генератор электростатических разрядов", images: ["/lab/dito/1.png", "/lab/dito/2.png", "/lab/dito/3.png", "/lab/dito/4.jpg"] },
+  { name: "Ametek NX5", desc: "Многофункциональный испытательный генератор переходных процессов ", images: ["/lab/nx5/1.png", "/lab/nx5/2.png", "/lab/nx5/3.png", "/lab/nx5/4.jpg"] },
   { name: "R&S SMB100В", desc: "Генератор сигналов", images: ["/lab/smb100b/1.jpg", "/lab/smb100b/2.jpg", "/lab/smb100b/3.jpg", "/lab/smb100b/4.jpg"] },
   { name: "R&S ENV216", desc: "Эквивалент сети", images: ["/lab/env216/1.jpg", "/lab/env216/2.jpg", "/lab/env216/3.jpg", "/lab/env216/4.jpg"] },
   { name: "R&S  ENV432", desc: "Эквивалент сети", images: ["/lab/env432/1.jpg", "/lab/env432/2.jpg", "/lab/env432/3.jpg", "/lab/env432/4.jpg"] },
   { name: "KEMZ 801", desc: "Электромагнитные клещи связи ", images: ["/lab/kemz801/1.jpg", "/lab/kemz801/2.jpg", "/lab/kemz801/3.jpg", "/lab/kemz801/4.jpg"] },
-  { name: "R&S HF907", desc: "Рупорная антенна", images: ["/lab/hf907/1.jpg", "/lab/hf907/2.jpg", "/lab/hf907/3.jpg", "/lab/hf907/4.jpg"] },
-  { name: "CDN-M216-10", desc: "Устройство связи/развязки", images: ["/lab/cdn216/1.jpg", "/lab/cdn216/2.jpg", "/lab/cdn216/3.jpg", "/lab/cdn216/4.jpg"] },
+  { name: "Ametek HF907", desc: "Рупорная антенна", images: ["/lab/hf907/1.png", "/lab/hf907/2.png", "/lab/hf907/3.jpg", "/lab/hf907/4.jpg"] },
+  { name: "Ametek CDN-M216-10", desc: "Устройство связи/развязки", images: ["/lab/cdn216/1.jpg", "/lab/cdn216/2.jpg", "/lab/cdn216/3.jpg", "/lab/cdn216/4.jpg"] },
 ];
 
 // 11 xodim
