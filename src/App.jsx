@@ -130,6 +130,20 @@ mijozga mos individual dastur tuziladi. Qo‘shimcha ma’lumot uchun "Bog‘lan
   },
 };
 
+
+
+
+/********************* EQUIPMENT CERTS (PDF yoki rasm) *********************/
+const EQUIPMENT_CERTS = {
+  "R&S ESW8":   "/certs/esw8.pdf",
+  "R&S ESR3":   "/certs/esr3.pdf",
+  "Schaffner NX5": "/certs/nx5.pdf",
+  "CDN M216-10": "/certs/cdn-m216-10.pdf",
+  // kerak bo‘lsa yana qo‘shing:
+  // "Jihoz 5": "/certs/jihoz5.jpg",
+};
+
+
 /********************* NEW: EQUIPMENT DETAILS (o‘zingiz to‘ldirasiz) *********************/
 const EQUIPMENT_DETAILS = {
   default: {
@@ -320,8 +334,10 @@ function TestDetailsModal({ open, onClose, test, lang = "uz" }) {
   );
 }
 
-/********************* NEW: EQUIPMENT DETAILS MODAL *********************/
+/********************* EQUIPMENT DETAILS MODAL (with certificate viewer) *********************/
 function EquipmentDetailsModal({ open, onClose, equipment, lang = "uz" }) {
+  const [showCert, setShowCert] = useState(false);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e) => e.key === "Escape" && onClose();
@@ -329,11 +345,17 @@ function EquipmentDetailsModal({ open, onClose, equipment, lang = "uz" }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
+  // modal har safar ochilganda sertifikat oynasini yopib qo'yamiz
+  useEffect(() => { if (open) setShowCert(false); }, [open]);
+
   if (!open || !equipment) return null;
 
   const details =
-    EQUIPMENT_DETAILS[equipment.name]?.[lang] ||
+    (EQUIPMENT_DETAILS[equipment.name] && EQUIPMENT_DETAILS[equipment.name][lang]) ||
     EQUIPMENT_DETAILS.default[lang];
+
+  const certPath = EQUIPMENT_CERTS[equipment.name];               // <— shu yerda bog‘lanadi
+  const isPdf = certPath?.toLowerCase().endsWith(".pdf");
 
   return (
     <div
@@ -341,26 +363,77 @@ function EquipmentDetailsModal({ open, onClose, equipment, lang = "uz" }) {
       onClick={onClose}
     >
       <div
-        className="w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-black/10 dark:border-white/10"
+        className="w-full max-w-3xl max-h-[85vh] overflow-hidden rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-black/10 dark:border-white/10"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* HEADER */}
         <div className="flex items-start gap-3 p-4 sm:p-5 border-b border-black/10 dark:border-white/10">
           <div className="flex-1 min-w-0">
             <div className="text-lg sm:text-xl font-semibold leading-tight">{equipment.name}</div>
             <div className="mt-1 text-sm text-slate-600 dark:text-slate-300">{equipment.desc}</div>
           </div>
+
+          {/* SERTIFIKAT TUGMASI (agar xaritada bor bo‘lsa) */}
+          {certPath && (
+            <div className="mr-2">
+              <button
+                onClick={() => setShowCert((v) => !v)}
+                className="rounded-lg border border-black/10 bg-white/70 dark:bg-white/10 px-3 py-1 text-sm hover:opacity-80"
+                title={lang === "uz" ? "Kalibrovka sertifikati" : "Сертификат калибровки"}
+              >
+                {showCert ? (lang === "uz" ? "Matnga qaytish" : "К описанию") : (lang === "uz" ? "Sertifikat" : "Сертификат")}
+              </button>
+            </div>
+          )}
+
           <button
             onClick={onClose}
-            className="ml-2 rounded-full bg-white/70 dark:bg-white/10 border border-black/10 px-3 py-1 text-sm shadow hover:opacity-80"
+            className="rounded-full bg-white/70 dark:bg-white/10 border border-black/10 px-3 py-1 text-sm shadow hover:opacity-80"
           >
             ✕
           </button>
         </div>
 
-        <div className="p-4 sm:p-6 text-sm sm:text-[15px] leading-6 text-slate-700 dark:text-slate-200 whitespace-pre-wrap">
-          {details}
+        {/* BODY */}
+        <div className="overflow-y-auto max-h-[calc(85vh-6.5rem)]">
+          {/* Agar sertifikat ko‘rish yoqilgan bo‘lsa — preview */}
+          {showCert && certPath ? (
+            <div className="p-0">
+              {isPdf ? (
+                <iframe
+                  src={certPath + "#toolbar=0&view=fitH"}
+                  title="Calibration certificate"
+                  className="w-full h-[70vh] border-0"
+                />
+              ) : (
+                <img
+                  src={certPath}
+                  alt="Calibration certificate"
+                  className="w-full max-h-[70vh] object-contain"
+                />
+              )}
+
+              {/* Pastda ochish/yuklab olish havolasi */}
+              <div className="p-3 sm:p-4 flex items-center justify-end gap-3 border-t border-black/10 dark:border-white/10">
+                <a
+                  href={certPath}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-xl border border-black/10 px-3 py-2 text-sm hover:bg-black/5"
+                >
+                  {lang === "uz" ? "Yangi oynada ochish" : "Открыть в новой вкладке"}
+                </a>
+              </div>
+            </div>
+          ) : (
+            // Oddiy matnli tavsif
+            <div className="p-4 sm:p-6 text-sm sm:text-[15px] leading-6 text-slate-700 dark:text-slate-200 whitespace-pre-wrap">
+              {details}
+            </div>
+          )}
         </div>
 
+        {/* FOOTER — Yopish */}
         <div className="p-4 sm:p-5 border-t border-black/10 dark:border-white/10 flex items-center justify-end">
           <button
             onClick={onClose}
@@ -373,6 +446,7 @@ function EquipmentDetailsModal({ open, onClose, equipment, lang = "uz" }) {
     </div>
   );
 }
+
 
 /********************* EQUIPMENT CARD (multi image + thumbs) *********************/
 function EquipmentCard({ eq, onOpenLightbox }) {
