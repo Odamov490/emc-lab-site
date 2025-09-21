@@ -130,15 +130,21 @@ mijozga mos individual dastur tuziladi. Qo‘shimcha ma’lumot uchun "Bog‘lan
   },
 };
 
-/********************* EQUIPMENT CERTS *********************/
+
+
+
+/********************* EQUIPMENT CERTS (PDF yoki rasm) *********************/
 const EQUIPMENT_CERTS = {
   "R&S ESW8":   "/certs/esw8.pdf",
   "R&S ESR3":   "/certs/esr3.pdf",
   "Schaffner NX5": "/certs/nx5.pdf",
   "CDN M216-10": "/certs/cdn-m216-10.pdf",
+  // kerak bo‘lsa yana qo‘shing:
+  // "Jihoz 5": "/certs/jihoz5.jpg",
 };
 
-/********************* NEW: EQUIPMENT DETAILS *********************/
+
+/********************* NEW: EQUIPMENT DETAILS (o‘zingiz to‘ldirasiz) *********************/
 const EQUIPMENT_DETAILS = {
   default: {
     uz: `
@@ -179,12 +185,6 @@ Schaffner NX5 — генератор ESD/EFT/Surge.
 • Аксессуары: CDN, coupling clamp, ESD gun`,
   },
 };
-
-/********************* SIMPLE AUTH (demo) *********************/
-const DEMO_USERS = [
-  { login: "admin", password: "admin123", name: "Admin", role: "admin" },
-  { login: "staff", password: "staff123", name: "Hodim", role: "staff" },
-];
 
 /********************* UI PRIMITIVES *********************/
 function Badge({ children }) {
@@ -345,6 +345,7 @@ function EquipmentDetailsModal({ open, onClose, equipment, lang = "uz" }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
+  // modal har safar ochilganda sertifikat oynasini yopib qo'yamiz
   useEffect(() => { if (open) setShowCert(false); }, [open]);
 
   if (!open || !equipment) return null;
@@ -353,7 +354,7 @@ function EquipmentDetailsModal({ open, onClose, equipment, lang = "uz" }) {
     (EQUIPMENT_DETAILS[equipment.name] && EQUIPMENT_DETAILS[equipment.name][lang]) ||
     EQUIPMENT_DETAILS.default[lang];
 
-  const certPath = EQUIPMENT_CERTS[equipment.name];
+  const certPath = EQUIPMENT_CERTS[equipment.name];               // <— shu yerda bog‘lanadi
   const isPdf = certPath?.toLowerCase().endsWith(".pdf");
 
   return (
@@ -372,6 +373,7 @@ function EquipmentDetailsModal({ open, onClose, equipment, lang = "uz" }) {
             <div className="mt-1 text-sm text-slate-600 dark:text-slate-300">{equipment.desc}</div>
           </div>
 
+          {/* SERTIFIKAT TUGMASI (agar xaritada bor bo‘lsa) */}
           {certPath && (
             <div className="mr-2">
               <button
@@ -394,6 +396,7 @@ function EquipmentDetailsModal({ open, onClose, equipment, lang = "uz" }) {
 
         {/* BODY */}
         <div className="overflow-y-auto max-h-[calc(85vh-6.5rem)]">
+          {/* Agar sertifikat ko‘rish yoqilgan bo‘lsa — preview */}
           {showCert && certPath ? (
             <div className="p-0">
               {isPdf ? (
@@ -410,6 +413,7 @@ function EquipmentDetailsModal({ open, onClose, equipment, lang = "uz" }) {
                 />
               )}
 
+              {/* Pastda ochish/yuklab olish havolasi */}
               <div className="p-3 sm:p-4 flex items-center justify-end gap-3 border-t border-black/10 dark:border-white/10">
                 <a
                   href={certPath}
@@ -422,12 +426,14 @@ function EquipmentDetailsModal({ open, onClose, equipment, lang = "uz" }) {
               </div>
             </div>
           ) : (
+            // Oddiy matnli tavsif
             <div className="p-4 sm:p-6 text-sm sm:text-[15px] leading-6 text-slate-700 dark:text-slate-200 whitespace-pre-wrap">
               {details}
             </div>
           )}
         </div>
 
+        {/* FOOTER — Yopish */}
         <div className="p-4 sm:p-5 border-t border-black/10 dark:border-white/10 flex items-center justify-end">
           <button
             onClick={onClose}
@@ -440,6 +446,7 @@ function EquipmentDetailsModal({ open, onClose, equipment, lang = "uz" }) {
     </div>
   );
 }
+
 
 /********************* EQUIPMENT CARD (multi image + thumbs) *********************/
 function EquipmentCard({ eq, onOpenLightbox }) {
@@ -518,72 +525,22 @@ function EquipmentCard({ eq, onOpenLightbox }) {
   );
 }
 
-/********************* EQUIPMENT DETAILS BUTTON (context-like) *********************/
+/********************* NEW: Small helper to open equipment modal via context *********************/
+/* Bu kichik komponent parentdagi ochish funksiyasiga ulanishi uchun context-ga tayyor emas.
+   Shuning uchun uni pastda EMCLabUltra ichida override qilamiz. */
 let _openEquipFromChild = null;
-let _btnLabelGetter = null;
 function EquipmentDetailsButton({ equipment }) {
   return (
     <button
       onClick={() => _openEquipFromChild && _openEquipFromChild(equipment)}
       className="rounded-xl border border-black/10 px-3 py-1.5 text-sm font-medium hover:bg-black/5"
     >
+      {/* Tilda avtomatik qaytadi (EMCLabUltra ichida sozlaymiz) */}
       {_btnLabelGetter ? _btnLabelGetter() : "Batafsil"}
     </button>
   );
 }
-
-/********************* LOGIN MODAL (NEW) *********************/
-function LoginModal({ open, onClose, onLogin, lang = "uz" }) {
-  const [login, setLogin] = useState("");
-  const [pass, setPass] = useState("");
-  const [error, setError] = useState("");
-
-  useEffect(() => { if (open) { setLogin(""); setPass(""); setError(""); } }, [open]);
-
-  if (!open) return null;
-
-  const submit = (e) => {
-    e.preventDefault();
-    const user = DEMO_USERS.find(u => u.login === login && u.password === pass);
-    if (!user) {
-      setError(lang === "uz" ? "Login yoki parol noto‘g‘ri" : "Неверный логин или пароль");
-      return;
-    }
-    onLogin({ name: user.name, role: user.role, login: user.login });
-    onClose();
-  };
-
-  return (
-    <div className="fixed inset-0 z-[80] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3" onClick={onClose}>
-      <div className="w-full max-w-md rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-black/10 dark:border-white/10"
-           onClick={(e)=>e.stopPropagation()}>
-        <div className="p-5 border-b border-black/10 dark:border-white/10 flex items-center justify-between">
-          <div className="text-lg font-semibold">{lang==="uz" ? "Kirish" : "Вход"}</div>
-          <button onClick={onClose} className="rounded-full border px-3 py-1 text-sm">✕</button>
-        </div>
-
-        <form onSubmit={submit} className="p-5 space-y-3">
-          <div>
-            <label className="text-sm font-medium">{lang==="uz" ? "Login" : "Логин"}</label>
-            <input value={login} onChange={e=>setLogin(e.target.value)} className="mt-1 w-full rounded-xl border px-3 py-2" required />
-          </div>
-          <div>
-            <label className="text-sm font-medium">{lang==="uz" ? "Parol" : "Пароль"}</label>
-            <input type="password" value={pass} onChange={e=>setPass(e.target.value)} className="mt-1 w-full rounded-xl border px-3 py-2" required />
-          </div>
-          {error && <div className="text-sm text-red-600">{error}</div>}
-          <button className="mt-2 rounded-xl bg-gray-900 text-white px-4 py-2 text-sm hover:opacity-90 w-full">
-            {lang==="uz" ? "Kirish" : "Войти"}
-          </button>
-
-          <div className="text-xs text-gray-500 mt-2">
-            Demo: admin / admin123 • staff / staff123
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
+let _btnLabelGetter = null;
 
 /********************* PAGE *********************/
 export default function EMCLabUltra() {
@@ -592,18 +549,6 @@ export default function EMCLabUltra() {
   const [sending, setSending] = useState(false);
   const [active, setActive] = useState("about");
   const [scrollProgress, setScrollProgress] = useState(0);
-
-  // AUTH (NEW)
-  const [authUser, setAuthUser] = useState(null);
-  const [openLogin, setOpenLogin] = useState(false);
-  useEffect(() => {
-    const raw = localStorage.getItem("emc_auth");
-    if (raw) try { setAuthUser(JSON.parse(raw)); } catch {}
-  }, []);
-  useEffect(() => {
-    if (authUser) localStorage.setItem("emc_auth", JSON.stringify(authUser));
-    else localStorage.removeItem("emc_auth");
-  }, [authUser]);
 
   // Lightbox
   const [lbOpen, setLbOpen] = useState(false);
@@ -620,12 +565,13 @@ export default function EMCLabUltra() {
   const openTest = (t) => { setSelectedTest(t); setOpenTestModal(true); };
   const closeTest = () => setOpenTestModal(false);
 
-  // Equipment details modal
+  // NEW: Equipment details modal
   const [openEquipModal, setOpenEquipModal] = useState(false);
   const [selectedEquip, setSelectedEquip] = useState(null);
   const openEquip = (e) => { setSelectedEquip(e); setOpenEquipModal(true); };
   const closeEquip = () => setOpenEquipModal(false);
 
+  // Child helper-larga handler va label beramiz
   _openEquipFromChild = openEquip;
   _btnLabelGetter = () => (lang === "uz" ? "Batafsil" : "Подробнее");
 
@@ -676,25 +622,6 @@ export default function EMCLabUltra() {
     }
   }, []);
 
-  // Admin demo: hodimlar ro'yxati (faqat frontend)
-  const [staffList, setStaffList] = useState([
-    { id: 1, name: "Hodim 1", role: "staff", phone: "+998 90 000 00 01" },
-    { id: 2, name: "Hodim 2", role: "staff", phone: "+998 90 000 00 02" },
-  ]);
-  const addStaff = (e) => {
-    e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const item = {
-      id: Date.now(),
-      name: fd.get("name"),
-      role: fd.get("role") || "staff",
-      phone: fd.get("phone"),
-    };
-    setStaffList((s)=>[...s, item]);
-    e.currentTarget.reset();
-  };
-  const removeStaff = (id) => setStaffList(s => s.filter(x=>x.id!==id));
-
   return (
     <div className={dark ? "dark" : ""}>
       {/* Global smooth scroll + scrollbar */}
@@ -713,7 +640,7 @@ export default function EMCLabUltra() {
 
       <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-gray-900 dark:from-slate-950 dark:to-slate-900 dark:text-slate-100 selection:bg-sky-200/50">
         {/* TOP BAR */}
-        <div className="border-b border-black/10 dark:border-white/10 bg-white/60 dark:bg:white/5 backdrop-blur">
+        <div className="border-b border-black/10 dark:border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur">
           <div className="mx-auto max-w-7xl px-4 py-2 flex items-center justify-between text-xs">
             <div className="flex items-center gap-2">
               <Badge>O’ZAK.SL.0309</Badge>
@@ -758,168 +685,436 @@ export default function EMCLabUltra() {
                 </a>
               ))}
             </nav>
-
-            <div className="flex items-center gap-2">
-              {/* NEW: Auth button / profile */}
-              {!authUser ? (
-                <button
-                  onClick={() => setOpenLogin(true)}
-                  className="rounded-2xl border border-black/10 bg-white/70 px-3 py-1.5 text-sm hover:opacity-90"
-                >
-                  {lang==="uz" ? "Kirish" : "Войти"}
-                </button>
-              ) : (
-                <div className="relative group">
-                  <button className="rounded-2xl border border-black/10 bg-white/70 px-3 py-1.5 text-sm hover:opacity-90">
-                    👤 {authUser.name}
-                  </button>
-                  <div className="absolute right-0 mt-2 hidden group-hover:block min-w-[180px] rounded-xl border bg-white shadow-lg text-sm">
-                    <a href="#portal" className="block px-3 py-2 hover:bg-slate-50">{lang==="uz" ? "Profil" : "Профиль"}</a>
-                    {authUser.role === "admin" && (
-                      <a href="#admin" className="block px-3 py-2 hover:bg-slate-50">Admin</a>
-                    )}
-                    <button onClick={()=>setAuthUser(null)} className="w-full text-left px-3 py-2 hover:bg-slate-50">
-                      {lang==="uz" ? "Chiqish" : "Выйти"}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <a
-                href="#contact"
-                className="rounded-2xl border border-black/10 bg-gray-900 text-white px-3 py-1.5 text-sm hover:-translate-y-0.5 transition will-change-transform"
-              >
-                {lang==="uz" ? "Sinovga buyurtma" : "Заявка на испытания"}
-              </a>
-            </div>
+            <a
+              href="#contact"
+              className="rounded-2xl border border-black/10 bg-gray-900 text-white px-3 py-1.5 text-sm hover:-translate-y-0.5 transition will-change-transform"
+            >
+              {lang==="uz" ? "Sinovga buyurtma" : "Заявка на испытания"}
+            </a>
           </div>
         </header>
 
         {/* HERO */}
-        {/* ——— SIZNING BOR KODINGIZ (o‘zgartirilmagan) ——— */}
-        {/* (Qisqartirish uchun bu qismni o‘zgartirmadim. Siz yuborgan kod saqlangan.) */}
+        <section className="relative overflow-hidden" id="top">
+          <div className="absolute inset-0 -z-10" aria-hidden>
+            {blobs.map((b, i) => (
+              <div key={i} className={`pointer-events-none absolute ${b.pos} ${b.size} ${b.blur} opacity-40 dark:opacity-30 rounded-full ${b.class}`} />
+            ))}
+          </div>
+
+          <div className="mx-auto max-w-7xl px-4 py-20 sm:py-28">
+            <div className="grid md:grid-cols-2 gap-10 sm:gap-12 items-center">
+              <div>
+                <p className="text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                  {lang==="uz" ? "Sertifikatlangan sinovlar" : "Сертифицированные испытания"}
+                </p>
+                <h1 className="mt-2 text-3xl sm:text-5xl md:text-6xl font-semibold tracking-tight">
+                  {lang==="uz" ? "Elektromagnit moslashuvchanlik" : "Электромагнитная совместимость"}
+                </h1>
+                <p className="mt-4 text-gray-700 dark:text-gray-300 text-base sm:text-lg max-w-xl">
+                  {lang==="uz"
+                    ? "ESD, EFT/B, Surge, RF immunitet, Flicker, Garmonik va emissiya o‘lchovlari. ISO/IEC 17025 akkreditatsiya doirasida."
+                    : "ESD, EFT/B, Surge, RF иммунитет, мерцание, гармоники и измерения помех. В рамках аккредитации ISO/IEC 17025."}
+                </p>
+                <div className="mt-6 flex flex-col xs:flex-row sm:flex-row items-start sm:items-center gap-3">
+                  <a href="#services" className="rounded-xl border border-black/10 bg-white/70 px-4 py-2 text-sm font-medium hover:opacity-90 backdrop-blur">
+                    {lang==="uz" ? "Xizmatlarni ko‘rish" : "Смотреть услуги"}
+                  </a>
+                  <a href="#contact" className="rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm font-medium shadow hover:shadow-md">
+                    {lang==="uz" ? "Ariza qoldirish" : "Оставить заявку"}
+                  </a>
+                </div>
+
+                <div className="mt-8 grid grid-cols-3 gap-3 sm:gap-6 text-center">
+                  {[{ v: "1200+", l: lang==="uz" ? "o‘lchov" : "измерений" },
+                    { v: "98%",  l: lang==="uz" ? "qoniqish" : "удовл." },
+                    { v: "24h",  l: lang==="uz" ? "javob" : "ответ" }].map((s, i) => (
+                    <Card key={i} className="p-4">
+                      <div className="text-xl sm:text-2xl font-semibold">{s.v}</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-300">{s.l}</div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+              <div className="relative">
+                <Card className="aspect-[4/3] overflow-hidden shadow-xl ring-1 ring-black/5">
+                  <img src="/hero/anechoic.jpg" alt="anechoic" className="h-full w-full object-cover md:scale-105" />
+                </Card>
+                <div className="absolute -bottom-6 -right-6 hidden sm:block">
+                  <div className="rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-400 text-white px-5 py-3 shadow-lg">
+                    <div className="text-xs">ISO/IEC 17025</div>
+                    <div className="text-sm font-semibold">{lang==="uz" ? "Akkreditatsiya" : "Аккредитация"}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* ABOUT */}
-        {/* ... barcha mavjud bo‘limlaringiz o‘z holicha ... */}
-
-        {/* SERVICES */}
-        {/* ... */}
-
-        {/* EQUIPMENT */}
-        {/* ... */}
-
-        {/* ACCREDITATION CTA */}
-        {/* ... */}
-
-        {/* GALLERY */}
-        {/* ... */}
-
-        {/* EXCURSION / VIRTUAL TOUR */}
-        {/* ... */}
-
-        {/* TEAM */}
-        {/* ... */}
-
-        {/* PRICING */}
-        {/* ... */}
-
-        {/* CONTACT */}
-        {/* ... yuqorida yuborgan bo‘limlaringizning barchasi qoldi ... */}
-
-        {/* NEW: PORTAL (Profil) — faqat kirgandan keyin ma’noli */}
         <Section
-          id="portal"
-          title={lang==="uz" ? "Xodim portali" : "Портал сотрудников"}
-          subtitle={lang==="uz" ? "Profil va rollar" : "Профиль и роли"}
+          id="about"
+          title={lang==="uz" ? "Biz haqimizda" : "О нас"}
+          subtitle={lang==="uz"
+            ? "ISO/IEC 17025 doirasida akkreditatsiyadan o‘tgan EMC laboratoriyasi (O’ZAK.SL.0309). 2021-yildan buyon elektromagnit moslashuvchanlik sinovlarini o‘tkazamiz."
+            : "EMC-лаборатория, аккредитованная по ISO/IEC 17025 (О’ЗАК.SL.0309). С 2021 года проводим испытания на электромагнитную совместимость."
+          }
         >
-          {!authUser ? (
-            <Card className="p-6">
-              <div className="text-sm">{lang==="uz" ? "Kirish tugmasi orqali tizimga kiring." : "Войдите через кнопку «Войти» вверху."}</div>
-            </Card>
-          ) : (
-            <div className="grid md:grid-cols-2 gap-6">
-              <Card className="p-6">
-                <div className="text-lg font-semibold mb-2">{lang==="uz" ? "Profil" : "Профиль"}</div>
-                <div className="text-sm"><b>{lang==="uz" ? "Ism:" : "Имя:"}</b> {authUser.name}</div>
-                <div className="text-sm"><b>Login:</b> {authUser.login}</div>
-                <div className="text-sm"><b>{lang==="uz" ? "Rol:" : "Роль:"}</b> {authUser.role}</div>
-                <div className="mt-4">
-                  {authUser.role === "admin" ? (
-                    <span className="inline-block text-xs rounded-full px-3 py-1 bg-green-100 text-green-700">admin</span>
-                  ) : (
-                    <span className="inline-block text-xs rounded-full px-3 py-1 bg-blue-100 text-blue-700">staff</span>
-                  )}
-                </div>
-              </Card>
-
-              <Card className="p-6">
-                <div className="text-lg font-semibold mb-2">{lang==="uz" ? "Tezkor havolalar" : "Быстрые ссылки"}</div>
-                <div className="flex flex-wrap gap-2">
-                  <a href="#equipment" className="rounded-xl border px-3 py-2 text-sm hover:bg-black/5">{lang==="uz" ? "Jihozlar" : "Оборудование"}</a>
-                  <a href="#services" className="rounded-xl border px-3 py-2 text-sm hover:bg-black/5">{lang==="uz" ? "Xizmatlar" : "Услуги"}</a>
-                  {authUser.role === "admin" && (
-                    <a href="#admin" className="rounded-xl border px-3 py-2 text-sm hover:bg-black/5">Admin</a>
-                  )}
-                </div>
-              </Card>
+          <div className="rounded-3xl bg-gradient-to-r from-sky-700 to-cyan-600 text-white shadow-lg p-6 sm:p-8 space-y-6">
+            <div className="space-y-3">
+              <h3 className="text-xl font-semibold">
+                {lang==="uz" ? "EMC sinovlari — Elektromagnit moslashuvchanlik" : "EMC-испытания — Электромагнитная совместимость"}
+              </h3>
+              <p className="opacity-95">
+                {lang==="uz"
+                  ? "Elektr qurilma yoki komponentni bozorga chiqarishdan avval, u boshqa qurilmalar bilan muvofiq ishlashi shart. Bunga elektromagnit moslashuvchanlik (EMC) deyiladi. Bizning laboratoriya qurilmalaringizning emissiya va immunitet ko‘rsatkichlarini IEC/CISPR talablariga muvofiq tekshiradi — natijada mahsulotlar milliy va xalqaro standartlarga hamda EMC direktivasiga mos keladi."
+                  : "Перед выводом электрического изделия или компонента на рынок необходимо убедиться, что оно не мешает работе других устройств и устойчиво к помехам. Это и есть электромагнитная совместимость (EMC). Наша лаборатория проверяет эмиссию и иммунитет по требованиям IEC/CISPR — чтобы продукция соответствовала национальным и международным стандартам и EMC-директиве."}
+              </p>
             </div>
-          )}
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-white/10 rounded-2xl p-4">
+                <h4 className="font-semibold mb-1">{lang==="uz" ? "Afzalliklar" : "Преимущества"}</h4>
+                <ul className="list-disc list-inside text-sm/6 opacity-95 space-y-1">
+                  <li>{lang==="uz" ? "Elektr mahsulotini bozorda sotish uchun majburiy talablar bajariladi." : "Выполнение обязательных требований для вывода продукции на рынок."}</li>
+                  <li>{lang==="uz" ? "Xalqaro bozorga kirish imkoniyati kengayadi." : "Доступ к международным рынкам."}</li>
+                  <li>{lang==="uz" ? "Qurilmalar xavfsiz va ishonchli ishlashi ta’minlanadi." : "Гарантируется безопасная и надежная работа устройств."}</li>
+                </ul>
+              </div>
+
+              <div className="bg-white/10 rounded-2xl p-4">
+                <h4 className="font-semibold mb-1">{lang==="uz" ? "Biz nima qilamiz" : "Что мы проверяем"}</h4>
+                <p className="text-sm opacity-95">
+                  {lang==="uz"
+                    ? "Har qanday elektr qurilma va komponent uchun EMC sinovlari: emissiya (chiqish) va immunitet (barqarorlik) darajalari o‘lchanadi hamda EMC direktivalari talablari bilan taqqoslanadi."
+                    : "Проводим EMC-испытания практически для любых электрических устройств и компонентов: измеряем уровни эмиссии и устойчивости к помехам и сопоставляем с требованиями EMC-директив."}
+                </p>
+              </div>
+
+              <div className="bg-white/10 rounded-2xl p-4">
+                <h4 className="font-semibold mb-1">{lang==="uz" ? "Natijalar" : "Результат"}</h4>
+                <p className="text-sm opacity-95">
+                  {lang==="uz"
+                    ? "Mahsulotlaringiz elektromagnit shovqinlarga bardoshliligi va chiqish darajalari me’yordan pastligi bo‘yicha hujjatli tasdiqqa ega bo‘ladi."
+                    : "Вы получаете подтверждение устойчивости к помехам и того, что уровни излучения вашей продукции ниже установленных норм."}
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-semibold mb-2">{lang==="uz" ? "Qo‘llaniladigan qurilmalar" : "Области применения"}</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-sm">
+                {[
+                  lang==="uz" ? "Aqlli qurilmalar (smart devices)" : "Умные устройства (smart devices)",
+                  lang==="uz" ? "Mobil/wireless mahsulotlar" : "Портативные и беспроводные изделия",
+                  lang==="uz" ? "Sanoat, ilmiy va tibbiyot qurilmalari" : "Промышленные, научные и медицинские приборы",
+                  lang==="uz" ? "O‘lchov va laboratoriya jihozlari" : "Измерительное и лабораторное оборудование",
+                  lang==="uz" ? "Elektr komponentlar (kalit, dimmer va b.)" : "Электрокомпоненты (выключатели, диммеры и др.)",
+                  lang==="uz" ? "Quvvat manbalari, elektronika (UPS, PV-invertor)" : "Источники питания, электроника (ИБП, PV-инверторы)",
+                  lang==="uz" ? "Maishiy texnika" : "Бытовая техника",
+                  lang==="uz" ? "Elektr asboblar" : "Электроинструмент",
+                  lang==="uz" ? "Elektr o‘yinchoqlar" : "Электронные игрушки",
+                  lang==="uz" ? "Yoritish mahsulotlari" : "Светотехника",
+                  lang==="uz" ? "Iste’molchi elektronika" : "Потребительская электроника",
+                  lang==="uz" ? "IT va ofis uskunalari" : "IT и офисное оборудование",
+                  lang==="uz" ? "Audio-video qurilmalar" : "Аудио-видео аппаратура",
+                  lang==="uz" ? "Telekommunikatsiya qurilmalari" : "Телекоммуникационное оборудование",
+                ].map((item, i) => (
+                  <div key={i} className="bg-white/10 rounded-xl px-3 py-2">{item}</div>
+                ))}
+              </div>
+            </div>
+
+            <div className="text-xs opacity-80">
+              {lang==="uz"
+                ? "Izoh: metodlar va sinov usullari (IEC/CISPR) hamda jihozlar ro‘yxati amaldagi tartib bo‘yicha qo‘llanadi."
+                : "Примечание: методики и процедуры испытаний (IEC/CISPR), а также перечень оборудования применяются в действующей редакции."}
+            </div>
+          </div>
         </Section>
 
-        {/* NEW: ADMIN — faqat adminlar uchun ko‘rinadi */}
-        {authUser?.role === "admin" && (
-          <Section
-            id="admin"
-            title="Admin"
-            subtitle={lang==="uz" ? "Hodimlarni ro‘yxatga olish va rollar" : "Учет сотрудников и роли"}
-          >
-            <div className="grid md:grid-cols-2 gap-6">
-              <Card className="p-6">
-                <div className="text-lg font-semibold mb-3">{lang==="uz" ? "Yangi hodim" : "Новый сотрудник"}</div>
-                <form onSubmit={addStaff} className="space-y-3">
+        {/* SERVICES */}
+        <Section
+          id="services"
+          title={lang === "uz" ? "Xizmatlar va sinovlar" : "Услуги и испытания"}
+          subtitle={
+            lang === "uz"
+              ? "IEC/CISPR talablari asosida to‘liq EMC dasturi"
+              : "Полный перечень EMC-испытаний по IEC/CISPR"
+          }
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {TESTS.map((tst, i) => (
+              <Card
+                key={i}
+                className="p-6 hover:shadow-lg transition bg-gradient-to-r from-sky-700 to-cyan-600 text-white"
+              >
+                {/* Sarlavha + Badge qismi */}
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                  <h3 className="flex-1 min-w-0 text-base font-semibold flex items-start gap-2 drop-shadow leading-tight">
+                    <span className="text-xl leading-none">{tst.icon}</span>
+                    <span className="break-words">{tst.title}</span>
+                  </h3>
+
+                  <span
+                    className="
+                      mt-1 sm:mt-0 self-start sm:self-auto
+                      inline-flex items-center rounded-full px-3 py-1 bg-white text-gray-900 shadow-md
+                      text-[11px] sm:text-xs
+                      whitespace-nowrap truncate
+                      max-w-full sm:max-w-[45%] md:max-w-[55%] lg:max-w-[60%]
+                    "
+                  >
+                    {tst.code}
+                  </span>
+                </div>
+
+                {/* Note */}
+                <p className="mt-3 text-sm text-white/90 drop-shadow">{tst.note}</p>
+
+                {/* Faqat “Batafsil” tugmasi */}
+                <div className="mt-4">
+                  <button
+                    onClick={() => openTest(tst)}
+                    className="rounded-xl bg-white text-gray-900 px-3 py-1.5 text-sm font-medium shadow hover:opacity-90"
+                  >
+                    {lang === "uz" ? "Batafsil" : "Подробнее"}
+                  </button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </Section>
+
+        {/* EQUIPMENT */}
+        <Section id="equipment" title={lang==="uz" ? "Jihozlar" : "Оборудование"} subtitle={lang==="uz" ? "Asosiy o‘lchash va sinov kompleksi" : "Основной комплекс измерений и испытаний"}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {EQUIPMENT.map((eq, i) => (
+              <EquipmentCard key={i} eq={eq} onOpenLightbox={openLightbox} />
+            ))}
+          </div>
+        </Section>
+
+        {/* ACCREDITATION CTA */}
+        <div id="accreditation" className="mx-auto max-w-7xl px-4 scroll-mt-24">
+          <div className="rounded-3xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white p-6 shadow-md">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <div className="text-sm/5 opacity-90">{lang==="uz" ? "Akkreditatsiya va doira" : "Аккредитация и область"}</div>
+                <div className="text-xl font-semibold">O’ZAK.SL.0309 • ISO/IEC 17025</div>
+              </div>
+              <a href="#contact" className="rounded-xl bg-white/15 px-4 py-2 text-sm font-medium hover:bg_white/20">
+                {lang==="uz" ? "Hujjatlarni ko‘rish" : "Просмотреть документы"}
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* GALLERY */}
+        <Section id="gallery" title={lang==="uz" ? "Galereya" : "Галерея"} subtitle={lang==="uz" ? "Laboratoriya, jihozlar va sinov jarayonlaridan suratlar" : "Фото лаборатории, оборудования и процесса испытаний"} bleed>
+          <div className="px-4 max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            {GALLERY.map((src, i) => (
+              <Card key={i}>
+                <img
+                  src={src}
+                  alt="lab photo"
+                  className="w-full h-auto aspect-[4/3] object-cover hover:scale-[1.02] transition-transform rounded-3xl cursor-zoom-in"
+                  onClick={() => openLightbox(GALLERY, i)}
+                />
+              </Card>
+            ))}
+          </div>
+        </Section>
+
+        {/* EXCURSION / VIRTUAL TOUR */}
+        <Section
+          id="excursion"
+          title={lang === "uz" ? "Ekskursiya" : "Экскурсия"}
+          subtitle={
+            lang === "uz"
+              ? "Laboratoriyamiz bo‘ylab 360° virtual sayohat qiling"
+              : "Совершите 360° виртуальную экскурсию по нашей лаборатории"
+          }
+        >
+          <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-lg">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!4v1700000000000!6m8!1m7!1sCAoSLEFGMVFpcE9Sdl9lYl9QeS1zN0pPSldCdmRkM1lDa0x4U3pNa2RjNEF4QlBF!2m2!1d41.311151!2d69.279737!3f0!4f0!5f0.7820865974627469"
+              title="Google Street View"
+              className="absolute inset-0 w-full h-full border-0"
+              allowFullScreen
+              loading="lazy"
+            ></iframe>
+          </div>
+
+          <p className="mt-4 text-sm text-gray-600 dark:text-gray-300 max-w-3xl">
+            {lang === "uz"
+              ? "Hozircha demo 360° panorama joylashtirildi (Google Street View orqali). Ertaga o‘z laboratoriyamizni suratga olib, havolani almashtiramiz."
+              : "Сейчас вставлена демо 360° панорама (через Google Street View). Завтра снимем нашу лабораторию и заменим ссылку."}
+          </p>
+        </Section>
+
+        {/* TEAM */}
+        <Section id="team" title={lang==="uz" ? "Bizning jamoa" : "Наша команда"} subtitle={lang==="uz" ? "11 nafar tajribali mutaxassis" : "11 опытных специалистов"}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {STAFF.map((p, i) => (
+              <Card key={i} className="p-5 text-center">
+                <img src={p.img} alt={p.name} className="w-28 h-28 sm:w-32 sm:h-32 mx-auto rounded-full object-cover border" onError={(e)=>{ e.currentTarget.src="/placeholder-avatar.jpg"; }} />
+                <div className="mt-3 text-lg font-semibold">{p.name}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">{p.role}</div>
+              </Card>
+            ))}
+          </div>
+        </Section>
+
+        {/* PRICING */}
+        <Section id="pricing" title={lang==="uz" ? "Narxlar" : "Цены"} subtitle={lang==="uz" ? "Individual kalkulyatsiya" : "Индивидуальный расчет"}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+            {["Basic", "Standard", "Premium"].map((tier, i) => (
+              <Card key={i} className="p-6 hover:shadow-md">
+                <div className="text-sm uppercase tracking-wide text-gray-500">{tier}</div>
+                <div className="mt-2 text-3xl font-semibold">$ —</div>
+                <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                  <li>• {lang==="uz" ? "1–2 sinov turidan boshlab" : "От 1–2 видов испытаний"}</li>
+                  <li>• {lang==="uz" ? "QR-kodli protokol" : "Протокол с QR-кодом"}</li>
+                  <li>• {lang==="uz" ? "Xulosa va tavsiyalar" : "Заключение и рекомендации"}</li>
+                </ul>
+                <a href="#contact" className="mt-5 inline-block rounded-xl bg-gray-900 text-white px-4 py-2 text-sm font-medium hover:opacity-90">
+                  {lang==="uz" ? "Kalkulyatsiya so‘rash" : "Запросить расчет"}
+                </a>
+              </Card>
+            ))}
+          </div>
+        </Section>
+
+        {/* CONTACT */}
+        <Section
+          id="contact"
+          title={lang==="uz" ? "Bog‘lanish" : "Контакты"}
+          subtitle={lang==="uz" ? "Ariza qoldiring – 1 ish kuni ichida javob" : "Оставьте заявку – ответ в течение 1 рабочего дня"}
+        >
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Chap — forma */}
+            <Card className="p-6 space-y-4">
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const fd = new FormData(e.currentTarget);
+                  const payload = {
+                    name: fd.get("name"),
+                    email: fd.get("email"),
+                    phone: fd.get("phone"),
+                    test: fd.get("test"),
+                    message: fd.get("message"),
+                  };
+                  try {
+                    setSending(true);
+                    const resp = await fetch("/api/contact", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify(payload),
+                    });
+                    setSending(false);
+                    if (resp.ok) {
+                      alert(lang==="uz" ? "Rahmat! Arizangiz qabul qilindi." : "Спасибо! Ваша заявка принята.");
+                      e.currentTarget.reset();
+                    } else {
+                      alert(lang==="uz" ? "Uzr, yuborishda xatolik bo‘ldi." : "Ошибка при отправке.");
+                    }
+                  } catch {
+                    setSending(false);
+                    alert(lang==="uz" ? "Tarmoq xatosi. Keyinroq urinib ko‘ring." : "Сетевая ошибка. Попробуйте позже.");
+                  }
+                }}
+                className="space-y-4"
+              >
+                <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium">{lang==="uz" ? "Ism" : "Имя"}</label>
-                    <input name="name" className="mt-1 w-full rounded-xl border px-3 py-2" required />
+                    <input name="name" className="mt-1 w-full rounded-xl border px-3 py-2" placeholder={lang==="uz" ? "Ismingiz" : "Ваше имя"} required />
                   </div>
                   <div>
-                    <label className="text-sm font-medium">{lang==="uz" ? "Telefon" : "Телефон"}</label>
-                    <input name="phone" className="mt-1 w-full rounded-xl border px-3 py-2" />
+                    <label className="text-sm font-medium">Email</label>
+                    <input name="email" type="email" className="mt-1 w-full rounded-xl border px-3 py-2" placeholder="name@example.com" required />
                   </div>
-                  <div>
-                    <label className="text-sm font-medium">Rol</label>
-                    <select name="role" className="mt-1 w-full rounded-xl border px-3 py-2">
-                      <option value="staff">staff</option>
-                      <option value="admin">admin</option>
-                    </select>
-                  </div>
-                  <button className="rounded-xl bg-gray-900 text-white px-4 py-2 text-sm hover:opacity-90">
-                    {lang==="uz" ? "Qo‘shish" : "Добавить"}
-                  </button>
-                </form>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">{lang==="uz" ? "Telefon" : "Телефон"}</label>
+                  <input name="phone" className="mt-1 w-full rounded-xl border px-3 py-2" placeholder="+998 __ ___ __ __" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">{lang==="uz" ? "Qiziqtirgan sinov(lar)" : "Интересующие испытания"}</label>
+                  <select name="test" className="mt-1 w-full rounded-xl border px-3 py-2">
+                    {TESTS.map((tst, i) => (
+                      <option key={i}>{`${tst.code} – ${tst.title}`}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">{lang==="uz" ? "Xabar" : "Сообщение"}</label>
+                  <textarea
+                    name="message"
+                    className="mt-1 w-full rounded-xl border px-3 py-2 h-28"
+                    placeholder={lang==="uz" ? "Namuna turi, kuchlanish, port(lar), sinov darajalari..." : "Тип образца, напряжение, порты, уровни испытаний..."}
+                  ></textarea>
+                </div>
+                <button
+                  disabled={sending}
+                  className="rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-60"
+                >
+                  {sending ? (lang==="uz" ? "Yuborilmoqda..." : "Отправляется...") : (lang==="uz" ? "Yuborish" : "Отправить")}
+                </button>
+              </form>
+            </Card>
+
+            {/* O‘ng — ma’lumotlar + QUICK LINKS */}
+            <div className="space-y-5">
+              <Card className="p-6">
+                <div className="text-sm font-semibold">{lang==="uz" ? "Manzil" : "Адрес"}</div>
+                <div className="text-gray-700 dark:text-gray-300 text-sm">Toshkent vil., Piskent t., Lola-ariq MFY, O‘zbekiston ko‘chasi, 174-uy</div>
+                <div className="mt-3 text-sm">
+                  <span className="font-medium">Telegram:</span> @EMM_Rasmiy
+                </div>
+                <div className="text-sm">
+                  <span className="font-medium">Email:</span> info@emc-lab.uz
+                </div>
+                <div className="text-sm">
+                  <span className="font-medium">Tel:</span> +998 (90) 000-00-00
+                </div>
               </Card>
 
               <Card className="p-6">
-                <div className="text-lg font-semibold mb-3">{lang==="uz" ? "Hodimlar ro‘yxati" : "Список сотрудников"}</div>
-                <div className="space-y-2">
-                  {staffList.map(s => (
-                    <div key={s.id} className="flex items-center justify-between rounded-xl border px-3 py-2 bg-white/70">
-                      <div className="text-sm">
-                        <div className="font-medium">{s.name} <span className="text-xs opacity-70">({s.role})</span></div>
-                        <div className="text-xs opacity-80">{s.phone}</div>
+                <div className="text-sm font-semibold">{lang==="uz" ? "Ish vaqti" : "График работы"}</div>
+                <ul className="mt-2 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                  <li>{lang==="uz" ? "Du–Ju: 09:00–18:00" : "Пн–Пт: 09:00–18:00"}</li>
+                  <li>{lang==="uz" ? "Sh: 10:00–16:00" : "Сб: 10:00–16:00"}</li>
+                  <li>{lang==="uz" ? "Yak: dam olish" : "Вс: выходной"}</li>
+                </ul>
+              </Card>
+
+              <Card className="p-4">
+                <div className="text-sm font-semibold mb-3">{lang==="uz" ? "Hujjatlar va lokatsiya" : "Документы и локация"}</div>
+                <div className="space-y-3">
+                  {QUICK_LINKS.map((item, i) => (
+                    <a
+                      key={i}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between rounded-xl border border-black/10 bg-white/70 backdrop-blur px-4 py-3 text-sm hover:shadow"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">{item.icon}</span>
+                        <span>{lang==="uz" ? item.labelUz : item.labelRu}</span>
                       </div>
-                      <button onClick={()=>removeStaff(s.id)} className="text-xs rounded-md border px-2 py-1 hover:bg-black/5">
-                        {lang==="uz" ? "O‘chirish" : "Удалить"}
-                      </button>
-                    </div>
+                      <span className="text-xs opacity-60">↗</span>
+                    </a>
                   ))}
                 </div>
               </Card>
             </div>
-            <div className="text-xs text-gray-500 mt-3">
-              * Demo: bu ro‘yxat faqat brauzer xotirasida. Backend qo‘shilganda API orqali haqiqiy bazaga yozasiz.
-            </div>
-          </Section>
-        )}
+          </div>
+        </Section>
 
         {/* FOOTER */}
         <footer className="bg-gradient-to-r from-sky-700 to-cyan-600">
@@ -944,10 +1139,6 @@ export default function EMCLabUltra() {
                     </a>
                   </div>
                 ))}
-                <div><a href="#portal" className="hover:text-cyan-300 transition-colors">Portal</a></div>
-                {authUser?.role === "admin" && (
-                  <div><a href="#admin" className="hover:text-cyan-300 transition-colors">Admin</a></div>
-                )}
               </div>
             </div>
 
@@ -993,19 +1184,11 @@ export default function EMCLabUltra() {
         lang={lang}
       />
 
-      {/* EQUIPMENT MODAL */}
+      {/* NEW: EQUIPMENT MODAL */}
       <EquipmentDetailsModal
         open={openEquipModal}
         onClose={closeEquip}
         equipment={selectedEquip}
-        lang={lang}
-      />
-
-      {/* LOGIN MODAL */}
-      <LoginModal
-        open={openLogin}
-        onClose={()=>setOpenLogin(false)}
-        onLogin={setAuthUser}
         lang={lang}
       />
     </div>
