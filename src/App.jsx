@@ -692,9 +692,11 @@ export default function EMCLabUltra() {
               {lang==="uz" ? "Sinovga buyurtma" : "Заявка на испытания"}
             </a>
 
-            <button
+ <button
   onClick={() => (window.location.href = "/login")}
-  className="ml-3 px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
+  className="ml-3 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 
+             text-white font-medium shadow-md hover:shadow-lg 
+             hover:scale-105 transform transition duration-200"
 >
   {lang === "uz" ? "Kirish" : "Вход"}
 </button>
