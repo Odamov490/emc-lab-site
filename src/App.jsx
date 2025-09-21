@@ -1,5 +1,8 @@
 import React, { useMemo, useState, useEffect } from "react";
 import ScrollToTopButton from "./ScrollToTopButton";
+import { Routes, Route } from "react-router-dom";
+import Login from "./pages/Login"; // login sahifang
+import EMCLabUltra from "./components/EMCLabUltra"; // asosiy sahifa
 
 /********************* CONFIG *********************/
 const NAV = [
@@ -543,7 +546,7 @@ function EquipmentDetailsButton({ equipment }) {
 let _btnLabelGetter = null;
 
 /********************* PAGE *********************/
-export default function EMCLabUltra() {
+function EMCLabUltra() {
   const [lang, setLang] = useState("uz");
   const [dark, setDark] = useState(false);
   const [sending, setSending] = useState(false);
@@ -583,6 +586,9 @@ export default function EMCLabUltra() {
     ],
     []
   );
+
+
+  
 
   // progress bar
   useEffect(() => {
@@ -1204,3 +1210,17 @@ export default function EMCLabUltra() {
     </div>
   );
 }
+
+function App() {
+  return (
+    <Routes>
+      {/* Asosiy sahifa */}
+      <Route path="/" element={<EMCLabUltra />} />
+
+      {/* Login sahifa */}
+      <Route path="/login" element={<Login />} />
+    </Routes>
+  );
+}
+
+export default App;
