@@ -1,46 +1,42 @@
 // src/pages/Login.jsx
-import React, { useState } from "react";
+import React from "react";
 
-const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert(`Email: ${email}\nParol: ${password}`);
-    // Bu yerga keyinchalik backend ulaysan
-  };
-
+export default function Login() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-sm bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-2xl font-bold text-center mb-6">Kirish</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50">
+      <div className="w-full max-w-sm rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
+        <h1 className="text-xl font-semibold mb-4">Kirish</h1>
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            alert("Kirish ishladi (demo)!");
+          }}
+          className="space-y-3"
+        >
           <div>
-            <label className="block text-gray-700">Email</label>
+            <label className="text-sm font-medium">Email</label>
             <input
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200"
-              placeholder="Emailingizni kiriting"
+              className="mt-1 w-full rounded-xl border px-3 py-2"
+              placeholder="name@example.com"
             />
           </div>
+
           <div>
-            <label className="block text-gray-700">Parol</label>
+            <label className="text-sm font-medium">Parol</label>
             <input
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200"
-              placeholder="Parolni kiriting"
+              className="mt-1 w-full rounded-xl border px-3 py-2"
+              placeholder="••••••••"
             />
           </div>
+
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+            className="w-full rounded-xl bg-gray-900 text-white px-4 py-2 hover:opacity-90"
           >
             Kirish
           </button>
@@ -48,6 +44,4 @@ const Login = () => {
       </div>
     </div>
   );
-};
-
-export default Login;
+}
