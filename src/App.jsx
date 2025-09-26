@@ -1,6 +1,10 @@
 import React, { useMemo, useState, useEffect } from "react";
 import ScrollToTopButton from "./ScrollToTopButton";
 
+import Login from "./pages/Login"; // login sahifang
+import EMCLabUltra from "./components/EMCLabUltra"; // asosiy sahifa
+ import { Routes, Route, useNavigate } from "react-router-dom";
+
 /********************* CONFIG *********************/
 const NAV = [
   { href: "#about", label: { uz: "Biz haqimizda", ru: "О нас" } },
@@ -543,13 +547,13 @@ function EquipmentDetailsButton({ equipment }) {
 let _btnLabelGetter = null;
 
 /********************* PAGE *********************/
-export default function EMCLabUltra() {
+function EMCLabUltra() {
   const [lang, setLang] = useState("uz");
   const [dark, setDark] = useState(false);
   const [sending, setSending] = useState(false);
   const [active, setActive] = useState("about");
   const [scrollProgress, setScrollProgress] = useState(0);
-
+const navigate = useNavigate();
   // Lightbox
   const [lbOpen, setLbOpen] = useState(false);
   const [lbImages, setLbImages] = useState([]);
@@ -583,6 +587,9 @@ export default function EMCLabUltra() {
     ],
     []
   );
+
+
+  
 
   // progress bar
   useEffect(() => {
@@ -691,6 +698,16 @@ export default function EMCLabUltra() {
             >
               {lang==="uz" ? "Sinovga buyurtma" : "Заявка на испытания"}
             </a>
+
+  <button
+    onClick={() => navigate("/login")}
+    className="ml-3 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 
+               text-white font-medium shadow-md hover:shadow-lg 
+               hover:scale-105 transform transition duration-200"
+  >
+    {lang === "uz" ? "Kirish" : "Вход"}
+  </button>
+
           </div>
         </header>
 
@@ -1153,6 +1170,7 @@ export default function EMCLabUltra() {
             </div>
 
             <div>
+
               <div className="text-sm font-semibold mb-3">{lang==="uz" ? "Manzil" : "Адрес"}</div>
               <div className="space-y-1 text-sm opacity-80">
                 <div>Toshkent vil., Piskent t.</div>
