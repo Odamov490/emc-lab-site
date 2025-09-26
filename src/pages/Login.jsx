@@ -1,33 +1,53 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+// src/pages/Login.jsx
+import React, { useState } from "react";
 
-export default function Login() {
-  const navigate = useNavigate();
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // DEMO: email/parol tekshiruvisiz kirib ketadi
-    navigate("/"); // kirgandan keyin bosh sahifaga qaytaramiz
+    alert(`Email: ${email}\nParol: ${password}`);
+    // Bu yerga keyinchalik backend ulaysan
   };
 
   return (
-    <div style={{minHeight:"100vh", display:"grid", placeItems:"center"}}>
-      <form onSubmit={handleSubmit} style={{width:320, padding:24, border:"1px solid #e5e7eb", borderRadius:16, background:"#fff"}}>
-        <h1 style={{margin:0, marginBottom:12}}>Kirish</h1>
-        <label style={{display:"block", fontSize:12, marginBottom:6}}>Email</label>
-        <input type="email" required style={{width:"100%", padding:10, borderRadius:10, border:"1px solid #e5e7eb"}} />
-
-        <label style={{display:"block", fontSize:12, margin:"12px 0 6px"}}>Parol</label>
-        <input type="password" required style={{width:"100%", padding:10, borderRadius:10, border:"1px solid #e5e7eb"}} />
-
-        <button type="submit" style={{marginTop:14, width:"100%", padding:10, borderRadius:10, background:"#111827", color:"#fff"}}>
-          Kirish
-        </button>
-
-        <button type="button" onClick={() => navigate("/")} style={{marginTop:10, width:"100%", padding:10, borderRadius:10}}>
-          Bosh sahifaga qaytish
-        </button>
-      </form>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="w-full max-w-sm bg-white shadow-md rounded-lg p-6">
+        <h2 className="text-2xl font-bold text-center mb-6">Kirish</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-gray-700">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+              placeholder="Emailingizni kiriting"
+            />
+          </div>
+          <div>
+            <label className="block text-gray-700">Parol</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+              placeholder="Parolni kiriting"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+          >
+            Kirish
+          </button>
+        </form>
+      </div>
     </div>
   );
-}
+};
+
+export default Login;
