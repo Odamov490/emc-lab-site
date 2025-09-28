@@ -1170,6 +1170,7 @@ const navigate = useNavigate();
             </div>
 
             <div>
+
               <div className="text-sm font-semibold mb-3">{lang==="uz" ? "Manzil" : "Адрес"}</div>
               <div className="space-y-1 text-sm opacity-80">
                 <div>Toshkent vil., Piskent t.</div>
