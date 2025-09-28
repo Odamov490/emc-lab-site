@@ -56,8 +56,6 @@ const T = {
     employeesList: "Hodimlar ro‘yxati",
     none: "Hozircha yo‘q",
     lang: "Til",
-    exportMov: "Harakatlarni Excelga chiqarish",
-    exportEmp: "Hodimlarni Excelga chiqarish",
   },
   ru: {
     title: "Вход",
@@ -98,8 +96,6 @@ const T = {
     employeesList: "Список сотрудников",
     none: "Пока нет",
     lang: "Язык",
-    exportMov: "Экспорт движений в Excel",
-    exportEmp: "Экспорт сотрудников в Excel",
   },
 };
 
@@ -156,9 +152,7 @@ export default function Login() {
       try {
         const parsed = JSON.parse(raw);
         setMe(parsed);
-      } catch {
-        // ignore
-      }
+      } catch { /* ignore */ }
     }
     setChecking(false);
   }, []);
@@ -196,7 +190,6 @@ export default function Login() {
     setErr("");
     setSubmitting(true);
     try {
-      // Firestore da tekshirish
       const q = query(
         collection(db, "employees"),
         where("username", "==", u.trim()),
@@ -238,7 +231,7 @@ export default function Login() {
     if (!me) return;
     if (!mvForm.product.trim() || !mvForm.qty) return;
 
-    setSavingMv(true);
+    setSavingMv(true    );
     try {
       await addDoc(collection(db, "movements"), {
         product: mvForm.product.trim(),
@@ -303,47 +296,6 @@ export default function Login() {
     } catch (e6) {
       console.error(e6);
       alert("O‘chirishda xatolik!");
-    }
-  };
-
-  // ======== Excel eksport (dinamik import — xlsx paketini o‘rnatgan bo‘ling) ========
-  const exportMovementsToExcel = async () => {
-    try {
-      const XLSX = await import("xlsx");
-      const rows = movements.map((m) => ({
-        Product: m.product || "",
-        Qty: m.qty ?? "",
-        Type: m.type === "in" ? (lang === "uz" ? "Kirim" : "Приход") : (lang === "uz" ? "Chiqim" : "Расход"),
-        Note: m.note || "",
-        By: m.byUser || "",
-        Time: m.createdAt?.toDate ? m.createdAt.toDate().toLocaleString() : "",
-      }));
-      const ws = XLSX.utils.json_to_sheet(rows);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Movements");
-      XLSX.writeFile(wb, `movements_${new Date().toISOString().slice(0, 10)}.xlsx`);
-    } catch (e7) {
-      console.error(e7);
-      alert("Excelga eksport qilishda xatolik.");
-    }
-  };
-
-  const exportEmployeesToExcel = async () => {
-    try {
-      const XLSX = await import("xlsx");
-      const rows = empList.map((e) => ({
-        Fullname: e.fullname || "",
-        Username: e.username || "",
-        Role: e.role || "",
-        CreatedAt: e.createdAt?.toDate ? e.createdAt.toDate().toLocaleString() : "",
-      }));
-      const ws = XLSX.utils.json_to_sheet(rows);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Employees");
-      XLSX.writeFile(wb, `employees_${new Date().toISOString().slice(0, 10)}.xlsx`);
-    } catch (e8) {
-      console.error(e8);
-      alert("Excelga eksport qilishda xatolik.");
     }
   };
 
@@ -516,17 +468,7 @@ export default function Login() {
           {tab === "products" && (
             <>
               <Card>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="text-lg font-semibold">{t.addMovement}</div>
-                  <button
-                    onClick={exportMovementsToExcel}
-                    className="rounded-xl border px-3 py-2 text-xs hover:bg-black/5"
-                    type="button"
-                  >
-                    {t.exportMov}
-                  </button>
-                </div>
-
+                <div className="text-lg font-semibold mb-3">{t.addMovement}</div>
                 <form onSubmit={addMovement} className="grid sm:grid-cols-2 gap-4 text-sm">
                   <div>
                     <label className="font-medium">{t.productName}</label>
@@ -635,17 +577,7 @@ export default function Login() {
           {tab === "employees" && me.role === "admin" && (
             <>
               <Card>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="text-lg font-semibold">{t.addEmployee}</div>
-                  <button
-                    onClick={exportEmployeesToExcel}
-                    className="rounded-xl border px-3 py-2 text-xs hover:bg-black/5"
-                    type="button"
-                  >
-                    {t.exportEmp}
-                  </button>
-                </div>
-
+                <div className="text-lg font-semibold mb-3">{t.addEmployee}</div>
                 <form onSubmit={addEmployee} className="grid sm:grid-cols-2 gap-4 text-sm">
                   <div>
                     <label className="font-medium">{t.fullname}</label>
