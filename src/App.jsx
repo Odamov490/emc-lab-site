@@ -1,6 +1,10 @@
 import React, { useMemo, useState, useEffect } from "react";
 import ScrollToTopButton from "./ScrollToTopButton";
 
+import Login from "./pages/Login"; // login sahifang
+import EMCLabUltra from "./components/EMCLabUltra"; // asosiy sahifa
+ import { Routes, Route, useNavigate } from "react-router-dom";
+
 /********************* CONFIG *********************/
 const NAV = [
   { href: "#about", label: { uz: "Biz haqimizda", ru: "О нас" } },
@@ -543,13 +547,13 @@ function EquipmentDetailsButton({ equipment }) {
 let _btnLabelGetter = null;
 
 /********************* PAGE *********************/
-export default function EMCLabUltra() {
+function EMCLabUltra() {
   const [lang, setLang] = useState("uz");
   const [dark, setDark] = useState(false);
   const [sending, setSending] = useState(false);
   const [active, setActive] = useState("about");
   const [scrollProgress, setScrollProgress] = useState(0);
-
+const navigate = useNavigate();
   // Lightbox
   const [lbOpen, setLbOpen] = useState(false);
   const [lbImages, setLbImages] = useState([]);
@@ -583,6 +587,9 @@ export default function EMCLabUltra() {
     ],
     []
   );
+
+
+  
 
   // progress bar
   useEffect(() => {
@@ -652,7 +659,7 @@ export default function EMCLabUltra() {
               <span className="text-gray-400">|</span>
               <button onClick={() => setLang("ru")} className={`hover:underline ${lang === "ru" ? "font-semibold" : ""}`}>РУ</button>
               <span className="mx-1" />
-              <button onClick={() => setDark((d) => !d)} className="rounded-lg border px-2 py-1 text-[11px] hover:opacity-80">
+              <button onClick={() => setDark((d) => !d)} className="rounded-lg border px-2 py-1 text_[11px] hover:opacity-80">
                 {dark ? (lang==="uz" ? "Yorug‘" : "Светлая") : (lang==="uz" ? "Qorong‘i" : "Тёмная")}
               </button>
             </div>
@@ -665,7 +672,7 @@ export default function EMCLabUltra() {
             <a
               href="#top"
               onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-              className="flex items-center gap-3"
+              className="flex items_center gap-3"
             >
               <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-400 ring-2 ring-white/60" aria-hidden />
               <span className="font-semibold">EMC Lab</span>
@@ -691,6 +698,16 @@ export default function EMCLabUltra() {
             >
               {lang==="uz" ? "Sinovga buyurtma" : "Заявка на испытания"}
             </a>
+
+  <button
+    onClick={() => navigate("/login")}
+    className="ml-3 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 
+               text-white font-medium shadow-md hover:shadow-lg 
+               hover:scale-105 transform transition duration-200"
+  >
+    {lang === "uz" ? "Kirish" : "Вход"}
+  </button>
+
           </div>
         </header>
 
@@ -738,7 +755,7 @@ export default function EMCLabUltra() {
               </div>
 
               <div className="relative">
-                <Card className="aspect-[4/3] overflow-hidden shadow-xl ring-1 ring-black/5">
+                <Card className="aspect_[4/3] overflow-hidden shadow-xl ring-1 ring-black/5">
                   <img src="/hero/anechoic.jpg" alt="anechoic" className="h-full w-full object-cover md:scale-105" />
                 </Card>
                 <div className="absolute -bottom-6 -right-6 hidden sm:block">
@@ -863,7 +880,7 @@ export default function EMCLabUltra() {
                       inline-flex items-center rounded-full px-3 py-1 bg-white text-gray-900 shadow-md
                       text-[11px] sm:text-xs
                       whitespace-nowrap truncate
-                      max-w-full sm:max-w-[45%] md:max-w-[55%] lg:max-w-[60%]
+                      max-w-full sm:max-w_[45%] md:max-w_[55%] lg:max-w_[60%]
                     "
                   >
                     {tst.code}
@@ -889,7 +906,7 @@ export default function EMCLabUltra() {
 
         {/* EQUIPMENT */}
         <Section id="equipment" title={lang==="uz" ? "Jihozlar" : "Оборудование"} subtitle={lang==="uz" ? "Asosiy o‘lchash va sinov kompleksi" : "Основной комплекс измерений и испытаний"}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid_cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {EQUIPMENT.map((eq, i) => (
               <EquipmentCard key={i} eq={eq} onOpenLightbox={openLightbox} />
             ))}
@@ -919,7 +936,7 @@ export default function EMCLabUltra() {
                 <img
                   src={src}
                   alt="lab photo"
-                  className="w-full h-auto aspect-[4/3] object-cover hover:scale-[1.02] transition-transform rounded-3xl cursor-zoom-in"
+                  className="w-full h-auto aspect_[4/3] object-cover hover:scale-[1.02] transition-transform rounded-3xl cursor-zoom-in"
                   onClick={() => openLightbox(GALLERY, i)}
                 />
               </Card>
@@ -1192,5 +1209,14 @@ export default function EMCLabUltra() {
         lang={lang}
       />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<EMCLabUltra />} />
+      <Route path="/login" element={<Login />} />
+    </Routes>
   );
 }
