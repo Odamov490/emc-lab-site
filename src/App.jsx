@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect } from "react";
 import ScrollToTopButton from "./ScrollToTopButton";
 
 import Login from "./pages/Login"; // login sahifang
-import EMCLabUltra from "./components/EMCLabUltra"; // asosiy sahifa
+ // asosiy sahifa
  import { Routes, Route, useNavigate } from "react-router-dom";
 
 /********************* CONFIG *********************/
