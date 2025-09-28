@@ -2,725 +2,929 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { db } from "../firebase";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  addDoc,
-  onSnapshot,
-  serverTimestamp,
-  doc,
-  getDoc,
-  deleteDoc,
-} from "firebase/firestore";
+/**
+ * EMC Lab — Login + Dashboard (UZ/RU)
+ * - Faqat admin hodim qo‘shadi, ro‘yxatdan o‘tish yo‘q
+ * - Hodimlar login orqali kiradi
+ * - Profilda: avatar, ism, lavozim, kontaktlar, statistika
+ * - Mahsulotlar: kirim/chiqim, status, mas’ul hodim
+ * - Admin: hodim qo‘shish/tahrirlash/o‘chirish, rollar
+ * - UZ/RU til tugmasi
+ * - Sessiya va ma’lumotlar localStorage’da (keyin Firestore’ga ko‘chirish oson)
+ */
 
-/** ======= TIL (UZ/RU) ======= */
-const T = {
+/* ----------------------- Utilities ----------------------- */
+const LS_KEYS = {
+  USERS: "emc_users",
+  PRODUCTS: "emc_products",
+  SESSION: "emc_session",
+  LANG: "emc_lang",
+};
+
+const ROLES = ["Admin", "Laboratoriya rahbari", "Bosh mutaxassis", "1-toifali mutaxassis", "2-toifali mutaxassis", "Texnik xodim"];
+
+const tdict = {
   uz: {
-    title: "Kirish",
-    username: "Login",
-    password: "Parol",
-    signIn: "Kirish",
-    wrong: "Login yoki parol noto‘g‘ri",
-    loading: "Yuklanmoqda...",
-    dashboard: "Boshqaruv paneli",
+    appTitle: "EMC Lab — Hodimlar paneli",
+    back: "Asosiy sayt",
     logout: "Chiqish",
-    hello: "Salom",
-    role: "Roli",
-    profile: "Profil",
-    activity: "Faollik",
-    products: "Mahsulot harakati",
-    employees: "Hodimlar",
-    addMovement: "Harakat qo‘shish",
-    productName: "Mahsulot nomi",
-    quantity: "Miqdor",
-    type: "Turi",
-    in: "Kirim",
-    out: "Chiqim",
-    note: "Izoh",
-    save: "Saqlash",
-    lastMovements: "Oxirgi harakatlar",
-    time: "Vaqt",
-    user: "Hodim",
-    actions: "Harakatlar",
-    remove: "O‘chirish",
-    addEmployee: "Yangi hodim qo‘shish",
-    fullname: "To‘liq ism",
-    empUsername: "Login (hodimniki)",
-    empPassword: "Parol (hodimniki)",
-    empRole: "Roli",
-    admin: "Admin",
-    employee: "Hodim",
-    create: "Yaratish",
-    employeesList: "Hodimlar ro‘yxati",
-    none: "Hozircha yo‘q",
+    tabs: { profile: "Profil", products: "Mahsulotlar", activity: "Faollik", admin: "Admin" },
+    login: {
+      title: "Kirish",
+      email: "Email",
+      password: "Parol",
+      signIn: "Kirish",
+      wrong: "Email yoki parol noto‘g‘ri.",
+      demo: "Demo ma’lumot: admin@emclab.uz / 123456",
+    },
+    profile: {
+      title: "Profil",
+      phone: "Telefon",
+      lastLogin: "Oxirgi kirish",
+      stats: "Statistika",
+      tests: "Sinovlar",
+      labs: "Laboratoriyalar",
+      edit: "Tahrirlash",
+      save: "Saqlash",
+      cancel: "Bekor qilish",
+      role: "Lavozim",
+      email: "Email",
+      changeAvatar: "Avatar URL",
+    },
+    products: {
+      title: "Mahsulotlar nazorati",
+      add: "Mahsulot qo‘shish",
+      name: "Nomi",
+      code: "Inventar raqami / Kod",
+      status: "Holati",
+      in: "Kirdi",
+      out: "Chiqdi",
+      responsible: "Mas’ul hodim",
+      note: "Izoh",
+      actions: "Amallar",
+      save: "Saqlash",
+      cancel: "Bekor qilish",
+      edit: "Tahrirlash",
+      delete: "O‘chirish",
+      search: "Qidirish...",
+      filter: "Filter:",
+      all: "Barchasi",
+      none: "Hali mahsulot yo‘q",
+    },
+    admin: {
+      title: "Hodimlar",
+      addStaff: "Hodim qo‘shish",
+      name: "Ism, familiya",
+      role: "Lavozim",
+      phone: "Telefon",
+      email: "Email (login uchun)",
+      pass: "Parol",
+      avatar: "Avatar URL (ixtiyoriy)",
+      actions: "Amallar",
+      save: "Saqlash",
+      cancel: "Bekor qilish",
+      edit: "Tahrirlash",
+      delete: "O‘chirish",
+      noUsers: "Hozircha hodim yo‘q",
+    },
     lang: "Til",
   },
   ru: {
-    title: "Вход",
-    username: "Логин",
-    password: "Пароль",
-    signIn: "Войти",
-    wrong: "Логин или пароль неверны",
-    loading: "Загрузка...",
-    dashboard: "Панель управления",
+    appTitle: "EMC Lab — Панель сотрудников",
+    back: "На сайт",
     logout: "Выйти",
-    hello: "Здравствуйте",
-    role: "Роль",
-    profile: "Профиль",
-    activity: "Активность",
-    products: "Движение товара",
-    employees: "Сотрудники",
-    addMovement: "Добавить движение",
-    productName: "Название товара",
-    quantity: "Количество",
-    type: "Тип",
-    in: "Приход",
-    out: "Расход",
-    note: "Примечание",
-    save: "Сохранить",
-    lastMovements: "Последние движения",
-    time: "Время",
-    user: "Сотрудник",
-    actions: "Действия",
-    remove: "Удалить",
-    addEmployee: "Добавить сотрудника",
-    fullname: "Полное имя",
-    empUsername: "Логин (сотр.)",
-    empPassword: "Пароль (сотр.)",
-    empRole: "Роль",
-    admin: "Админ",
-    employee: "Сотр.",
-    create: "Создать",
-    employeesList: "Список сотрудников",
-    none: "Пока нет",
+    tabs: { profile: "Профиль", products: "Продукты", activity: "Активность", admin: "Админ" },
+    login: {
+      title: "Вход",
+      email: "Эл. почта",
+      password: "Пароль",
+      signIn: "Войти",
+      wrong: "Неверная почта или пароль.",
+      demo: "Демо: admin@emclab.uz / 123456",
+    },
+    profile: {
+      title: "Профиль",
+      phone: "Телефон",
+      lastLogin: "Последний вход",
+      stats: "Статистика",
+      tests: "Испытания",
+      labs: "Лаборатории",
+      edit: "Редактировать",
+      save: "Сохранить",
+      cancel: "Отмена",
+      role: "Должность",
+      email: "Эл. почта",
+      changeAvatar: "URL аватара",
+    },
+    products: {
+      title: "Учет продуктов",
+      add: "Добавить продукт",
+      name: "Название",
+      code: "Инвентарный № / Код",
+      status: "Статус",
+      in: "Вход",
+      out: "Выход",
+      responsible: "Ответственный",
+      note: "Примечание",
+      actions: "Действия",
+      save: "Сохранить",
+      cancel: "Отмена",
+      edit: "Редактировать",
+      delete: "Удалить",
+      search: "Поиск...",
+      filter: "Фильтр:",
+      all: "Все",
+      none: "Пока нет продуктов",
+    },
+    admin: {
+      title: "Сотрудники",
+      addStaff: "Добавить сотрудника",
+      name: "ФИО",
+      role: "Должность",
+      phone: "Телефон",
+      email: "Эл. почта (для входа)",
+      pass: "Пароль",
+      avatar: "URL аватара (необязательно)",
+      actions: "Действия",
+      save: "Сохранить",
+      cancel: "Отмена",
+      edit: "Редактировать",
+      delete: "Удалить",
+      noUsers: "Пока нет сотрудников",
+    },
     lang: "Язык",
   },
 };
 
-/** ======= KICHIK UI ======= */
-function Card({ children, className = "" }) {
+const useLang = () => {
+  const [lang, setLang] = useState(localStorage.getItem(LS_KEYS.LANG) || "uz");
+  useEffect(() => localStorage.setItem(LS_KEYS.LANG, lang), [lang]);
+  const t = (keyPath) => {
+    // keyPath: "login.title" etc.
+    const [a, b, c] = keyPath.split(".");
+    return c ? tdict[lang][a][b][c] : tdict[lang][a][b] ?? tdict[lang][a] ?? keyPath;
+  };
+  return { lang, setLang, t, dict: tdict[lang] };
+};
+
+/* ----------------------- Seed data ----------------------- */
+function seedIfEmpty() {
+  const users = JSON.parse(localStorage.getItem(LS_KEYS.USERS) || "[]");
+  if (!users.length) {
+    const demo = [
+      {
+        id: crypto.randomUUID(),
+        name: "Odamov G‘ulomjon",
+        role: "Admin",
+        email: "admin@emclab.uz",
+        phone: "+998 90 123 45 67",
+        password: "123456",
+        img: "/staff/4.jpg",
+        lastLogin: new Date().toISOString(),
+        testsDone: 120,
+        labs: 6,
+        isAdmin: true,
+      },
+      {
+        id: crypto.randomUUID(),
+        name: "Abdurashidov Davron",
+        role: "Bosh mutaxassis",
+        email: "davron@emclab.uz",
+        phone: "+998 90 555 66 77",
+        password: "123456",
+        img: "/staff/3.png",
+        lastLogin: "",
+        testsDone: 58,
+        labs: 4,
+        isAdmin: false,
+      },
+    ];
+    localStorage.setItem(LS_KEYS.USERS, JSON.stringify(demo));
+  }
+  const products = JSON.parse(localStorage.getItem(LS_KEYS.PRODUCTS) || "[]");
+  if (!products.length) {
+    localStorage.setItem(
+      LS_KEYS.PRODUCTS,
+      JSON.stringify([
+        {
+          id: crypto.randomUUID(),
+          name: "SMB100B Signal Generator",
+          code: "INV-001",
+          status: "in",
+          responsibleId: null,
+          note: "Yangi kalibrovka qilingan",
+          ts: Date.now(),
+        },
+      ])
+    );
+  }
+}
+
+/* ----------------------- Hooks for LS CRUD ----------------------- */
+const useUsers = () => {
+  const [users, setUsers] = useState(() => JSON.parse(localStorage.getItem(LS_KEYS.USERS) || "[]"));
+  const save = (next) => {
+    setUsers(next);
+    localStorage.setItem(LS_KEYS.USERS, JSON.stringify(next));
+  };
+  const add = (u) => save([...users, { ...u, id: crypto.randomUUID(), isAdmin: u.role === "Admin" }]);
+  const update = (id, patch) => save(users.map((u) => (u.id === id ? { ...u, ...patch, isAdmin: (patch.role ?? u.role) === "Admin" } : u)));
+  const remove = (id) => save(users.filter((u) => u.id !== id));
+  return { users, add, update, remove, setUsers: save };
+};
+
+const useProducts = () => {
+  const [items, setItems] = useState(() => JSON.parse(localStorage.getItem(LS_KEYS.PRODUCTS) || "[]"));
+  const save = (next) => {
+    setItems(next);
+    localStorage.setItem(LS_KEYS.PRODUCTS, JSON.stringify(next));
+  };
+  const add = (p) => save([{ ...p, id: crypto.randomUUID(), ts: Date.now() }, ...items]);
+  const update = (id, patch) => save(items.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+  const remove = (id) => save(items.filter((p) => p.id !== id));
+  return { items, add, update, remove, setItems: save };
+};
+
+/* ----------------------- Login Page ----------------------- */
+function LoginForm({ onSuccess }) {
+  const { dict } = useLang();
+  const [email, setEmail] = useState("admin@emclab.uz");
+  const [password, setPassword] = useState("123456");
+  const [error, setError] = useState("");
+
+  const submit = (e) => {
+    e.preventDefault();
+    const users = JSON.parse(localStorage.getItem(LS_KEYS.USERS) || "[]");
+    const u = users.find((x) => x.email.trim().toLowerCase() === email.trim().toLowerCase() && x.password === password);
+    if (!u) {
+      setError(dict.login.wrong);
+      return;
+    }
+    const updated = users.map((x) => (x.id === u.id ? { ...x, lastLogin: new Date().toISOString() } : x));
+    localStorage.setItem(LS_KEYS.USERS, JSON.stringify(updated));
+    localStorage.setItem(LS_KEYS.SESSION, JSON.stringify({ userId: u.id }));
+    onSuccess(u.id);
+  };
+
   return (
-    <div className={`rounded-2xl border border-black/10 bg-white/80 dark:bg-white/10 backdrop-blur p-5 shadow ${className}`}>
-      {children}
+    <div className="min-h-[80vh] flex items-center justify-center px-4">
+      <div className="w-full max-w-md rounded-2xl border border-black/10 bg-white/80 backdrop-blur p-6 shadow">
+        <h1 className="text-2xl font-semibold">{dict.login.title}</h1>
+        <p className="text-xs text-gray-500 mt-1">{dict.login.demo}</p>
+
+        <form onSubmit={submit} className="mt-6 space-y-4">
+          <div>
+            <label className="text-sm font-medium">{dict.login.email}</label>
+            <input
+              className="mt-1 w-full rounded-xl border px-3 py-2"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              required
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium">{dict.login.password}</label>
+            <input
+              className="mt-1 w-full rounded-xl border px-3 py-2"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              type="password"
+              required
+            />
+          </div>
+
+        {error && <div className="text-red-600 text-sm">{error}</div>}
+
+          <button className="w-full rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm font-medium hover:opacity-90">
+            {dict.login.signIn}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
-function Pill({ children }) {
+
+/* ----------------------- Top Bar ----------------------- */
+function TopBar({ onBack, onLogout, lang, setLang }) {
+  const { dict } = useLang();
   return (
-    <span className="inline-flex items-center rounded-full bg-sky-100 text-sky-800 px-3 py-0.5 text-xs">
-      {children}
-    </span>
+    <div className="sticky top-0 z-30 bg-white/70 backdrop-blur border-b border-black/10">
+      <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-400" />
+          <div className="font-semibold">{dict.appTitle}</div>
+        </div>
+        <div className="flex items-center gap-2">
+          <select
+            value={lang}
+            onChange={(e) => setLang(e.target.value)}
+            className="rounded-lg border px-2 py-1 text-sm"
+            aria-label={dict.lang}
+          >
+            <option value="uz">UZ</option>
+            <option value="ru">RU</option>
+          </select>
+          <button onClick={onBack} className="rounded-lg border px-3 py-1 text-sm hover:bg-black/5">
+            {dict.back}
+          </button>
+          <button onClick={onLogout} className="rounded-lg border px-3 py-1 text-sm hover:bg-black/5">
+            {dict.logout}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
-/** ======= LOGIN KOMPONENT ======= */
-export default function Login() {
-  const navigate = useNavigate();
-  const [lang, setLang] = useState("uz"); // uz | ru
+/* ----------------------- Tabs ----------------------- */
+function Tabs({ value, onChange, labels }) {
+  return (
+    <div className="border-b border-black/10 bg-white/50">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex gap-2">
+          {Object.entries(labels).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => onChange(key)}
+              className={`px-4 py-2 text-sm rounded-t-lg border-b-2 ${
+                value === key ? "border-cyan-500 text-cyan-700" : "border-transparent hover:text-cyan-700"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
-  // auth holati
-  const [me, setMe] = useState(null);
-  const [checking, setChecking] = useState(true);
+/* ----------------------- Profile ----------------------- */
+function ProfileView({ me, onUpdate, dict }) {
+  const [edit, setEdit] = useState(false);
+  const [form, setForm] = useState(me);
 
-  // login form
-  const [u, setU] = useState("");
-  const [p, setP] = useState("");
-  const [err, setErr] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  useEffect(() => setForm(me), [me]);
 
-  // dashboard state
-  const [tab, setTab] = useState("profile"); // profile | products | employees | activity
+  const save = () => {
+    onUpdate(form);
+    setEdit(false);
+  };
 
-  // movements (real-time)
-  const [movements, setMovements] = useState([]);
-  const [mvForm, setMvForm] = useState({ product: "", qty: "", type: "in", note: "" });
-  const [savingMv, setSavingMv] = useState(false);
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-6 grid md:grid-cols-3 gap-6">
+      <div className="md:col-span-1">
+        <div className="rounded-2xl border bg-white p-6">
+          <div className="flex flex-col items-center">
+            <img
+              src={form.img || "/placeholder-avatar.jpg"}
+              alt={form.name}
+              className="w-32 h-32 rounded-full border-4 border-cyan-400 object-cover"
+              onError={(e) => (e.currentTarget.src = "/placeholder-avatar.jpg")}
+            />
+            <h2 className="text-xl font-semibold mt-3 text-center">{form.name}</h2>
+            <div className="text-sm text-gray-600">{form.role}</div>
+          </div>
 
-  // employees (admin only)
-  const [empList, setEmpList] = useState([]);
-  const [empForm, setEmpForm] = useState({ fullname: "", username: "", password: "", role: "employee" });
-  const [savingEmp, setSavingEmp] = useState(false);
+          <div className="mt-6 space-y-2 text-sm">
+            <div><b>{dict.profile.email}:</b> {form.email}</div>
+            <div><b>{dict.profile.phone}:</b> {form.phone || "-"}</div>
+            <div><b>{dict.profile.lastLogin}:</b> {form.lastLogin ? new Date(form.lastLogin).toLocaleString() : "-"}</div>
+          </div>
 
-  const t = useMemo(() => T[lang], [lang]);
+          <div className="mt-6">
+            {!edit ? (
+              <button onClick={() => setEdit(true)} className="w-full rounded-xl border px-4 py-2 text-sm hover:bg-black/5">
+                {dict.profile.edit}
+              </button>
+            ) : (
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm">{dict.profile.role}</label>
+                  <input
+                    className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
+                    value={form.role}
+                    onChange={(e) => setForm({ ...form, role: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm">{dict.profile.phone}</label>
+                  <input
+                    className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
+                    value={form.phone || ""}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm">{dict.profile.changeAvatar}</label>
+                  <input
+                    className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
+                    value={form.img || ""}
+                    onChange={(e) => setForm({ ...form, img: e.target.value })}
+                    placeholder="https://…"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={save} className="flex-1 rounded-xl bg-cyan-600 text-white px-4 py-2 text-sm hover:opacity-90">
+                    {dict.profile.save}
+                  </button>
+                  <button onClick={() => setEdit(false)} className="flex-1 rounded-xl border px-4 py-2 text-sm hover:bg-black/5">
+                    {dict.profile.cancel}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
-  // sessiyani localStorage dan yuklash
-  useEffect(() => {
-    const raw = localStorage.getItem("emc_auth");
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw);
-        setMe(parsed);
-      } catch {}
-    }
-    setChecking(false);
-  }, []);
+      <div className="md:col-span-2">
+        <div className="rounded-2xl border bg-white p-6">
+          <h3 className="text-lg font-semibold">{dict.profile.stats}</h3>
+          <div className="grid sm:grid-cols-3 gap-4 mt-4">
+            <div className="p-4 rounded-xl bg-cyan-50 text-center">
+              <div className="text-2xl font-semibold">{me.testsDone ?? 0}</div>
+              <div className="text-sm">{dict.profile.tests}</div>
+            </div>
+            <div className="p-4 rounded-xl bg-emerald-50 text-center">
+              <div className="text-2xl font-semibold">{me.labs ?? 0}</div>
+              <div className="text-sm">{dict.profile.labs}</div>
+            </div>
+            <div className="p-4 rounded-xl bg-indigo-50 text-center">
+              <div className="text-2xl font-semibold">{me.isAdmin ? "Admin" : "Staff"}</div>
+              <div className="text-sm">Role</div>
+            </div>
+          </div>
+        </div>
 
-  // real-time kuzatuvlar (faqat kirgandan keyin)
-  useEffect(() => {
-    if (!me) return;
+        {/* Activity placeholder */}
+        <div className="rounded-2xl border bg-white p-6 mt-6">
+          <h3 className="text-lg font-semibold">Activity</h3>
+          <p className="text-sm text-gray-600 mt-2">
+            {/* Future: pull from Firestore logs */}
+            Recent actions, product changes, and login history will appear here.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-    // movements
-    const unsubMv = onSnapshot(collection(db, "movements"), (snap) => {
-      const list = snap.docs
-        .map((d) => ({ id: d.id, ...d.data() }))
-        .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-      setMovements(list);
-    });
+/* ----------------------- Products ----------------------- */
+function ProductsView({ dict, items, add, update, remove, users, me }) {
+  const [q, setQ] = useState("");
+  const [filter, setFilter] = useState("all");
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState({ name: "", code: "", status: "in", responsibleId: me.id, note: "" });
 
-    // employees (faqat admin ko‘radi)
-    let unsubEmp = null;
-    if (me.role === "admin") {
-      unsubEmp = onSnapshot(collection(db, "employees"), (snap) => {
-        const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        setEmpList(list);
+  const filtered = useMemo(() => {
+    return items
+      .filter((p) => (filter === "all" ? true : p.status === filter))
+      .filter((p) => {
+        const s = `${p.name} ${p.code} ${p.note}`.toLowerCase();
+        return s.includes(q.toLowerCase());
       });
-    }
+  }, [items, q, filter]);
 
-    return () => {
-      unsubMv && unsubMv();
-      unsubEmp && unsubEmp();
-    };
-  }, [me]);
-
-  // --- YORDAMCHI: foydalanuvchini topish (avval ID bo‘yicha, so‘ng username bo‘yicha) ---
-  const findUserByUsername = async (username) => {
-    const id = username.trim();
-    // 1) Document ID bo‘yicha o‘qish (index talab qilmaydi, eng tez)
-    const docRef = doc(db, "employees", id);
-    const snap = await getDoc(docRef);
-    if (snap.exists()) {
-      return { id: snap.id, ...snap.data() };
-    }
-    // 2) Fallback: username maydoni bo‘yicha bitta where
-    const q = query(collection(db, "employees"), where("username", "==", id));
-    const qs = await getDocs(q);
-    if (qs.empty) return null;
-    return { id: qs.docs[0].id, ...qs.docs[0].data() };
+  const startEdit = (p) => {
+    setEditing(p.id);
+    setForm({ name: p.name, code: p.code, status: p.status, responsibleId: p.responsibleId || me.id, note: p.note || "" });
   };
 
-  // login
-  const doLogin = async (e) => {
-    e.preventDefault();
-    setErr("");
-    setSubmitting(true);
-    try {
-      const username = u.trim();
-      if (!username || !p.trim()) {
-        setErr(t.wrong);
-        setSubmitting(false);
-        return;
-      }
-
-      const user = await findUserByUsername(username);
-      if (!user) {
-        setErr(t.wrong); // foydalanuvchi topilmadi
-        setSubmitting(false);
-        return;
-      }
-
-      if ((user.password || "") !== p) {
-        setErr(t.wrong); // parol xato
-        setSubmitting(false);
-        return;
-      }
-
-      const authObj = {
-        id: user.id,
-        username: user.username || username,
-        fullname: user.fullname || username,
-        role: user.role || "employee",
-      };
-      localStorage.setItem("emc_auth", JSON.stringify(authObj));
-      setMe(authObj);
-      setTab("profile");
-    } catch (e) {
-      // xatoni ko‘rsatamiz (mas: rules Permission denied / index kerak bo‘lsa h.k.)
-      setErr((e && e.message) ? e.message : "Xatolik. Keyinroq urinib ko‘ring.");
-    } finally {
-      setSubmitting(false);
-    }
+  const cancel = () => {
+    setEditing(null);
+    setForm({ name: "", code: "", status: "in", responsibleId: me.id, note: "" });
   };
 
-  const logout = () => {
-    localStorage.removeItem("emc_auth");
-    setMe(null);
-    setTab("profile");
+  const saveNew = () => {
+    if (!form.name.trim()) return;
+    add(form);
+    cancel();
   };
 
-  // movement qo‘shish
-  const addMovement = async (e) => {
-    e.preventDefault();
-    if (!me) return;
-    if (!mvForm.product.trim() || !mvForm.qty) return;
-
-    setSavingMv(true);
-    try {
-      await addDoc(collection(db, "movements"), {
-        product: mvForm.product.trim(),
-        qty: Number(mvForm.qty),
-        type: mvForm.type, // "in" | "out"
-        note: mvForm.note.trim(),
-        byUser: me.fullname,
-        byUserId: me.id,
-        createdAt: serverTimestamp(),
-      });
-      setMvForm({ product: "", qty: "", type: "in", note: "" });
-    } catch (e) {
-      console.error(e);
-      alert("Saqlashda xatolik!");
-    } finally {
-      setSavingMv(false);
-    }
+  const saveEdit = () => {
+    update(editing, form);
+    cancel();
   };
 
-  // employee qo‘shish (admin)
-  const addEmployee = async (e) => {
-    e.preventDefault();
-    if (!me || me.role !== "admin") return;
+  const responsibleName = (id) => users.find((u) => u.id === id)?.name || "-";
 
-    if (!empForm.username.trim() || !empForm.password.trim() || !empForm.fullname.trim()) {
-      return alert("To‘liq to‘ldiring.");
-    }
-    setSavingEmp(true);
-    try {
-      await addDoc(collection(db, "employees"), {
-        username: empForm.username.trim(),
-        password: empForm.password.trim(),
-        fullname: empForm.fullname.trim(),
-        role: empForm.role, // admin | employee
-        createdAt: serverTimestamp(),
-      });
-      setEmpForm({ fullname: "", username: "", password: "", role: "employee" });
-    } catch (e) {
-      console.error(e);
-      alert("Hodim qo‘shishda xatolik!");
-    } finally {
-      setSavingEmp(false);
-    }
-  };
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="rounded-2xl border bg-white p-6">
+        <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+          <h3 className="text-lg font-semibold">{dict.products.title}</h3>
+          <div className="flex items-center gap-2">
+            <input
+              className="rounded-xl border px-3 py-2 text-sm"
+              placeholder={dict.products.search}
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+            />
+            <label className="text-sm">{dict.products.filter}</label>
+            <select className="rounded-xl border px-3 py-2 text-sm" value={filter} onChange={(e) => setFilter(e.target.value)}>
+              <option value="all">{dict.products.all}</option>
+              <option value="in">{dict.products.in}</option>
+              <option value="out">{dict.products.out}</option>
+            </select>
+          </div>
+        </div>
 
-  const removeMovement = async (id) => {
-    if (!me) return;
-    if (!confirm("O‘chirasizmi?")) return;
-    try {
-      await deleteDoc(doc(db, "movements", id));
-    } catch (e) {
-      console.error(e);
-      alert("O‘chirishda xatolik!");
-    }
-  };
+        {/* Add / Edit form */}
+        <div className="mt-5 grid md:grid-cols-5 gap-3">
+          <input
+            className="rounded-xl border px-3 py-2 text-sm md:col-span-1"
+            placeholder={dict.products.name}
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+          />
+          <input
+            className="rounded-xl border px-3 py-2 text-sm md:col-span-1"
+            placeholder={dict.products.code}
+            value={form.code}
+            onChange={(e) => setForm({ ...form, code: e.target.value })}
+          />
+          <select
+            className="rounded-xl border px-3 py-2 text-sm"
+            value={form.status}
+            onChange={(e) => setForm({ ...form, status: e.target.value })}
+          >
+            <option value="in">{dict.products.in}</option>
+            <option value="out">{dict.products.out}</option>
+          </select>
+          <select
+            className="rounded-xl border px-3 py-2 text-sm"
+            value={form.responsibleId || ""}
+            onChange={(e) => setForm({ ...form, responsibleId: e.target.value })}
+          >
+            {users.map((u) => (
+              <option key={u.id} value={u.id}>
+                {u.name}
+              </option>
+            ))}
+          </select>
+          <input
+            className="rounded-xl border px-3 py-2 text-sm md:col-span-1"
+            placeholder={dict.products.note}
+            value={form.note}
+            onChange={(e) => setForm({ ...form, note: e.target.value })}
+          />
+        </div>
+        <div className="mt-3 flex gap-2">
+          {!editing ? (
+            <button onClick={saveNew} className="rounded-xl bg-cyan-600 text-white px-4 py-2 text-sm hover:opacity-90">
+              {dict.products.add}
+            </button>
+          ) : (
+            <>
+              <button onClick={saveEdit} className="rounded-xl bg-cyan-600 text-white px-4 py-2 text-sm hover:opacity-90">
+                {dict.products.save}
+              </button>
+              <button onClick={cancel} className="rounded-xl border px-4 py-2 text-sm hover:bg-black/5">
+                {dict.products.cancel}
+              </button>
+            </>
+          )}
+        </div>
 
-  const removeEmployee = async (id) => {
-    if (!me || me.role !== "admin") return;
-    if (!confirm("Hodimni o‘chirasizmi?")) return;
-    try {
-      await deleteDoc(doc(db, "employees", id));
-    } catch (e) {
-      console.error(e);
-      alert("O‘chirishda xatolik!");
-    }
-  };
+        {/* Table */}
+        <div className="mt-6 overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-gray-600">
+                <th className="py-2 pr-3">{dict.products.name}</th>
+                <th className="py-2 pr-3">{dict.products.code}</th>
+                <th className="py-2 pr-3">{dict.products.status}</th>
+                <th className="py-2 pr-3">{dict.products.responsible}</th>
+                <th className="py-2 pr-3">{dict.products.note}</th>
+                <th className="py-2">{dict.products.actions}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length ? (
+                filtered.map((p) => (
+                  <tr key={p.id} className="border-t">
+                    <td className="py-2 pr-3">{p.name}</td>
+                    <td className="py-2 pr-3">{p.code}</td>
+                    <td className="py-2 pr-3">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          p.status === "in" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                        }`}
+                      >
+                        {p.status === "in" ? dict.products.in : dict.products.out}
+                      </span>
+                    </td>
+                    <td className="py-2 pr-3">{responsibleName(p.responsibleId)}</td>
+                    <td className="py-2 pr-3">{p.note}</td>
+                    <td className="py-2">
+                      <div className="flex gap-2">
+                        <button onClick={() => startEdit(p)} className="rounded-lg border px-3 py-1 hover:bg-black/5">
+                          {dict.products.edit}
+                        </button>
+                        <button onClick={() => remove(p.id)} className="rounded-lg border px-3 py-1 hover:bg-black/5">
+                          {dict.products.delete}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td className="py-6 text-gray-500" colSpan={6}>
+                    {dict.products.none}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-  if (checking) {
+/* ----------------------- Admin (Users) ----------------------- */
+function AdminUsers({ dict, users, add, update, remove, me }) {
+  if (!me.isAdmin) {
     return (
-      <div className="min-h-screen grid place-items-center">
-        <div className="text-sm text-gray-600">{t.loading}</div>
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="rounded-2xl border bg-white p-6">
+          <h3 className="text-lg font-semibold">Admin</h3>
+          <p className="text-sm text-gray-600 mt-2">Access denied.</p>
+        </div>
       </div>
     );
   }
 
-  // === Agar kirilmagan bo‘lsa — LOGIN FORMA ===
-  if (!me) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-slate-50">
-        <div className="w-full max-w-md">
-          <div className="mb-4 flex items-center justify-between">
-            <h1 className="text-2xl font-semibold">{t.title}</h1>
-            <div className="flex items-center gap-2 text-sm">
-              <span>{t.lang}:</span>
-              <button
-                onClick={() => setLang("uz")}
-                className={`px-2 py-1 rounded border ${lang === "uz" ? "border-sky-500 text-sky-700" : "border-black/10"}`}
-              >
-                UZ
+  const emptyForm = { name: "", role: "Texnik xodim", phone: "", email: "", password: "", img: "" };
+  const [adding, setAdding] = useState(false);
+  const [form, setForm] = useState(emptyForm);
+  const [editId, setEditId] = useState(null);
+
+  const startAdd = () => {
+    setAdding(true);
+    setEditId(null);
+    setForm(emptyForm);
+  };
+
+  const startEdit = (u) => {
+    setEditId(u.id);
+    setAdding(false);
+    setForm({ name: u.name, role: u.role, phone: u.phone || "", email: u.email, password: u.password || "", img: u.img || "" });
+  };
+
+  const cancel = () => {
+    setAdding(false);
+    setEditId(null);
+    setForm(emptyForm);
+  };
+
+  const save = () => {
+    if (!form.name.trim() || !form.email.trim() || !form.password.trim()) return;
+    if (adding) {
+      add({ ...form });
+    } else if (editId) {
+      update(editId, { ...form });
+    }
+    cancel();
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="rounded-2xl border bg-white p-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold">{dict.admin.title}</h3>
+          <button onClick={startAdd} className="rounded-xl bg-cyan-600 text-white px-4 py-2 text-sm hover:opacity-90">
+            {dict.admin.addStaff}
+          </button>
+        </div>
+
+        {(adding || editId) && (
+          <div className="mt-5 grid md:grid-cols-6 gap-3">
+            <input
+              className="rounded-xl border px-3 py-2 text-sm md:col-span-2"
+              placeholder={dict.admin.name}
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
+            <select
+              className="rounded-xl border px-3 py-2 text-sm"
+              value={form.role}
+              onChange={(e) => setForm({ ...form, role: e.target.value })}
+            >
+              {ROLES.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+            <input
+              className="rounded-xl border px-3 py-2 text-sm"
+              placeholder={dict.admin.phone}
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            />
+            <input
+              className="rounded-xl border px-3 py-2 text-sm"
+              placeholder={dict.admin.email}
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+            <input
+              className="rounded-xl border px-3 py-2 text-sm"
+              placeholder={dict.admin.pass}
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              type="text"
+            />
+            <input
+              className="rounded-xl border px-3 py-2 text-sm md:col-span-3"
+              placeholder={dict.admin.avatar}
+              value={form.img}
+              onChange={(e) => setForm({ ...form, img: e.target.value })}
+            />
+            <div className="md:col-span-3 flex gap-2">
+              <button onClick={save} className="rounded-xl bg-cyan-600 text-white px-4 py-2 text-sm hover:opacity-90">
+                {dict.admin.save}
               </button>
-              <button
-                onClick={() => setLang("ru")}
-                className={`px-2 py-1 rounded border ${lang === "ru" ? "border-sky-500 text-sky-700" : "border-black/10"}`}
-              >
-                RU
+              <button onClick={cancel} className="rounded-xl border px-4 py-2 text-sm hover:bg-black/5">
+                {dict.admin.cancel}
               </button>
             </div>
           </div>
+        )}
 
-          <Card>
-            <form onSubmit={doLogin} className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">{t.username}</label>
-                <input
-                  className="mt-1 w-full rounded-xl border px-3 py-2"
-                  value={u}
-                  onChange={(e) => setU(e.target.value)}
-                  placeholder="employee1"
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">{t.password}</label>
-                <input
-                  type="password"
-                  className="mt-1 w-full rounded-xl border px-3 py-2"
-                  value={p}
-                  onChange={(e) => setP(e.target.value)}
-                  placeholder="••••••"
-                  required
-                />
-              </div>
-
-              {err && <div className="text-sm text-red-600 break-words">{err}</div>}
-
-              <button
-                disabled={submitting}
-                className="w-full rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-60"
-              >
-                {submitting ? t.loading : t.signIn}
-              </button>
-            </form>
-          </Card>
-
-          <div className="mt-4 text-xs text-gray-500">
-            {/* Admin hodimni Firestore orqali qo‘shadi: collection "employees" */}
-            {/* { username, password, fullname, role } */}
-          </div>
+        <div className="mt-6 overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-gray-600">
+                <th className="py-2 pr-3">{dict.admin.name}</th>
+                <th className="py-2 pr-3">{dict.admin.role}</th>
+                <th className="py-2 pr-3">{dict.admin.phone}</th>
+                <th className="py-2 pr-3">{dict.admin.email}</th>
+                <th className="py-2">{dict.admin.actions}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.length ? (
+                users.map((u) => (
+                  <tr key={u.id} className="border-t">
+                    <td className="py-2 pr-3">
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={u.img || "/placeholder-avatar.jpg"}
+                          alt={u.name}
+                          className="w-8 h-8 rounded-full object-cover border"
+                          onError={(e) => (e.currentTarget.src = "/placeholder-avatar.jpg")}
+                        />
+                        <span>{u.name}</span>
+                        {u.isAdmin && (
+                          <span className="text-[10px] ml-1 px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-700">Admin</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-2 pr-3">{u.role}</td>
+                    <td className="py-2 pr-3">{u.phone || "-"}</td>
+                    <td className="py-2 pr-3">{u.email}</td>
+                    <td className="py-2">
+                      <div className="flex gap-2">
+                        <button onClick={() => startEdit(u)} className="rounded-lg border px-3 py-1 hover:bg-black/5">
+                          {dict.admin.edit}
+                        </button>
+                        {u.id !== me.id && (
+                          <button onClick={() => remove(u.id)} className="rounded-lg border px-3 py-1 hover:bg-black/5">
+                            {dict.admin.delete}
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td className="py-6 text-gray-500" colSpan={5}>
+                    {dict.admin.noUsers}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
+      </div>
+    </div>
+  );
+}
+
+/* ----------------------- Main Component ----------------------- */
+export default function Login() {
+  // Seed demo data (one-time)
+  useEffect(() => seedIfEmpty(), []);
+
+  const { lang, setLang, dict } = useLang();
+  const nav = useNavigate();
+
+  const { users, add: addUser, update: updateUser, remove: removeUser, setUsers } = useUsers();
+  const { items, add: addProduct, update: updateProduct, remove: removeProduct } = useProducts();
+
+  const [tab, setTab] = useState("profile");
+  const [me, setMe] = useState(null);
+
+  // Restore session
+  useEffect(() => {
+    const s = JSON.parse(localStorage.getItem(LS_KEYS.SESSION) || "null");
+    if (s?.userId) {
+      const u = users.find((x) => x.id === s.userId);
+      if (u) setMe(u);
+    }
+  }, [users]);
+
+  const handleLoginSuccess = (userId) => {
+    const u = users.find((x) => x.id === userId);
+    setMe(u || null);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem(LS_KEYS.SESSION);
+    setMe(null);
+  };
+
+  const updateMe = (patch) => {
+    if (!me) return;
+    const next = { ...me, ...patch };
+    setMe(next);
+    updateUser(me.id, patch);
+  };
+
+  // Keep my changes in list
+  useEffect(() => {
+    if (!me) return;
+    setUsers(users.map((u) => (u.id === me.id ? me : u)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [me?.name, me?.role, me?.phone, me?.img]);
+
+  if (!me) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white to-slate-50">
+        <SiteHeaderTop dict={dict} />
+        <LoginForm onSuccess={handleLoginSuccess} />
       </div>
     );
   }
 
-  // === Kirgandan keyin — DASHBOARD (hammasi shu faylda) ===
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50">
-      {/* Top bar */}
-      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-black/10">
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-400" />
-            <div className="font-semibold">{T[lang].dashboard}</div>
-            <Pill>{me.role}</Pill>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <button
-              onClick={() => setLang(lang === "uz" ? "ru" : "uz")}
-              className="rounded-lg border px-2 py-1 text-[12px]"
-            >
-              {lang === "uz" ? "РУ" : "UZ"}
-            </button>
-            <button
-              onClick={logout}
-              className="rounded-lg border px-3 py-1.5 text-sm hover:bg-black/5"
-            >
-              {t.logout}
-            </button>
+      <TopBar onBack={() => nav("/")} onLogout={handleLogout} lang={lang} setLang={setLang} />
+      <Tabs
+        value={tab}
+        onChange={setTab}
+        labels={{
+          profile: dict.tabs.profile,
+          products: dict.tabs.products,
+          activity: dict.tabs.activity,
+          ...(me.isAdmin ? { admin: dict.tabs.admin } : {}),
+        }}
+      />
+
+      {tab === "profile" && <ProfileView me={me} onUpdate={updateMe} dict={dict} />}
+
+      {tab === "products" && (
+        <ProductsView
+          dict={dict}
+          items={items}
+          add={addProduct}
+          update={updateProduct}
+          remove={removeProduct}
+          users={users}
+          me={me}
+        />
+      )}
+
+      {tab === "activity" && (
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="rounded-2xl border bg-white p-6">
+            <h3 className="text-lg font-semibold">Activity</h3>
+            <p className="text-sm text-gray-600 mt-2">Bu bo‘limni keyin Firestore loglari bilan to‘ldiramiz.</p>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Content */}
-      <div className="max-w-6xl mx-auto px-4 py-6 grid md:grid-cols-[220px_1fr] gap-6">
-        {/* Sidebar */}
-        <Card className="p-0 overflow-hidden">
-          <div className="p-4 border-b border-black/10">
-            <div className="font-semibold">{t.hello}, {me.fullname}</div>
-            <div className="text-xs text-gray-500">{t.role}: {me.role}</div>
-          </div>
-          <nav className="p-2">
-            <button
-              onClick={() => setTab("profile")}
-              className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${tab === "profile" ? "bg-black/5 font-semibold" : ""}`}
-            >
-              {t.profile}
-            </button>
-            <button
-              onClick={() => setTab("products")}
-              className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${tab === "products" ? "bg-black/5 font-semibold" : ""}`}
-            >
-              {t.products}
-            </button>
-            {me.role === "admin" && (
-              <button
-                onClick={() => setTab("employees")}
-                className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${tab === "employees" ? "bg-black/5 font-semibold" : ""}`}
-              >
-                {t.employees}
-              </button>
-            )}
-            <button
-              onClick={() => setTab("activity")}
-              className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${tab === "activity" ? "bg-black/5 font-semibold" : ""}`}
-            >
-              {t.activity}
-            </button>
-          </nav>
-        </Card>
+      {tab === "admin" && (
+        <AdminUsers dict={dict} users={users} add={addUser} update={updateUser} remove={removeUser} me={me} />
+      )}
+    </div>
+  );
+}
 
-        {/* Main */}
-        <div className="space-y-6">
-          {/* PROFILE */}
-          {tab === "profile" && (
-            <Card>
-              <div className="text-lg font-semibold mb-3">{t.profile}</div>
-              <div className="grid sm:grid-cols-2 gap-4 text-sm">
-                <div>
-                  <div className="text-gray-500">{t.username}</div>
-                  <div className="font-medium">{me.username}</div>
-                </div>
-                <div>
-                  <div className="text-gray-500">{t.role}</div>
-                  <div className="font-medium">{me.role}</div>
-                </div>
-                <div className="sm:col-span-2">
-                  <div className="text-gray-500">{t.fullname}</div>
-                  <div className="font-medium">{me.fullname}</div>
-                </div>
-              </div>
-            </Card>
-          )}
-
-          {/* PRODUCTS (movement) */}
-          {tab === "products" && (
-            <>
-              <Card>
-                <div className="text-lg font-semibold mb-3">{t.addMovement}</div>
-                <form onSubmit={addMovement} className="grid sm:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <label className="font-medium">{t.productName}</label>
-                    <input
-                      className="mt-1 w-full rounded-xl border px-3 py-2"
-                      value={mvForm.product}
-                      onChange={(e) => setMvForm((s) => ({ ...s, product: e.target.value }))}
-                      placeholder="Masalan: R&S ESW8"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="font-medium">{t.quantity}</label>
-                    <input
-                      type="number"
-                      min={1}
-                      className="mt-1 w-full rounded-xl border px-3 py-2"
-                      value={mvForm.qty}
-                      onChange={(e) => setMvForm((s) => ({ ...s, qty: e.target.value }))}
-                      placeholder="1"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="font-medium">{t.type}</label>
-                    <select
-                      className="mt-1 w-full rounded-xl border px-3 py-2"
-                      value={mvForm.type}
-                      onChange={(e) => setMvForm((s) => ({ ...s, type: e.target.value }))}
-                    >
-                      <option value="in">{t.in}</option>
-                      <option value="out">{t.out}</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="font-medium">{t.note}</label>
-                    <input
-                      className="mt-1 w-full rounded-xl border px-3 py-2"
-                      value={mvForm.note}
-                      onChange={(e) => setMvForm((s) => ({ ...s, note: e.target.value }))}
-                      placeholder="ixtiyoriy"
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <button
-                      disabled={savingMv}
-                      className="rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-60"
-                    >
-                      {savingMv ? t.loading : t.save}
-                    </button>
-                  </div>
-                </form>
-              </Card>
-
-              <Card>
-                <div className="text-lg font-semibold mb-3">{t.lastMovements}</div>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full text-sm">
-                    <thead>
-                      <tr className="text-left text-gray-500">
-                        <th className="py-2 pr-3">{t.productName}</th>
-                        <th className="py-2 pr-3">{t.quantity}</th>
-                        <th className="py-2 pr-3">{t.type}</th>
-                        <th className="py-2 pr-3">{t.note}</th>
-                        <th className="py-2 pr-3">{t.user}</th>
-                        <th className="py-2 pr-3">{t.time}</th>
-                        <th className="py-2 pr-3">{t.actions}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {movements.length === 0 && (
-                        <tr>
-                          <td colSpan={7} className="py-4 text-gray-400">{t.none}</td>
-                        </tr>
-                      )}
-                      {movements.map((m) => (
-                        <tr key={m.id} className="border-t">
-                          <td className="py-2 pr-3">{m.product}</td>
-                          <td className="py-2 pr-3">{m.qty}</td>
-                          <td className="py-2 pr-3">
-                            <Pill>{m.type === "in" ? t.in : t.out}</Pill>
-                          </td>
-                          <td className="py-2 pr-3">{m.note || "-"}</td>
-                          <td className="py-2 pr-3">{m.byUser}</td>
-                          <td className="py-2 pr-3">
-                            {m.createdAt?.toDate ? m.createdAt.toDate().toLocaleString() : "-"}
-                          </td>
-                          <td className="py-2 pr-3">
-                            <button
-                              onClick={() => removeMovement(m.id)}
-                              className="text-red-600 hover:underline"
-                            >
-                              {t.remove}
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Card>
-            </>
-          )}
-
-          {/* EMPLOYEES (admin only) */}
-          {tab === "employees" && me.role === "admin" && (
-            <>
-              <Card>
-                <div className="text-lg font-semibold mb-3">{t.addEmployee}</div>
-                <form onSubmit={addEmployee} className="grid sm:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <label className="font-medium">{t.fullname}</label>
-                    <input
-                      className="mt-1 w-full rounded-xl border px-3 py-2"
-                      value={empForm.fullname}
-                      onChange={(e) => setEmpForm((s) => ({ ...s, fullname: e.target.value }))}
-                      placeholder="Sobirov Doston"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="font-medium">{t.empUsername}</label>
-                    <input
-                      className="mt-1 w-full rounded-xl border px-3 py-2"
-                      value={empForm.username}
-                      onChange={(e) => setEmpForm((s) => ({ ...s, username: e.target.value }))}
-                      placeholder="doston"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="font-medium">{t.empPassword}</label>
-                    <input
-                      type="text"
-                      className="mt-1 w-full rounded-xl border px-3 py-2"
-                      value={empForm.password}
-                      onChange={(e) => setEmpForm((s) => ({ ...s, password: e.target.value }))}
-                      placeholder="parol"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="font-medium">{t.empRole}</label>
-                    <select
-                      className="mt-1 w-full rounded-xl border px-3 py-2"
-                      value={empForm.role}
-                      onChange={(e) => setEmpForm((s) => ({ ...s, role: e.target.value }))}
-                    >
-                      <option value="employee">{t.employee}</option>
-                      <option value="admin">{t.admin}</option>
-                    </select>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <button
-                      disabled={savingEmp}
-                      className="rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-60"
-                    >
-                      {savingEmp ? t.loading : t.create}
-                    </button>
-                  </div>
-                </form>
-              </Card>
-
-              <Card>
-                <div className="text-lg font-semibold mb-3">{t.employeesList}</div>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full text-sm">
-                    <thead>
-                      <tr className="text-left text-gray-500">
-                        <th className="py-2 pr-3">{t.fullname}</th>
-                        <th className="py-2 pr-3">{t.username}</th>
-                        <th className="py-2 pr-3">{t.role}</th>
-                        <th className="py-2 pr-3">{t.actions}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {empList.length === 0 && (
-                        <tr>
-                          <td colSpan={4} className="py-4 text-gray-400">{t.none}</td>
-                        </tr>
-                      )}
-                      {empList.map((e) => (
-                        <tr key={e.id} className="border-t">
-                          <td className="py-2 pr-3">{e.fullname || "-"}</td>
-                          <td className="py-2 pr-3">{e.username}</td>
-                          <td className="py-2 pr-3">{e.role}</td>
-                          <td className="py-2 pr-3">
-                            <button
-                              onClick={() => removeEmployee(e.id)}
-                              className="text-red-600 hover:underline"
-                            >
-                              {t.remove}
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Card>
-            </>
-          )}
-
-          {/* ACTIVITY */}
-          {tab === "activity" && (
-            <Card>
-              <div className="text-lg font-semibold mb-3">{t.activity}</div>
-              <div className="space-y-3 text-sm">
-                {movements.length === 0 && <div className="text-gray-400">{t.none}</div>}
-                {movements.slice(0, 30).map((m) => (
-                  <div key={m.id} className="flex items-start gap-3">
-                    <div className="mt-1">
-                      <Pill>{m.type === "in" ? t.in : t.out}</Pill>
-                    </div>
-                    <div>
-                      <div className="font-medium">{m.product} <span className="text-gray-500">×{m.qty}</span></div>
-                      <div className="text-xs text-gray-500">
-                        {m.byUser} • {m.createdAt?.toDate ? m.createdAt.toDate().toLocaleString() : "-"}
-                        {m.note ? ` • ${m.note}` : ""}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          )}
-        </div>
+/* ----------------------- Small Header on Login screen ----------------------- */
+function SiteHeaderTop({ dict }) {
+  return (
+    <div className="border-b border-black/10 bg-white/70 backdrop-blur">
+      <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-3">
+        <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-400" />
+        <div className="font-semibold">EMC Lab</div>
+        <div className="ml-auto text-xs text-gray-500">{dict.appTitle}</div>
       </div>
     </div>
   );
