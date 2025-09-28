@@ -12,6 +12,7 @@ import {
   onSnapshot,
   serverTimestamp,
   doc,
+  getDoc,
   deleteDoc,
 } from "firebase/firestore";
 
@@ -184,38 +185,61 @@ export default function Login() {
     };
   }, [me]);
 
+  // --- YORDAMCHI: foydalanuvchini topish (avval ID bo‘yicha, so‘ng username bo‘yicha) ---
+  const findUserByUsername = async (username) => {
+    const id = username.trim();
+    // 1) Document ID bo‘yicha o‘qish (index talab qilmaydi, eng tez)
+    const docRef = doc(db, "employees", id);
+    const snap = await getDoc(docRef);
+    if (snap.exists()) {
+      return { id: snap.id, ...snap.data() };
+    }
+    // 2) Fallback: username maydoni bo‘yicha bitta where
+    const q = query(collection(db, "employees"), where("username", "==", id));
+    const qs = await getDocs(q);
+    if (qs.empty) return null;
+    return { id: qs.docs[0].id, ...qs.docs[0].data() };
+  };
+
   // login
   const doLogin = async (e) => {
     e.preventDefault();
     setErr("");
     setSubmitting(true);
     try {
-      // Firestore da tekshirish
-      const q = query(
-        collection(db, "employees"),
-        where("username", "admin", u.trim()),
-        where("password", "123456", p)
-      );
-      const qs = await getDocs(q);
-      if (qs.empty) {
+      const username = u.trim();
+      if (!username || !p.trim()) {
         setErr(t.wrong);
         setSubmitting(false);
         return;
       }
-      const docData = qs.docs[0].data();
+
+      const user = await findUserByUsername(username);
+      if (!user) {
+        setErr(t.wrong); // foydalanuvchi topilmadi
+        setSubmitting(false);
+        return;
+      }
+
+      if ((user.password || "") !== p) {
+        setErr(t.wrong); // parol xato
+        setSubmitting(false);
+        return;
+      }
+
       const authObj = {
-        id: qs.docs[0].id,
-        username: docData.username,
-        fullname: docData.fullname || docData.username,
-        role: docData.role || "employee",
+        id: user.id,
+        username: user.username || username,
+        fullname: user.fullname || username,
+        role: user.role || "employee",
       };
       localStorage.setItem("emc_auth", JSON.stringify(authObj));
       setMe(authObj);
-      setSubmitting(false);
       setTab("profile");
-      // ixtiyoriy: navigate("/") — lekin siz aytgandek hammasi shu faylda
     } catch (e) {
-      setErr("Xatolik. Keyinroq urinib ko‘ring.");
+      // xatoni ko‘rsatamiz (mas: rules Permission denied / index kerak bo‘lsa h.k.)
+      setErr((e && e.message) ? e.message : "Xatolik. Keyinroq urinib ko‘ring.");
+    } finally {
       setSubmitting(false);
     }
   };
@@ -356,7 +380,7 @@ export default function Login() {
                 />
               </div>
 
-              {err && <div className="text-sm text-red-600">{err}</div>}
+              {err && <div className="text-sm text-red-600 break-words">{err}</div>}
 
               <button
                 disabled={submitting}
@@ -673,7 +697,7 @@ export default function Login() {
             </>
           )}
 
-          {/* ACTIVITY (simple feed — movements ro‘yxati) */}
+          {/* ACTIVITY */}
           {tab === "activity" && (
             <Card>
               <div className="text-lg font-semibold mb-3">{t.activity}</div>
