@@ -193,8 +193,8 @@ export default function Login() {
       // Firestore da tekshirish
       const q = query(
         collection(db, "employees"),
-        where("username", "==", u.trim()),
-        where("password", "==", p)
+        where("username", "admin", u.trim()),
+        where("password", "123456", p)
       );
       const qs = await getDocs(q);
       if (qs.empty) {
