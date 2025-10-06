@@ -999,7 +999,7 @@ const navigate = useNavigate();
         {/* PRICING */}
         <Section id="pricing" title={lang==="uz" ? "Narxlar" : "Цены"} subtitle={lang==="uz" ? "Individual kalkulyatsiya" : "Индивидуальный расчет"}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-            {["Maishiy texnikalar","Avtotransport vositalari", "Qishloq xo'jalik texnikalari", "Ilmiy tadqiqot sinovlari"].map((tier, i) => (
+            {["Maishiy texnikalar","Avtotransport vositalari", "Qishloq xo'jalik texnikalari","Muzlatgich va sovitgichlar",  "Ilmiy tadqiqot sinovlari"].map((tier, i) => (
               <Card key={i} className="p-6 hover:shadow-md">
                 <div className="text-sm uppercase tracking-wide text-gray-500">{tier}</div>
                 <div className="mt-2 text-3xl font-semibold"> mln —</div>
