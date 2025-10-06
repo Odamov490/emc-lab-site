@@ -929,20 +929,32 @@ const navigate = useNavigate();
         </div>
 
         {/* GALLERY */}
-        <Section id="gallery" title={lang==="uz" ? "Galereya" : "Галерея"} subtitle={lang==="uz" ? "Laboratoriya, jihozlar va sinov jarayonlaridan suratlar" : "Фото лаборатории, оборудования и процесса испытаний"} bleed>
-          <div className="px-4 max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {GALLERY.map((src, i) => (
-              <Card key={i}>
-                <img
-                  src={src}
-                  alt="lab photo"
-                  className="w-full h-auto aspect_[4/3] object-cover hover:scale-[1.02] transition-transform rounded-3xl cursor-zoom-in"
-                  onClick={() => openLightbox(GALLERY, i)}
-                />
-              </Card>
-            ))}
-          </div>
-        </Section>
+    
+<Section
+  id="gallery"
+  title={lang==="uz" ? "Galereya" : "Галерея"}
+  subtitle={lang==="uz" ? "Laboratoriya, jihozlar va sinov jarayonlaridan suratlar" : "Фото лаборатории, оборудования и процесса испытаний"}
+  bleed
+>
+  <div className="px-4 max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+    {GALLERY.map((src, i) => (
+      <div key={i} className="rounded-3xl overflow-hidden bg-slate-100 shadow-sm">
+        {/* Fiks holat: hammasi 4:3 */}
+        <div className="w-full aspect-[4/3]">
+          <img
+            src={src}
+            alt="lab photo"
+            loading="lazy"
+            onClick={() => openLightbox(GALLERY, i)}
+            className="w-full h-full object-cover cursor-zoom-in"
+            onError={(e)=>{ e.currentTarget.src="/placeholder-gallery.jpg"; }}
+          />
+        </div>
+      </div>
+    ))}
+  </div>
+</Section>
+
 
         {/* EXCURSION / VIRTUAL TOUR */}
         <Section
