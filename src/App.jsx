@@ -1107,10 +1107,7 @@ const navigate = useNavigate();
               {title}
             </div>
 
-              <div className="mt-auto pt-4 text-sky-600 font-semibold text-lg">
-              {price}
-            </div>
-            {sub && <div className="text-[12px] text-gray-500">{sub}</div>}
+            
 
             <ul className="mt-4 min-h-[96px] space-y-2 text-sm text-gray-700 dark:text-gray-300">
               {feats.map((f, i) => (
@@ -1120,6 +1117,10 @@ const navigate = useNavigate();
                 </li>
               ))}
             </ul>
+  <div className="mt-auto pt-4 text-sky-600 font-semibold text-lg">
+              {price}
+            </div>
+            {sub && <div className="text-[12px] text-gray-500">{sub}</div>}
           </div>
         </Card>
       );
