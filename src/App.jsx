@@ -1129,7 +1129,7 @@ const navigate = useNavigate();
       return (
         <Card key={c.key} className="p-0 overflow-hidden flex flex-col h-full">
           {/* Rasm */}
-          <div className="h-full w-full overflow-hidden">
+          <div className="h-40 w-full overflow-hidden">
             <img
               src={c.image}
               alt={title}
