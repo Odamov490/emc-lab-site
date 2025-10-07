@@ -1095,8 +1095,8 @@ const navigate = useNavigate();
 
           <p className="mt-4 text-sm text-gray-600 dark:text-gray-300 max-w-3xl">
             {lang === "uz"
-              ? "Hozircha demo 360° panorama joylashtirildi (Google Street View orqali). Ertaga o‘z laboratoriyamizni suratga olib, havolani almashtiramiz."
-              : "Сейчас вставлена демо 360° панорама (через Google Street View). Завтра снимем нашу лабораторию и заменим ссылку."}
+              ? "Hozircha demo 360° panorama joylashtirildi. Tez orada o‘z laboratoriyamizni suratga olib, havolani almashtiramiz."
+              : "Сейчас вставлена демо 360° панорама. Скоро снимем нашу лабораторию и заменим ссылку."}
           </p>
         </Section>
 
@@ -1260,10 +1260,10 @@ const navigate = useNavigate();
                   <span className="font-medium">Telegram:</span> @EMM_Rasmiy
                 </div>
                 <div className="text-sm">
-                  <span className="font-medium">Email:</span> info@emc-lab.uz
+                  <span className="font-medium">Email:</span> piskentems@gmail.com
                 </div>
                 <div className="text-sm">
-                  <span className="font-medium">Tel:</span> +998 (90) 000-00-00
+                  <span className="font-medium">Tel:</span> +998 (99) 508-31-04
                 </div>
               </Card>
 
@@ -1271,8 +1271,7 @@ const navigate = useNavigate();
                 <div className="text-sm font-semibold">{lang==="uz" ? "Ish vaqti" : "График работы"}</div>
                 <ul className="mt-2 text-sm text-gray-700 dark:text-gray-300 space-y-1">
                   <li>{lang==="uz" ? "Du–Ju: 09:00–18:00" : "Пн–Пт: 09:00–18:00"}</li>
-                  <li>{lang==="uz" ? "Sh: 10:00–16:00" : "Сб: 10:00–16:00"}</li>
-                  <li>{lang==="uz" ? "Yak: dam olish" : "Вс: выходной"}</li>
+                  <li>{lang==="uz" ? "Sh-Yak: dam olish" : "Вс: выходной"}</li>
                 </ul>
               </Card>
 
