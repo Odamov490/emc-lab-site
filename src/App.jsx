@@ -767,9 +767,9 @@ const navigate = useNavigate();
         <div className="border-b border-black/10 dark:border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur">
           <div className="mx-auto max-w-7xl px-4 py-2 flex items-center justify-between text-xs">
             <div className="flex items-center gap-2">
-              <Badge>O’ZAK.SL.0309</Badge>
+              {/* <Badge>O’ZAK.SL.0309</Badge>
               <Badge>ISO/IEC 17025</Badge>
-              <Badge>ILAC – G8</Badge>
+              <Badge>ILAC – G8</Badge> */}
             </div>
             <div className="flex items-center gap-3">
               <button onClick={() => setLang("uz")} className={`hover:underline ${lang === "uz" ? "font-semibold" : ""}`}>UZ</button>
