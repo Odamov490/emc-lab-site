@@ -132,16 +132,16 @@ const PRICING_CARDS = [
   subRu: "с НДС 16 884 000 сум",
   image: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=600&q=80",
 
-  // Turlari (ichki ro‘yxat)
-  typesUz: [
+  // kartadagi punktlar
+  featuresUz: [
     "Yangi mahsulotlarning tajriba nusxalari",
     "Bozorga chiqishdan oldingi sinov namunalari",
     "Kengaytirilgan sinov dasturlari (kompleks rejimlar)",
     "Normativdan tashqari maxsus o‘lchovlar (masalan, yuqori chastota yoki kuchlanishli)",
     "Ilmiy loyihalar doirasidagi prototiplar",
   ],
-  typesRu: [
-    "Экспериментальные образцы новых изделий",
+  featuresRu: [
+     "Экспериментальные образцы новых изделий",
     "Образцы для предпродажных испытаний",
     "Расширенные программы испытаний (комплексные режимы)",
     "Вненормативные специальные измерения (напр., высокие частоты/напряжения)",
@@ -149,7 +149,7 @@ const PRICING_CARDS = [
   ],
 }
 
-];
+   ];
 
 
 
