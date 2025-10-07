@@ -84,8 +84,8 @@ const PRICING_CARDS = [
   },
   {
     key: "auto",
-    titleUz: "Avtotransport vositalari",
-    titleRu: "Автотранспорт",
+    titleUz: "Transport vositalari",
+    titleRu: "Транспортные средства",
    priceUz: "1 340 000 so‘m",
     subUz: "QQS bilan 1 500 800 so‘m",
     priceRu: "1 340 000  сум",
