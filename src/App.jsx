@@ -997,24 +997,98 @@ const navigate = useNavigate();
         </Section>
 
         {/* PRICING */}
-        <Section id="pricing" title={lang==="uz" ? "Narxlar" : "Цены"} subtitle={lang==="uz" ? "Individual kalkulyatsiya" : "Индивидуальный расчет"}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-            {["Maishiy texnikalar","Avtotransport vositalari", "Qishloq xo'jalik texnikalari","Muzlatgich va sovitgichlar",  "Ilmiy tadqiqot sinovlari"].map((tier, i) => (
-              <Card key={i} className="p-6 hover:shadow-md">
-                <div className="text-sm uppercase tracking-wide text-gray-500">{tier}</div>
-                <div className="mt-2 text-3xl font-semibold"> mln —</div>
-                <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                  <li>• {lang==="uz" ? "1–2 sinov turidan boshlab" : "От 1–2 видов испытаний"}</li>
-                  <li>• {lang==="uz" ? "QR-kodli protokol" : "Протокол с QR-кодом"}</li>
-                  <li>• {lang==="uz" ? "Xulosa va tavsiyalar" : "Заключение и рекомендации"}</li>
-                </ul>
-                <a href="#contact" className="mt-5 inline-block rounded-xl bg-gray-900 text-white px-4 py-2 text-sm font-medium hover:opacity-90">
-                  {lang==="uz" ? "Kalkulyatsiya so‘rash" : "Запросить расчет"}
-                </a>
-              </Card>
-            ))}
-          </div>
-        </Section>
+<Section
+  id="pricing"
+  title={lang === "uz" ? "Narxlar" : "Цены"}
+  subtitle={lang === "uz" ? "Individual kalkulyatsiya" : "Индивидуальный расчет"}
+>
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+    {/* 1 — Maishiy texnikalar */}
+    <Card className="p-6 hover:shadow-md flex flex-col h-full">
+      <div>
+        <div className="text-sm uppercase tracking-wide text-gray-500">
+          {lang === "uz" ? "Maishiy texnikalar" : "Бытовая техника"}
+        </div>
+        <div className="mt-2 text-3xl font-semibold">mln —</div>
+        <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300 min-h-[84px]">
+          <li>• {lang === "uz" ? "1–2 sinov turidan boshlab" : "От 1–2 видов испытаний"}</li>
+          <li>• {lang === "uz" ? "QR-kodli protokol" : "Протокол с QR-кодом"}</li>
+          <li>• {lang === "uz" ? "Xulosa va tavsiyalar" : "Заключение и рекомендации"}</li>
+        </ul>
+      </div>
+      <a
+        href="#contact"
+        className="mt-auto inline-block rounded-xl bg-gray-900 text-white px-4 py-2 text-sm font-medium hover:opacity-90"
+      >
+        {lang === "uz" ? "Kalkulyatsiya so‘rash" : "Запросить расчет"}
+      </a>
+    </Card>
+
+    {/* 2 — Avtotransport vositalari */}
+    <Card className="p-6 hover:shadow-md flex flex-col h-full">
+      <div>
+        <div className="text-sm uppercase tracking-wide text-gray-500">
+          {lang === "uz" ? "Avtotransport vositalari" : "Автотранспорт"}
+        </div>
+        <div className="mt-2 text-3xl font-semibold">mln —</div>
+        <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300 min-h-[84px]">
+          <li>• {lang === "uz" ? "1–2 sinov turidan boshlab" : "От 1–2 видов испытаний"}</li>
+          <li>• {lang === "uz" ? "QR-kodli protokol" : "Протокол с QR-кодом"}</li>
+          <li>• {lang === "uz" ? "Xulosa va tavsiyalar" : "Заключение и рекомендации"}</li>
+        </ul>
+      </div>
+      <a
+        href="#contact"
+        className="mt-auto inline-block rounded-xl bg-gray-900 text-white px-4 py-2 text-sm font-medium hover:opacity-90"
+      >
+        {lang === "uz" ? "Kalkulyatsiya so‘rash" : "Запросить расчет"}
+      </a>
+    </Card>
+
+    {/* 3 — Qishloq xo'jalik texnikalari */}
+    <Card className="p-6 hover:shadow-md flex flex-col h-full">
+      <div>
+        <div className="text-sm uppercase tracking-wide text-gray-500">
+          {lang === "uz" ? "Qishloq xo'jalik texnikalari" : "С/х техника"}
+        </div>
+        <div className="mt-2 text-3xl font-semibold">mln —</div>
+        <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300 min-h-[84px]">
+          <li>• {lang === "uz" ? "1–2 sinov turidan boshlab" : "От 1–2 видов испытаний"}</li>
+          <li>• {lang === "uz" ? "QR-kodli protokol" : "Протокол с QR-кодом"}</li>
+          <li>• {lang === "uz" ? "Xulosa va tavsiyalar" : "Заключение и рекомендации"}</li>
+        </ul>
+      </div>
+      <a
+        href="#contact"
+        className="mt-auto inline-block rounded-xl bg-gray-900 text-white px-4 py-2 text-sm font-medium hover:opacity-90"
+      >
+        {lang === "uz" ? "Kalkulyatsiya so‘rash" : "Запросить расчет"}
+      </a>
+    </Card>
+
+    {/* 4 — Muzlatgich va sovitgichlar */}
+    <Card className="p-6 hover:shadow-md flex flex-col h-full">
+      <div>
+        <div className="text-sm uppercase tracking-wide text-gray-500">
+          {lang === "uz" ? "Muzlatgich va sovitgichlar" : "Холодильное оборудование"}
+        </div>
+        <div className="mt-2 text-3xl font-semibold">mln —</div>
+        <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300 min-h-[84px]">
+          <li>• {lang === "uz" ? "1–2 sinov turidan boshlab" : "От 1–2 видов испытаний"}</li>
+          <li>• {lang === "uz" ? "QR-kodli protokol" : "Протокол с QR-кодом"}</li>
+          <li>• {lang === "uz" ? "Xulosa va tavsiyalar" : "Заключение и рекомендации"}</li>
+        </ul>
+      </div>
+      <a
+        href="#contact"
+        className="mt-auto inline-block rounded-xl bg-gray-900 text-white px-4 py-2 text-sm font-medium hover:opacity-90"
+      >
+        {lang === "uz" ? "Kalkulyatsiya so‘rash" : "Запросить расчет"}
+      </a>
+    </Card>
+  </div>
+</Section>
+
 
         {/* CONTACT */}
         <Section
