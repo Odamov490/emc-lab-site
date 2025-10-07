@@ -14,6 +14,7 @@ const NAV = [
   { href: "#gallery", label: { uz: "Galereya", ru: "Галерея" } },
   { href: "#excursion", label: { uz: "Ekskursiya", ru: "Экскурсия" } },
   { href: "#team", label: { uz: "Jamoa", ru: "Команда" } },
+  { href: "#pricing", label: { uz: "Narxlar", ru: "Цены" } },
   { href: "#contact", label: { uz: "Bog‘lanish", ru: "Контакты" } },
 ];
 
