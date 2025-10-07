@@ -70,7 +70,7 @@ const PRICING_CARDS = [
     subUz: "QQS bilan 750 400 so‘m",
     priceRu: "670 000 сум",
     subRu: "с НДС 750 400 сум",
-    image: "https://images.unsplash.com/photo-1581092919535-7147f13fcb4c?auto=format&fit=crop&w=600&q=80",
+      image: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=600&q=80",
     featuresUz: [
       "GOST/CISPR sinov to‘plamidan boshlanadi",
       "QR-kodli protokol (PDF)",
@@ -88,7 +88,7 @@ const PRICING_CARDS = [
     titleRu: "Автотранспорт",
     priceUz: "mln —",
     priceRu: "млн —",
-    image: "https://images.unsplash.com/photo-1615193472296-26a24b98f47d?auto=format&fit=crop&w=600&q=80",
+     image: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=600&q=80",
     featuresUz: [
       "1–2 sinov turidan boshlab",
       "ISO/IEC/CISPR bo‘yicha protokollar",
@@ -124,7 +124,7 @@ const PRICING_CARDS = [
     titleRu: "Холодильное оборудование",
     priceUz: "mln —",
     priceRu: "млн —",
-    image: "https://images.unsplash.com/photo-1600508774685-3c1e40b6a8b1?auto=format&fit=crop&w=600&q=80",
+     image: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=600&q=80",
     featuresUz: [
       "Flicker/Garmonik (tarmoq sifati) majburiy",
       "Emissiya/Immunitet to‘plami",
