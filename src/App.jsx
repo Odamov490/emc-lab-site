@@ -122,26 +122,33 @@ const PRICING_CARDS = [
       "Заключение и рекомендации",
     ],
   },
-  {
-    key: "cool",
-    titleUz: "Ilmiy tadqiqot sinovlari",    
-    titleRu: "Научные испытания",
-    priceUz: "15 075 000 so‘m",
-    subUz: "QQS bilan 16 884 000 so‘m",
-    priceRu: "15 075 000 сум",
-    subRu: "с НДС 16 884 000 сум",
-     image: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=600&q=80",
-    featuresUz: [
-      "Flicker/Garmonik (tarmoq sifati) majburiy",
-      "Emissiya/Immunitet to‘plami",
-      "Protokol + xulosa",
-    ],
-    featuresRu: [
-      "Flicker/Harmonics (качество сети) обязательно",
-      "Набор Эмиссия/Иммунитет",
-      "Протокол + заключение",
-    ],
-  },
+{
+  key: "cool",
+  titleUz: "Ilmiy tadqiqot sinovlari",
+  titleRu: "Научные испытания",
+  priceUz: "15 075 000 so‘m",
+  subUz: "QQS bilan 16 884 000 so‘m",
+  priceRu: "15 075 000 сум",
+  subRu: "с НДС 16 884 000 сум",
+  image: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=600&q=80",
+
+  // Turlari (ichki ro‘yxat)
+  typesUz: [
+    "Yangi mahsulotlarning tajriba nusxalari",
+    "Bozorga chiqishdan oldingi sinov namunalari",
+    "Kengaytirilgan sinov dasturlari (kompleks rejimlar)",
+    "Normativdan tashqari maxsus o‘lchovlar (masalan, yuqori chastota yoki kuchlanishli)",
+    "Ilmiy loyihalar doirasidagi prototiplar",
+  ],
+  typesRu: [
+    "Экспериментальные образцы новых изделий",
+    "Образцы для предпродажных испытаний",
+    "Расширенные программы испытаний (комплексные режимы)",
+    "Вненормативные специальные измерения (напр., высокие частоты/напряжения)",
+    "Прототипы в рамках научных проектов",
+  ],
+}
+
 ];
 
 
