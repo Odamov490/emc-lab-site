@@ -1009,7 +1009,7 @@ const navigate = useNavigate();
         <div className="text-sm uppercase tracking-wide text-gray-500">
           {lang === "uz" ? "Maishiy texnikalar" : "Бытовая техника"}
         </div>
-        <div className="mt-2 text-3xl font-semibold">{lang === "uz" ? "mln" : "млн"}</div>
+        <div className="mt-2 text-3xl font-semibold">{lang === "uz" ? "670 000 so'm QQS bilan 750 400 so'm " : "млн"}</div>
         <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300 min-h-[84px]">
           <li>• {lang === "uz" ? "1–2 sinov turidan boshlab" : "От 1–2 видов испытаний"}</li>
           <li>• {lang === "uz" ? "QR-kodli protokol" : "Протокол с QR-кодом"}</li>
@@ -1030,7 +1030,7 @@ const navigate = useNavigate();
         <div className="text-sm uppercase tracking-wide text-gray-500">
           {lang === "uz" ? "Avtotransport vositalari" : "Автотранспорт"}
         </div>
-        <div className="mt-2 text-3xl font-semibold">mln —</div>
+        <div className="mt-2 text-3xl font-semibold">{lang === "uz" ? "mln" : "млн"}</div>
         <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300 min-h-[84px]">
           <li>• {lang === "uz" ? "1–2 sinov turidan boshlab" : "От 1–2 видов испытаний"}</li>
           <li>• {lang === "uz" ? "QR-kodli protokol" : "Протокол с QR-кодом"}</li>
@@ -1051,7 +1051,7 @@ const navigate = useNavigate();
         <div className="text-sm uppercase tracking-wide text-gray-500">
           {lang === "uz" ? "Qishloq xo'jalik texnikalari" : "С/х техника"}
         </div>
-        <div className="mt-2 text-3xl font-semibold">mln —</div>
+        <div className="mt-2 text-3xl font-semibold">{lang === "uz" ? "mln" : "млн"}</div>
         <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300 min-h-[84px]">
           <li>• {lang === "uz" ? "1–2 sinov turidan boshlab" : "От 1–2 видов испытаний"}</li>
           <li>• {lang === "uz" ? "QR-kodli protokol" : "Протокол с QR-кодом"}</li>
@@ -1072,7 +1072,7 @@ const navigate = useNavigate();
         <div className="text-sm uppercase tracking-wide text-gray-500">
           {lang === "uz" ?  "Ilmiy tadqiqot sinovlari" : "Научные испытания"}
         </div>
-        <div className="mt-2 text-3xl font-semibold">mln —</div>
+        <div className="mt-2 text-3xl font-semibold">{lang === "uz" ? "mln" : "млн"}</div>
         <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300 min-h-[84px]">
           <li>• {lang === "uz" ? "1–2 sinov turidan boshlab" : "От 1–2 видов испытаний"}</li>
           <li>• {lang === "uz" ? "QR-kodli protokol" : "Протокол с QR-кодом"}</li>
