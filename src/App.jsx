@@ -1009,7 +1009,7 @@ const navigate = useNavigate();
         <div className="text-sm uppercase tracking-wide text-gray-500">
           {lang === "uz" ? "Maishiy texnikalar" : "Бытовая техника"}
         </div>
-        <div className="mt-2 text-3xl font-semibold">mln —</div>
+        <div className="mt-2 text-3xl font-semibold">{lang === "uz" ? "mln" : "млн"}</div>
         <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300 min-h-[84px]">
           <li>• {lang === "uz" ? "1–2 sinov turidan boshlab" : "От 1–2 видов испытаний"}</li>
           <li>• {lang === "uz" ? "QR-kodli protokol" : "Протокол с QR-кодом"}</li>
@@ -1066,11 +1066,11 @@ const navigate = useNavigate();
       </a>
     </Card>
 
-    {/* 4 — Muzlatgich va sovitgichlar */}
+    {/* 4 — Ilmiy tadqiqot sinovlari */}
     <Card className="p-6 hover:shadow-md flex flex-col h-full">
       <div>
         <div className="text-sm uppercase tracking-wide text-gray-500">
-          {lang === "uz" ? "Muzlatgich va sovitgichlar" : "Холодильное оборудование"}
+          {lang === "uz" ?  "Ilmiy tadqiqot sinovlari" : "Научные испытания"}
         </div>
         <div className="mt-2 text-3xl font-semibold">mln —</div>
         <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300 min-h-[84px]">
