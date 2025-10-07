@@ -87,6 +87,8 @@ const PRICING_CARDS = [
     "ИТ-устройства: принтеры, компьютеры, роутеры, смартфоны, планшеты",
     "Лампы и осветительные блоки (LED, электронные балласты)",
     ],
+      noteUz: "💡 Narx faqat bitta mahsulot uchun amal qiladi.",
+  noteRu: "💡 Цена указана за одно изделие.",
   },
   {
     key: "auto",
@@ -111,6 +113,8 @@ const PRICING_CARDS = [
     "Мотоциклы и скутеры (городские и дорожные мотоциклы, электроскутеры и мопеды, трёхколёсные транспортные средства (трайки))",
     "Автопогрузчики (техника для погрузки и транспортировки грузов)",
     ],
+      noteUz: "💡 Narx faqat bitta mahsulot uchun amal qiladi.",
+  noteRu: "💡 Цена указана за одно изделие.",
   },
   {
     key: "agro",
@@ -135,6 +139,8 @@ const PRICING_CARDS = [
      "Комбайны (зерно, картофель, овощи и бахчевые культуры)",
     "Хлопкоуборочные машины",
     ],
+      noteUz: "💡 Narx faqat bitta mahsulot uchun amal qiladi.",
+  noteRu: "💡 Цена указана за одно изделие.",
   },
 {
   key: "cool",
@@ -161,6 +167,8 @@ const PRICING_CARDS = [
     "Вненормативные специальные измерения (напр., высокие частоты/напряжения)",
     "Прототипы в рамках научных проектов",
   ],
+    noteUz: "💡 Narx faqat bitta mahsulot uchun amal qiladi.",
+  noteRu: "💡 Цена указана за одно изделие.",
 }
 
    ];
@@ -1116,7 +1124,7 @@ const navigate = useNavigate();
       const price = lang === "uz" ? c.priceUz : c.priceRu;
       const sub = lang === "uz" ? c.subUz : c.subRu;
       const feats = lang === "uz" ? c.featuresUz : c.featuresRu;
-
+      const note = lang === "uz" ? c.noteUz : c.noteRu;
       return (
         <Card key={c.key} className="p-0 overflow-hidden flex flex-col h-full">
           {/* Rasm */}
@@ -1149,6 +1157,10 @@ const navigate = useNavigate();
             </div>
             {sub && <div className="text-[12px] text-gray-500">{sub}</div>}
           </div>
+
+ <div className="text-xs text-gray-500 mt-1 italic">
+              {note}
+            </div>
         </Card>
       );
     })}
