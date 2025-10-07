@@ -1120,9 +1120,9 @@ const navigate = useNavigate();
             </ul>
 
             {/* pastki narx */}
-            <div className="mt-auto pt-4 text-sky-600 font-semibold text-lg">
+            {/* <div className="mt-auto pt-4 text-sky-600 font-semibold text-lg">
               {price}
-            </div>
+            </div> */}
           </div>
         </Card>
       );
