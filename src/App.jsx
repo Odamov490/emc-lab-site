@@ -60,6 +60,87 @@ const STAFF = [
   { name: "Sharofiddinov Najmiddin", role: "Texnik xodim", img: "/staff/11.png" },
 ];
 
+
+const PRICING_CARDS = [
+  {
+    key: "home",
+    titleUz: "Maishiy texnikalar",
+    titleRu: "Бытовая техника",
+    priceUz: "670 000 so‘m",
+    subUz: "QQS bilan 750 400 so‘m",
+    priceRu: "670 000 сум",
+    subRu: "с НДС 750 400 сум",
+    image: "https://images.unsplash.com/photo-1581092919535-7147f13fcb4c?auto=format&fit=crop&w=600&q=80",
+    featuresUz: [
+      "GOST/CISPR sinov to‘plamidan boshlanadi",
+      "QR-kodli protokol (PDF)",
+      "Xulosa va tavsiyalar",
+    ],
+    featuresRu: [
+      "Старт по пакету GOST/CISPR",
+      "Протокол с QR-кодом (PDF)",
+      "Заключение и рекомендации",
+    ],
+  },
+  {
+    key: "auto",
+    titleUz: "Avtotransport vositalari",
+    titleRu: "Автотранспорт",
+    priceUz: "mln —",
+    priceRu: "млн —",
+    image: "https://images.unsplash.com/photo-1615193472296-26a24b98f47d?auto=format&fit=crop&w=600&q=80",
+    featuresUz: [
+      "1–2 sinov turidan boshlab",
+      "ISO/IEC/CISPR bo‘yicha protokollar",
+      "Xulosa va tavsiyalar",
+    ],
+    featuresRu: [
+      "От 1–2 видов испытаний",
+      "Протоколы по ISO/IEC/CISPR",
+      "Заключение и рекомендации",
+    ],
+  },
+  {
+    key: "agro",
+    titleUz: "Qishloq xo‘jalik texnikalari",
+    titleRu: "С/х техника",
+    priceUz: "mln —",
+    priceRu: "млн —",
+    image: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=600&q=80",
+    featuresUz: [
+      "Katta quvvat liniyalari uchun ölçov",
+      "QR-kodli protokol",
+      "Xulosa va tavsiyalar",
+    ],
+    featuresRu: [
+      "Измерения для мощных линий питания",
+      "Протокол с QR-кодом",
+      "Заключение и рекомендации",
+    ],
+  },
+  {
+    key: "cool",
+    titleUz: "Muzlatgich va sovitgichlar",
+    titleRu: "Холодильное оборудование",
+    priceUz: "mln —",
+    priceRu: "млн —",
+    image: "https://images.unsplash.com/photo-1600508774685-3c1e40b6a8b1?auto=format&fit=crop&w=600&q=80",
+    featuresUz: [
+      "Flicker/Garmonik (tarmoq sifati) majburiy",
+      "Emissiya/Immunitet to‘plami",
+      "Protokol + xulosa",
+    ],
+    featuresRu: [
+      "Flicker/Harmonics (качество сети) обязательно",
+      "Набор Эмиссия/Иммунитет",
+      "Протокол + заключение",
+    ],
+  },
+];
+
+
+
+
 const GALLERY = ["/gallery/1.jpg", "/gallery/2.jpg", "/gallery/3.jpg", "/gallery/4.jpg", "/gallery/5.jpg", "/gallery/6.jpg"];
 
 // QUICK LINKS
@@ -996,98 +1077,59 @@ const navigate = useNavigate();
           </div>
         </Section>
 
-        {/* PRICING */}
+   {/* PRICING */}
 <Section
   id="pricing"
   title={lang === "uz" ? "Narxlar" : "Цены"}
   subtitle={lang === "uz" ? "Individual kalkulyatsiya" : "Индивидуальный расчет"}
 >
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-    {/* 1 — Maishiy texnikalar */}
-    <Card className="p-6 hover:shadow-md flex flex-col h-full">
-      <div>
-        <div className="text-sm uppercase tracking-wide text-gray-500">
-          {lang === "uz" ? "Maishiy texnikalar" : "Бытовая техника"}
-        </div>
-        <div className="mt-2 text-3xl font-semibold">{lang === "uz" ? "670 000 so'm QQS bilan 750 400 so'm " : "млн"}</div>
-        <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300 min-h-[84px]">
-          <li>• {lang === "uz" ? "1–2 sinov turidan boshlab" : "От 1–2 видов испытаний"}</li>
-          <li>• {lang === "uz" ? "QR-kodli protokol" : "Протокол с QR-кодом"}</li>
-          <li>• {lang === "uz" ? "Xulosa va tavsiyalar" : "Заключение и рекомендации"}</li>
-        </ul>
-      </div>
-      <a
-        href="#contact"
-        className="mt-auto inline-block rounded-xl bg-gray-900 text-white px-4 py-2 text-sm font-medium hover:opacity-90"
-      >
-        {lang === "uz" ? "Kalkulyatsiya so‘rash" : "Запросить расчет"}
-      </a>
-    </Card>
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+    {PRICING_CARDS.map((c) => {
+      const title = lang === "uz" ? c.titleUz : c.titleRu;
+      const price = lang === "uz" ? c.priceUz : c.priceRu;
+      const sub = lang === "uz" ? c.subUz : c.subRu;
+      const feats = lang === "uz" ? c.featuresUz : c.featuresRu;
 
-    {/* 2 — Avtotransport vositalari */}
-    <Card className="p-6 hover:shadow-md flex flex-col h-full">
-      <div>
-        <div className="text-sm uppercase tracking-wide text-gray-500">
-          {lang === "uz" ? "Avtotransport vositalari" : "Автотранспорт"}
-        </div>
-        <div className="mt-2 text-3xl font-semibold">{lang === "uz" ? "mln" : "млн"}</div>
-        <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300 min-h-[84px]">
-          <li>• {lang === "uz" ? "1–2 sinov turidan boshlab" : "От 1–2 видов испытаний"}</li>
-          <li>• {lang === "uz" ? "QR-kodli protokol" : "Протокол с QR-кодом"}</li>
-          <li>• {lang === "uz" ? "Xulosa va tavsiyalar" : "Заключение и рекомендации"}</li>
-        </ul>
-      </div>
-      <a
-        href="#contact"
-        className="mt-auto inline-block rounded-xl bg-gray-900 text-white px-4 py-2 text-sm font-medium hover:opacity-90"
-      >
-        {lang === "uz" ? "Kalkulyatsiya so‘rash" : "Запросить расчет"}
-      </a>
-    </Card>
+      return (
+        <Card key={c.key} className="p-0 overflow-hidden flex flex-col h-full">
+          {/* Rasm */}
+          <div className="h-32 w-full overflow-hidden">
+            <img
+              src={c.image}
+              alt={title}
+              className="h-full w-full object-cover"
+            />
+          </div>
 
-    {/* 3 — Qishloq xo'jalik texnikalari */}
-    <Card className="p-6 hover:shadow-md flex flex-col h-full">
-      <div>
-        <div className="text-sm uppercase tracking-wide text-gray-500">
-          {lang === "uz" ? "Qishloq xo'jalik texnikalari" : "С/х техника"}
-        </div>
-        <div className="mt-2 text-3xl font-semibold">{lang === "uz" ? "mln" : "млн"}</div>
-        <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300 min-h-[84px]">
-          <li>• {lang === "uz" ? "1–2 sinov turidan boshlab" : "От 1–2 видов испытаний"}</li>
-          <li>• {lang === "uz" ? "QR-kodli protokol" : "Протокол с QR-кодом"}</li>
-          <li>• {lang === "uz" ? "Xulosa va tavsiyalar" : "Заключение и рекомендации"}</li>
-        </ul>
-      </div>
-      <a
-        href="#contact"
-        className="mt-auto inline-block rounded-xl bg-gray-900 text-white px-4 py-2 text-sm font-medium hover:opacity-90"
-      >
-        {lang === "uz" ? "Kalkulyatsiya so‘rash" : "Запросить расчет"}
-      </a>
-    </Card>
+          {/* Kontent */}
+          <div className="p-5 flex flex-col flex-grow">
+            <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+              {title}
+            </div>
 
-    {/* 4 — Ilmiy tadqiqot sinovlari */}
-    <Card className="p-6 hover:shadow-md flex flex-col h-full">
-      <div>
-        <div className="text-sm uppercase tracking-wide text-gray-500">
-          {lang === "uz" ?  "Ilmiy tadqiqot sinovlari" : "Научные испытания"}
-        </div>
-        <div className="mt-2 text-3xl font-semibold">{lang === "uz" ? "mln" : "млн"}</div>
-        <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300 min-h-[84px]">
-          <li>• {lang === "uz" ? "1–2 sinov turidan boshlab" : "От 1–2 видов испытаний"}</li>
-          <li>• {lang === "uz" ? "QR-kodli protokol" : "Протокол с QR-кодом"}</li>
-          <li>• {lang === "uz" ? "Xulosa va tavsiyalar" : "Заключение и рекомендации"}</li>
-        </ul>
-      </div>
-      <a
-        href="#contact"
-        className="mt-auto inline-block rounded-xl bg-gray-900 text-white px-4 py-2 text-sm font-medium hover:opacity-90"
-      >
-        {lang === "uz" ? "Kalkulyatsiya so‘rash" : "Запросить расчет"}
-      </a>
-    </Card>
+            <div className="mt-2 text-xl font-semibold">{price}</div>
+            {sub && <div className="text-[12px] text-gray-500">{sub}</div>}
+
+            <ul className="mt-4 min-h-[96px] space-y-2 text-sm text-gray-700 dark:text-gray-300">
+              {feats.map((f, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="mt-[6px] h-[6px] w-[6px] rounded-full bg-sky-500 shrink-0" />
+                  <span className="leading-6">{f}</span>
+                </li>
+              ))}
+            </ul>
+
+            {/* pastki narx */}
+            <div className="mt-auto pt-4 text-sky-600 font-semibold text-lg">
+              {price}
+            </div>
+          </div>
+        </Card>
+      );
+    })}
   </div>
 </Section>
+
 
 
         {/* CONTACT */}
