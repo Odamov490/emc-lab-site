@@ -1156,11 +1156,12 @@ const navigate = useNavigate();
               {price}
             </div>
             {sub && <div className="text-[12px] text-gray-500">{sub}</div>}
-          </div>
-
- <div className="text-xs text-gray-500 mt-1 italic">
+          <div className="text-xs text-gray-500 mt-1 italic">
               {note}
             </div>
+          </div>
+
+
         </Card>
       );
     })}
