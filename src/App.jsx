@@ -71,7 +71,7 @@ const PRICING_CARDS = [
     subUz: "QQS bilan 750 400 so‘m",
     priceRu: "670 000 сум",
     subRu: "с НДС 750 400 сум",
-      image: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=600&q=80",
+      image: "/images/1.png",
     featuresUz: [
        "Televizorlar, radiopriyomniklar, media pleerlar",
     "Muzlatgich, konditsioner, kir yuvish mashinalari",
@@ -99,7 +99,7 @@ const PRICING_CARDS = [
     subUz: "QQS bilan 1 500 800 so‘m",
     priceRu: "1 340 000  сум",
     subRu: "с НДС 1 500 800 сум",
-     image: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=600&q=80",
+     image: "/images/2.png",
     featuresUz: [
        "Engil avtomobillar (M1 — yo‘lovchi, N1 — yengil yuk tashuvchi toifalari)",
     "Yuk avtomobillari (N2, N3 — og‘ir yuk mashinalari)",
@@ -125,7 +125,7 @@ const PRICING_CARDS = [
     subUz: "QQS bilan 4 502 400 so‘m",
     priceRu: "4 020 000 сум",
     subRu: "с НДС 4 502 400 сум",
-    image: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=600&q=80",
+    image: "/images/3.png",
     featuresUz: [
      "G‘ildirakli traktorlar (T1–T5 toifalari)",
     "Mini-traktorlar (fermer xo‘jaliklari uchun)",
@@ -151,7 +151,7 @@ const PRICING_CARDS = [
   subUz: "QQS bilan 16 884 000 so‘m",
   priceRu: "15 075 000 сум",
   subRu: "с НДС 16 884 000 сум",
-  image: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=600&q=80",
+  image: "/images/4.png",
 
   // kartadagi punktlar
   featuresUz: [
