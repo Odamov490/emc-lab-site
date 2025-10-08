@@ -3,7 +3,3 @@ export default {
   theme: { extend: {} },
   plugins: [],
 }
-module.exports = {
-  darkMode: "class",
-  // ...
-};

@@ -4,8 +4,6 @@ import ScrollToTopButton from "./ScrollToTopButton";
 import Login from "./pages/Login"; // login sahifang
  // asosiy sahifa
  import { Routes, Route, useNavigate } from "react-router-dom";
-import { initTheme, applyTheme } from "./utils/theme"; // <-- yangi
-
 
 /********************* CONFIG *********************/
 const NAV = [
@@ -673,20 +671,6 @@ function EMCLabUltra() {
   const [active, setActive] = useState("about");
   const [scrollProgress, setScrollProgress] = useState(0);
 const navigate = useNavigate();
-
-// THEME init va toggle
-useEffect(() => {
-  const initial = initTheme();   // localStorage + system preference
-  setDark(initial);              // komponent state’ini ham sinxron qilamiz
-}, []);
-
-const toggleTheme = () => {
-  const next = !dark;
-  setDark(next);                 // UI ni yangilaydi
-  applyTheme(next);              // <html class="dark"> ni yangilaydi + localStorage
-};
-
-
   // Lightbox
   const [lbOpen, setLbOpen] = useState(false);
   const [lbImages, setLbImages] = useState([]);
@@ -792,28 +776,9 @@ const toggleTheme = () => {
               <span className="text-gray-400">|</span>
               <button onClick={() => setLang("ru")} className={`hover:underline ${lang === "ru" ? "font-semibold" : ""}`}>РУ</button>
               <span className="mx-1" />
-             
-<button
-  onClick={toggleTheme}
-  className={`relative w-14 h-7 rounded-full transition-colors duration-300 ${
-    dark ? "bg-gray-700" : "bg-yellow-400"
-  }`}
-  aria-label={dark ? "Yorug‘ rejim" : "Qorong‘i rejim"}
-  title={dark ? (lang==="uz" ? "Yorug‘ rejim" : "Светлая тема") : (lang==="uz" ? "Qorong‘i rejim" : "Тёмная тема")}
->
-  <span
-    className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow transform transition-transform duration-300 flex items-center justify-center ${
-      dark ? "translate-x-7" : "translate-x-0"
-    }`}
-  >
-    <span className={dark ? "text-gray-800" : "text-yellow-500"}>
-      {dark ? "🌙" : "☀️"}
-    </span>
-  </span>
-</button>
-
-
-
+              <button onClick={() => setDark((d) => !d)} className="rounded-lg border px-2 py-1 text_[11px] hover:opacity-80">
+                {dark ? (lang==="uz" ? "Yorug‘" : "Светлая") : (lang==="uz" ? "Qorong‘i" : "Тёмная")}
+              </button>
             </div>
           </div>
         </div>
