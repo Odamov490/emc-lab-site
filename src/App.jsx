@@ -4,6 +4,9 @@ import ScrollToTopButton from "./ScrollToTopButton";
 import Login from "./pages/Login"; // login sahifang
  // asosiy sahifa
  import { Routes, Route, useNavigate } from "react-router-dom";
+ import { useEffect, useState } from "react";
+import { initTheme, applyTheme } from "./utils/theme"; // <-- yangi
+
 
 /********************* CONFIG *********************/
 const NAV = [
@@ -250,6 +253,21 @@ mijozga mos individual dastur tuziladi. Qo‘shimcha ma’lumot uchun "Bog‘lan
     `,
   },
 };
+
+
+const [dark, setDark] = useState(false);
+
+useEffect(() => {
+  const initial = initTheme();
+  setDark(initial);
+}, []);
+
+const toggleTheme = () => {
+  const next = !dark;
+  setDark(next);
+  applyTheme(next);
+};
+
 
 
 
@@ -776,9 +794,28 @@ const navigate = useNavigate();
               <span className="text-gray-400">|</span>
               <button onClick={() => setLang("ru")} className={`hover:underline ${lang === "ru" ? "font-semibold" : ""}`}>РУ</button>
               <span className="mx-1" />
-              <button onClick={() => setDark((d) => !d)} className="rounded-lg border px-2 py-1 text_[11px] hover:opacity-80">
-                {dark ? (lang==="uz" ? "Yorug‘" : "Светлая") : (lang==="uz" ? "Qorong‘i" : "Тёмная")}
-              </button>
+             
+<button
+  onClick={toggleTheme}
+  className={`relative w-14 h-7 rounded-full transition-colors duration-300 ${
+    dark ? "bg-gray-700" : "bg-yellow-400"
+  }`}
+  aria-label={dark ? "Yorug‘ rejim" : "Qorong‘i rejim"}
+  title={dark ? (lang==="uz" ? "Yorug‘ rejim" : "Светлая тема") : (lang==="uz" ? "Qorong‘i rejim" : "Тёмная тема")}
+>
+  <span
+    className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow transform transition-transform duration-300 flex items-center justify-center ${
+      dark ? "translate-x-7" : "translate-x-0"
+    }`}
+  >
+    <span className={dark ? "text-gray-800" : "text-yellow-500"}>
+      {dark ? "🌙" : "☀️"}
+    </span>
+  </span>
+</button>
+
+
+
             </div>
           </div>
         </div>
