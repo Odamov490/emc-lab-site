@@ -254,18 +254,18 @@ mijozga mos individual dastur tuziladi. Qo‘shimcha ma’lumot uchun "Bog‘lan
 };
 
 
-const [dark, setDark] = useState(false);
+// const [dark, setDark] = useState(false);
 
-useEffect(() => {
-  const initial = initTheme();
-  setDark(initial);
-}, []);
+// useEffect(() => {
+//   const initial = initTheme();
+//   setDark(initial);
+// }, []);
 
-const toggleTheme = () => {
-  const next = !dark;
-  setDark(next);
-  applyTheme(next);
-};
+// const toggleTheme = () => {
+//   const next = !dark;
+//   setDark(next);
+//   applyTheme(next);
+// };
 
 
 
