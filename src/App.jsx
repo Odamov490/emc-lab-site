@@ -254,21 +254,6 @@ mijozga mos individual dastur tuziladi. Qo‘shimcha ma’lumot uchun "Bog‘lan
 };
 
 
-// const [dark, setDark] = useState(false);
-
-// useEffect(() => {
-//   const initial = initTheme();
-//   setDark(initial);
-// }, []);
-
-// const toggleTheme = () => {
-//   const next = !dark;
-//   setDark(next);
-//   applyTheme(next);
-// };
-
-
-
 
 
 /********************* EQUIPMENT CERTS (PDF yoki rasm) *********************/
@@ -688,6 +673,20 @@ function EMCLabUltra() {
   const [active, setActive] = useState("about");
   const [scrollProgress, setScrollProgress] = useState(0);
 const navigate = useNavigate();
+
+// THEME init va toggle
+useEffect(() => {
+  const initial = initTheme();   // localStorage + system preference
+  setDark(initial);              // komponent state’ini ham sinxron qilamiz
+}, []);
+
+const toggleTheme = () => {
+  const next = !dark;
+  setDark(next);                 // UI ni yangilaydi
+  applyTheme(next);              // <html class="dark"> ni yangilaydi + localStorage
+};
+
+
   // Lightbox
   const [lbOpen, setLbOpen] = useState(false);
   const [lbImages, setLbImages] = useState([]);
