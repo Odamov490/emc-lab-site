@@ -4,7 +4,6 @@ import ScrollToTopButton from "./ScrollToTopButton";
 import Login from "./pages/Login"; // login sahifang
  // asosiy sahifa
  import { Routes, Route, useNavigate } from "react-router-dom";
- import { useEffect, useState } from "react";
 import { initTheme, applyTheme } from "./utils/theme"; // <-- yangi
 
 
