@@ -16,20 +16,7 @@ const NAV = [
   { href: "#team", label: { uz: "Jamoa", ru: "Команда" } },
   { href: "#pricing", label: { uz: "Narxlar", ru: "Цены" } },
   { href: "#contact", label: { uz: "Bog‘lanish", ru: "Контакты" } },
-  
 ];
-  // ✅ Dark rejimni ilk bor o‘qish (localStorage / system preference)
-  useEffect(() => {
-    const initial = initTheme();
-    setDark(initial);
-  }, []);
-
-  // ✅ Dark rejimni almashtirish (localStorage + <html class="dark"> yangilanadi)
-  const toggleTheme = () => {
-    const next = !dark;
-    setDark(next);
-    applyTheme(next);
-  };
 
 const TESTS = [
   { code: "O’zMSt IEC 61000.4.2-2023", title: "Устойчивость к электростатическим разрядам", note: "Sifat", icon: "⚡" },
@@ -789,10 +776,9 @@ const navigate = useNavigate();
               <span className="text-gray-400">|</span>
               <button onClick={() => setLang("ru")} className={`hover:underline ${lang === "ru" ? "font-semibold" : ""}`}>РУ</button>
               <span className="mx-1" />
-              <button onClick={toggleTheme} className="rounded-lg border px-2 py-1 text_[11px] hover:opacity-80">
-  {dark ? (lang==="uz" ? "Yorug‘" : "Светлая") : (lang==="uz" ? "Qorong‘i" : "Тёмная")}
-</button>
-
+              <button onClick={() => setDark((d) => !d)} className="rounded-lg border px-2 py-1 text_[11px] hover:opacity-80">
+                {dark ? (lang==="uz" ? "Yorug‘" : "Светлая") : (lang==="uz" ? "Qorong‘i" : "Тёмная")}
+              </button>
             </div>
           </div>
         </div>
