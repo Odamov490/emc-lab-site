@@ -18,18 +18,6 @@ const NAV = [
   { href: "#contact", label: { uz: "Bog‘lanish", ru: "Контакты" } },
   
 ];
-  // ✅ Dark rejimni ilk bor o‘qish (localStorage / system preference)
-  useEffect(() => {
-    const initial = initTheme();
-    setDark(initial);
-  }, []);
-
-  // ✅ Dark rejimni almashtirish (localStorage + <html class="dark"> yangilanadi)
-  const toggleTheme = () => {
-    const next = !dark;
-    setDark(next);
-    applyTheme(next);
-  };
 
 const TESTS = [
   { code: "O’zMSt IEC 61000.4.2-2023", title: "Устойчивость к электростатическим разрядам", note: "Sifat", icon: "⚡" },
@@ -684,6 +672,19 @@ function EMCLabUltra() {
   const [active, setActive] = useState("about");
   const [scrollProgress, setScrollProgress] = useState(0);
 const navigate = useNavigate();
+  // ✅ Dark rejimni ilk bor o‘qish (localStorage / system preference)
+  useEffect(() => {
+    const initial = initTheme();
+    setDark(initial);
+  }, []);
+
+  // ✅ Dark rejimni almashtirish (localStorage + <html class="dark"> yangilanadi)
+  const toggleTheme = () => {
+    const next = !dark;
+    setDark(next);
+    applyTheme(next);
+  };
+
   // Lightbox
   const [lbOpen, setLbOpen] = useState(false);
   const [lbImages, setLbImages] = useState([]);
