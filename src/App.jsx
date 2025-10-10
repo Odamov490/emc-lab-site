@@ -4,7 +4,7 @@ import ScrollToTopButton from "./ScrollToTopButton";
 import Login from "./pages/Login"; // login sahifang
  // asosiy sahifa
  import { Routes, Route, useNavigate } from "react-router-dom";
-import { initTheme, applyTheme } from "../utils/theme";
+
 /********************* CONFIG *********************/
 const NAV = [
   { href: "#about", label: { uz: "Biz haqimizda", ru: "О нас" } },
@@ -1383,7 +1383,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<EMCLabUltra />} />
       <Route path="/login" element={<Login />} />
-      
+
     </Routes>
   );
 }
