@@ -968,70 +968,58 @@ const navigate = useNavigate();
           </div>
         </Section>
 
-<Card
-  key={i}
-  role="button"
-  tabIndex={0}
-  onClick={(e) => {
-    // Kartochkani “silkitish”
-    const el = e.currentTarget;
-    el.classList.remove("animate-shake");
-    void el.offsetWidth; // reflow
-    el.classList.add("animate-shake");
+        {/* SERVICES */}
+        <Section
+          id="services"
+          title={lang === "uz" ? "Xizmatlar va sinovlar" : "Услуги и испытания"}
+          subtitle={
+            lang === "uz"
+              ? "IEC/CISPR talablari asosida to‘liq EMC dasturi"
+              : "Полный перечень EMC-испытаний по IEC/CISPR"
+          }
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {TESTS.map((tst, i) => (
+              <Card
+                key={i}
+                className="p-6 hover:shadow-lg transition bg-gradient-to-r from-sky-700 to-cyan-600 text-white"
+              >
+                {/* Sarlavha + Badge qismi */}
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                  <h3 className="flex-1 min-w-0 text-base font-semibold flex items-start gap-2 drop-shadow leading-tight">
+                    <span className="text-xl leading-none">{tst.icon}</span>
+                    <span className="break-words">{tst.title}</span>
+                  </h3>
 
-    el.addEventListener(
-      "animationend",
-      () => el.classList.remove("animate-shake"),
-      { once: true }
-    );
-  }}
-  onKeyDown={(e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      e.currentTarget.click();
-    }
-  }}
-  className="p-6 bg-gradient-to-r from-sky-700 to-cyan-600 text-white
-             transition hover:shadow-lg cursor-pointer
-             hover:-translate-y-0.5 active:scale-[0.99] rounded-2xl"
->
-  {/* Sarlavha + Badge qismi */}
-  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-    <h3 className="flex-1 min-w-0 text-base font-semibold flex items-start gap-2 drop-shadow leading-tight">
-      <span className="text-xl leading-none">{tst.icon}</span>
-      <span className="break-words">{tst.title}</span>
-    </h3>
+                  <span
+                    className="
+                      mt-1 sm:mt-0 self-start sm:self-auto
+                      inline-flex items-center rounded-full px-3 py-1 bg-white text-gray-900 shadow-md
+                      text-[11px] sm:text-xs
+                      whitespace-nowrap truncate
+                      max-w-full sm:max-w_[45%] md:max-w_[55%] lg:max-w_[60%]
+                    "
+                  >
+                    {tst.code}
+                  </span>
+                </div>
 
-    <span
-      className="
-        mt-1 sm:mt-0 self-start sm:self-auto
-        inline-flex items-center rounded-full px-3 py-1 bg-white text-gray-900 shadow-md
-        text-[11px] sm:text-xs
-        whitespace-nowrap truncate
-        max-w-full sm:max-w_[45%] md:max-w_[55%] lg:max-w_[60%]
-      "
-    >
-      {tst.code}
-    </span>
-  </div>
+                {/* Note */}
+                <p className="mt-3 text-sm text-white/90 drop-shadow">{tst.note}</p>
 
-  {/* Note */}
-  <p className="mt-3 text-sm text-white/90 drop-shadow">{tst.note}</p>
-
-  {/* Faqat “Batafsil” tugmasi */}
-  <div className="mt-4">
-    <button
-      onClick={(ev) => {
-        ev.stopPropagation(); // tugma bosilganda karta silkinmasligi uchun
-        openTest(tst);
-      }}
-      className="rounded-xl bg-white text-gray-900 px-3 py-1.5 text-sm font-medium shadow hover:opacity-90"
-    >
-      {lang === "uz" ? "Batafsil" : "Подробнее"}
-    </button>
-  </div>
-</Card>
-
+                {/* Faqat “Batafsil” tugmasi */}
+                <div className="mt-4">
+                  <button
+                    onClick={() => openTest(tst)}
+                    className="rounded-xl bg-white text-gray-900 px-3 py-1.5 text-sm font-medium shadow hover:opacity-90"
+                  >
+                    {lang === "uz" ? "Batafsil" : "Подробнее"}
+                  </button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </Section>
 
 
 
