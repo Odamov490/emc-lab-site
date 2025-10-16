@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Bosh sahifa -->
+  <url>
+    <loc>https://emclab.uz/</loc>
+    <lastmod>2025-10-16</lastmod>
+    <priority>1.00</priority>
+  </url>
+
+  <!-- Biz haqimizda -->
+  <url>
+    <loc>https://emclab.uz/biz-haqimizda</loc>
+    <lastmod>2025-10-16</lastmod>
+    <priority>0.90</priority>
+  </url>
+
+  <!-- Xizmatlar -->
+  <url>
+    <loc>https://emclab.uz/xizmatlar</loc>
+    <lastmod>2025-10-16</lastmod>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Jihozlar -->
+  <url>
+    <loc>https://emclab.uz/jihozlar</loc>
+    <lastmod>2025-10-16</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- Akkreditatsiya -->
+  <url>
+    <loc>https://emclab.uz/akkreditatsiya</loc>
+    <lastmod>2025-10-16</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- Galereya -->
+  <url>
+    <loc>https://emclab.uz/galereya</loc>
+    <lastmod>2025-10-16</lastmod>
+    <priority>0.70</priority>
+  </url>
+
+  <!-- Ekskursiya -->
+  <url>
+    <loc>https://emclab.uz/ekskursiya</loc>
+    <lastmod>2025-10-16</lastmod>
+    <priority>0.70</priority>
+  </url>
+
+  <!-- Jamoa -->
+  <url>
+    <loc>https://emclab.uz/jamoa</loc>
+    <lastmod>2025-10-16</lastmod>
+    <priority>0.70</priority>
+  </url>
+
+  <!-- Narxlar -->
+  <url>
+    <loc>https://emclab.uz/narxlar</loc>
+    <lastmod>2025-10-16</lastmod>
+    <priority>0.70</priority>
+  </url>
+
+  <!-- Bog‘lanish -->
+  <url>
+    <loc>https://emclab.uz/boglanish</loc>
+    <lastmod>2025-10-16</lastmod>
+    <priority>0.70</priority>
+  </url>
+
+</urlset>
