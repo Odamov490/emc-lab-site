@@ -1,4 +1,4 @@
-// src/pages/Login.jsx (enhanced)
+// src/pages/Login.jsx (enhanced + Standartlar)
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
@@ -37,7 +37,7 @@ const T = {
   uz: {
     title:"Kirish", username:"Login", password:"Parol", signIn:"Kirish", wrong:"Login yoki parol noto‘g‘ri",
     loading:"Yuklanmoqda...", dashboard:"Boshqaruv paneli", logout:"Chiqish", hello:"Salom", role:"Roli",
-    profile:"Profil", activity:"Faollik", employees:"Hodimlar",
+    profile:"Profil", activity:"Faollik", employees:"Hodimlar", standards:"Standartlar",
     combo:"Arizalar & Harakat", stats:"Statistika", total:"Jami", inprog:"Jarayonda", done:"Sinov tugatildi",
     canceled:"Bekor qilindi", payyes:"To‘lov bor", payno:"To‘lov yo‘q",
     newApp:"Yangi ariza", appNum:"Ariza raqami", org:"Organ Sertifikatsiya", product:"Mahsulot",
@@ -50,11 +50,14 @@ const T = {
     perPage:"Sahifada", saved:"Saqlandi", updated:"Yangilandi", deleted:"O‘chirildi",
     changePass:"Parolni almashtirish", newPass:"Yangi parol", confirm:"Tasdiqlash", passChanged:"Parol almashtirildi",
     duplicate:"Bu ariza raqami allaqachon mavjud", sort:"Saralash",
+    stdTitle:"Standartlar to‘plami", stdHint:"/public/standards/ ichiga fayllarni joylang va index.json ni to‘ldiring",
+    stdRefresh:"Yangilash", stdDownload:"Yuklab olish", stdOpenFolder:"Papkani ochish", stdCount:"Jami fayl",
+    stdBadJson:"index.json xato yoki to‘liq emas", stdEmpty:"Hozircha standartlar topilmadi",
   },
   ru: {
     title:"Вход", username:"Логин", password:"Пароль", signIn:"Войти", wrong:"Логин или пароль неверны",
     loading:"Загрузка...", dashboard:"Панель", logout:"Выйти", hello:"Здравствуйте", role:"Роль",
-    profile:"Профиль", activity:"Лента", employees:"Сотрудники",
+    profile:"Профиль", activity:"Лента", employees:"Сотрудники", standards:"Стандарты",
     combo:"Заявки & Движение", stats:"Статистика", total:"Всего", inprog:"В процессе", done:"Завершено",
     canceled:"Отменено", payyes:"Оплачено", payno:"Без оплаты",
     newApp:"Новая заявка", appNum:"№ заявки", org:"Орган сертиф.", product:"Изделие",
@@ -67,6 +70,9 @@ const T = {
     perPage:"На странице", saved:"Сохранено", updated:"Обновлено", deleted:"Удалено",
     changePass:"Сменить пароль", newPass:"Новый пароль", confirm:"Подтвердить", passChanged:"Пароль изменен",
     duplicate:"Такая заявка уже существует", sort:"Сортировка",
+    stdTitle:"Каталог стандартов", stdHint:"Положите файлы в /public/standards/ и заполните index.json",
+    stdRefresh:"Обновить", stdDownload:"Скачать", stdOpenFolder:"Открыть папку", stdCount:"Всего файлов",
+    stdBadJson:"index.json поврежден или неполный", stdEmpty:"Пока нет стандартов",
   }
 };
 
@@ -110,7 +116,7 @@ export default function Login(){
   const [u,setU]=useState(""); const [p,setP]=useState(""); const [err,setErr]=useState(""); const [submitting,setSubmitting]=useState(false);
 
   // tabs
-  const [tab,setTab]=useState("combo"); // profile | combo | employees | activity
+  const [tab,setTab]=useState("combo"); // profile | combo | employees | activity | standards
 
   // data
   const [apps,setApps]=useState([]);
@@ -150,7 +156,8 @@ export default function Login(){
   // session
   useEffect(()=>{
     const raw=localStorage.getItem("emc_auth");
-    if(raw){ try{ setMe(JSON.parse(raw)); }catch{} }
+    if(raw){ try{ setMe(JSON.parse(raw)); }catch{}
+    }
     setChecking(false);
   },[]);
 
@@ -276,6 +283,35 @@ export default function Login(){
     payno: apps.filter(a=>a.pay==="To'lov yo'q").length,
   };
 
+  // ====== STANDARDS state ======
+  const [stdList,setStdList]=useState([]);
+  const [stdQ,setStdQ]=useState("");
+  const [stdErr,setStdErr]=useState("");
+  const [stdLoading,setStdLoading]=useState(false);
+
+  const loadStandards = async ()=>{
+    setStdErr(""); setStdLoading(true);
+    try{
+      const res = await fetch('/standards/index.json', {cache:'no-store'});
+      const text = await res.text();
+      let json;
+      try{ json = JSON.parse(text); }catch(parseErr){ throw new Error(t.stdBadJson+` (JSON.parse)\n`+parseErr.message); }
+      if(!Array.isArray(json)) throw new Error(t.stdBadJson+` (Array expected)`);
+      // minimal schema check
+      const ok = json.every(x=> x && typeof x.id!=="undefined" && x.name && x.file);
+      if(!ok) throw new Error(t.stdBadJson+` (fields: id,name,file)`);
+      setStdList(json);
+    }catch(e){ console.error(e); setStdErr(String(e.message||e)); setStdList([]); }
+    finally{ setStdLoading(false); }
+  };
+  useEffect(()=>{ if(tab==="standards") loadStandards(); }, [tab]);
+
+  const stdFiltered = stdList.filter(s=>{
+    if(!stdQ.trim()) return true;
+    const q = stdQ.toLowerCase();
+    return (s.name||"").toLowerCase().includes(q) || (s.desc||"").toLowerCase().includes(q) || (s.file||"").toLowerCase().includes(q);
+  });
+
   if(checking){
     return <div className="min-h-screen grid place-items-center"><div className="text-sm text-gray-600">{t.loading}</div></div>;
   }
@@ -358,6 +394,8 @@ export default function Login(){
             <button onClick={()=>setTab("profile")} className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${tab==="profile"?"bg-black/5 font-semibold":""}`}>{t.profile}</button>
             {me.role==="admin" && <button onClick={()=>setTab("employees")} className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${tab==="employees"?"bg-black/5 font-semibold":""}`}>{t.employees}</button>}
             <button onClick={()=>setTab("activity")} className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${tab==="activity"?"bg-black/5 font-semibold":""}`}>{t.activity}</button>
+            {/* NEW: Standards button */}
+            <button onClick={()=>setTab("standards")} className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${tab==="standards"?"bg-black/5 font-semibold":""}`}>{t.standards}</button>
           </nav>
         </Card>
 
@@ -637,6 +675,45 @@ export default function Login(){
                       <div className="text-xs text-gray-500">
                         {m.byUser} • {formatDT(m.createdAt)} {m.note?` • ${m.note}`:""}
                       </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
+          {/* ======= NEW: STANDARDS ======= */}
+          {tab==="standards" && (
+            <Card>
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-lg font-semibold">{t.stdTitle}</div>
+                <div className="flex items-center gap-2">
+                  <a href="/standards/" target="_blank" rel="noreferrer" className="rounded-xl border px-3 py-1.5 text-sm hover:bg-black/5">{t.stdOpenFolder}</a>
+                  <button onClick={loadStandards} className="rounded-xl border px-3 py-1.5 text-sm hover:bg-black/5">{t.stdRefresh}</button>
+                </div>
+              </div>
+
+              <div className="text-xs text-gray-500 mb-3">{t.stdHint}</div>
+
+              <div className="flex items-center gap-2 mb-3">
+                <input className="rounded-xl border px-3 py-2 text-sm flex-1" placeholder={t.search} value={stdQ} onChange={e=>setStdQ(e.target.value)} />
+                <Pill>{t.stdCount}: {stdFiltered.length}</Pill>
+              </div>
+
+              {stdLoading && <div className="text-sm text-gray-600">{t.loading}</div>}
+              {stdErr && <div className="text-sm text-red-600 whitespace-pre-wrap">{stdErr}</div>}
+              {!stdLoading && !stdErr && stdFiltered.length===0 && (
+                <div className="text-sm text-gray-500">{t.stdEmpty}</div>
+              )}
+
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {stdFiltered.map(s=> (
+                  <div key={s.id} className="rounded-xl border p-3 bg-white/60">
+                    <div className="font-medium text-sm mb-1">{s.name}</div>
+                    {s.desc && <div className="text-xs text-gray-500 mb-2">{s.desc}</div>}
+                    <div className="flex gap-2">
+                      <a href={s.file} download className="rounded-lg bg-sky-600 text-white px-3 py-1.5 text-xs hover:opacity-90">{t.stdDownload}</a>
+                      <a href={s.file} target="_blank" rel="noreferrer" className="rounded-lg border px-3 py-1.5 text-xs hover:bg-black/5">PDF</a>
                     </div>
                   </div>
                 ))}
