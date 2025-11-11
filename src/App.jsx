@@ -54,11 +54,13 @@ const STAFF = [
   { name: "Odamov G‘ulomjon", role: "Bosh mutaxassis", img: "/staff/4.jpg" },
   { name: "Reimbayev Xushnud", role: "1-toifali mutaxassis", img: "/staff/5.png" },
   { name: "Alekseyev Andrey", role: "1-toifali mutaxassis", img: "/staff/6.png" },
+  { name: "Suxanov Alijan", role: "1-toifali mutaxassis", img: "/staff/12.png" },
   { name: "Abduvohobov Ravshan", role: "2-toifali mutaxassis", img: "/staff/7.png" },
   { name: "Joldasbaev Dastanbek", role: "2-toifali mutaxassis", img: "/staff/8.jpg" },
   { name: "Sobirov Doston", role: "Texnik xodim", img: "/staff/9.png" },
   { name: "Karimov Suxrob", role: "Texnik xodim", img: "/staff/10.png" },
   { name: "Sharofiddinov Najmiddin", role: "Texnik xodim", img: "/staff/11.png" },
+ 
 ];
 
 
