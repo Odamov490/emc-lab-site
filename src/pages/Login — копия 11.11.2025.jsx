@@ -1,10 +1,10 @@
-// src/pages/Login.jsx (enhanced)
-import React, { useEffect, useMemo, useState, useRef } from "react";
+// src/pages/Login.jsx
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
 import {
   collection, query, where, getDocs, addDoc, onSnapshot,
-  serverTimestamp, doc, deleteDoc, updateDoc, orderBy, limit
+  serverTimestamp, doc, deleteDoc, updateDoc, orderBy
 } from "firebase/firestore";
 
 /** ===========================================================
@@ -48,8 +48,6 @@ const T = {
     fullname:"To‘liq ism", empUsername:"Login (hodimniki)", empPassword:"Parol (hodimniki)", empRole:"Roli",
     admin:"Admin", employee:"Hodim", photoUrl:"Rasm (URL)", importCSV:"CSV import", exportCSV:"CSV export",
     perPage:"Sahifada", saved:"Saqlandi", updated:"Yangilandi", deleted:"O‘chirildi",
-    changePass:"Parolni almashtirish", newPass:"Yangi parol", confirm:"Tasdiqlash", passChanged:"Parol almashtirildi",
-    duplicate:"Bu ariza raqami allaqachon mavjud", sort:"Saralash",
   },
   ru: {
     title:"Вход", username:"Логин", password:"Пароль", signIn:"Войти", wrong:"Логин или пароль неверны",
@@ -65,8 +63,6 @@ const T = {
     fullname:"ФИО", empUsername:"Логин (сотр.)", empPassword:"Пароль (сотр.)", empRole:"Роль",
     admin:"Админ", employee:"Сотр.", photoUrl:"Фото (URL)", importCSV:"Импорт CSV", exportCSV:"Экспорт CSV",
     perPage:"На странице", saved:"Сохранено", updated:"Обновлено", deleted:"Удалено",
-    changePass:"Сменить пароль", newPass:"Новый пароль", confirm:"Подтвердить", passChanged:"Пароль изменен",
-    duplicate:"Такая заявка уже существует", sort:"Сортировка",
   }
 };
 
@@ -98,11 +94,8 @@ function validateApp(app){
 /** ======= ASOSIY ======= */
 export default function Login(){
   const navigate = useNavigate();
-  const [lang,setLang]=useState(() => localStorage.getItem("emc_lang") || "uz");
+  const [lang,setLang]=useState("uz");
   const t = useMemo(()=>T[lang], [lang]);
-
-  // persist language
-  useEffect(()=>{ localStorage.setItem("emc_lang", lang); }, [lang]);
 
   // auth
   const [me,setMe]=useState(null);
@@ -131,21 +124,8 @@ export default function Login(){
   // filters
   const [q,setQ]=useState(""); const [fPay,setFPay]=useState(t.all); const [fFlow,setFFlow]=useState(t.all); const [fRed,setFRed]=useState(t.all);
 
-  // sorting
-  const [sortKey,setSortKey]=useState("createdAt"); // appNum | org | product | client | pay | flow | red | createdAt
-  const [sortDir,setSortDir]=useState("desc"); // asc | desc
-
   // pagination
   const [perPage,setPerPage]=useState(10); const [page,setPage]=useState(1);
-
-  // simple debounce for search
-  const [debouncedQ,setDebouncedQ]=useState("");
-  const debounceRef = useRef(null);
-  useEffect(()=>{
-    clearTimeout(debounceRef.current);
-    debounceRef.current=setTimeout(()=>setDebouncedQ(q), 250);
-    return ()=>clearTimeout(debounceRef.current);
-  }, [q]);
 
   // session
   useEffect(()=>{
@@ -191,20 +171,12 @@ export default function Login(){
   };
   const logout=()=>{localStorage.removeItem("emc_auth"); setMe(null); setTab("combo");};
 
-  /** ======= HELPERS ======= */
-  const formatDT=(ts)=>{ try{ return ts?.toDate ? ts.toDate().toLocaleString() : "-"; }catch{return "-";} };
-
   /** ======= CRUD (applications) ======= */
   const addApp=async(e)=>{
     e.preventDefault(); if(!me) return;
     const errs=validateApp(appForm); if(errs.length){ alert(errs.join("\n")); return; }
     setSavingApp(true);
     try{
-      // === Duplicate check by appNum ===
-      const dupQ = query(collection(db,"applications"), where("appNum","==", appForm.appNum.trim()), limit(1));
-      const dupSnap = await getDocs(dupQ);
-      if(!dupSnap.empty){ alert(t.duplicate); setSavingApp(false); return; }
-
       await addDoc(collection(db,"applications"), { ...appForm, appNum:appForm.appNum.trim(), byUser:me.fullname, byUserId:me.id, createdAt:serverTimestamp() });
       setAppForm(emptyApp); alert(t.saved);
     }catch(ex){ console.error(ex); alert("Saqlashda xato!"); } finally{ setSavingApp(false); }
@@ -218,11 +190,6 @@ export default function Login(){
     catch(ex){ console.error(ex); alert("Yangilashda xato!"); } finally{ setUpdating(false); }
   };
   const removeApp=async(id)=>{ if(!confirm("O‘chirasizmi?")) return; try{ await deleteDoc(doc(db,"applications",id)); alert(t.deleted); }catch(ex){ console.error(ex); alert("O‘chirishda xato!"); } };
-
-  // inline quick setters for status (admin or the creator)
-  const canQuickEdit = (row) => me?.role === 'admin' || row.byUserId === me?.id;
-  const setFlow = async (row, value) => { try{ await updateDoc(doc(db,'applications',row.id), { flow:value, updatedAt:serverTimestamp() }); }catch(e){ console.error(e); alert('Xato'); } };
-  const setPay = async (row, value) => { try{ await updateDoc(doc(db,'applications',row.id), { pay:value, updatedAt:serverTimestamp() }); }catch(e){ console.error(e); alert('Xato'); } };
 
   /** ======= EMPLOYEES ======= */
   const addEmployee=async(e)=>{
@@ -238,30 +205,14 @@ export default function Login(){
   };
   const removeEmployee=async(id)=>{ if(!me||me.role!=="admin") return; if(!confirm("Hodimni o‘chirasizmi?")) return; try{ await deleteDoc(doc(db,"employees",id)); alert(t.deleted); }catch(ex){ console.error(ex); alert("O‘chirishda xato!"); } };
 
-  // profile: change own password
-  const [newPass,setNewPass]=useState("");
-  const [changing,setChanging]=useState(false);
-  const changeMyPass=async()=>{
-    if(!me) return; if(!newPass.trim()) return alert("Parol kiriting");
-    setChanging(true);
-    try{ await updateDoc(doc(db,'employees', me.id), { password:newPass.trim() }); alert(t.passChanged); setNewPass(""); }
-    catch(e){ console.error(e); alert('Xato'); }
-    finally{ setChanging(false); }
-  };
-
-  /** ======= FILTER/PAGINATION/SORT ======= */
+  /** ======= FILTER/PAGINATION ======= */
   const filtered = apps.filter(a=>{
     const text=(a.appNum+" "+a.product+" "+a.client+" "+a.org+" "+(a.note||"")).toLowerCase();
-    const okText=!debouncedQ || text.includes(debouncedQ.toLowerCase());
+    const okText=!q || text.includes(q.toLowerCase());
     const okPay=(fPay===t.all)||a.pay===fPay;
     const okFlow=(fFlow===t.all)||a.flow===fFlow;
     const okRed=(fRed===t.all)||a.red===fRed;
     return okText&&okPay&&okFlow&&okRed;
-  }).sort((a,b)=>{
-    const dir = sortDir === 'asc' ? 1 : -1;
-    const va = sortKey==='createdAt' ? (a.createdAt?.seconds||0) : (a[sortKey]||'');
-    const vb = sortKey==='createdAt' ? (b.createdAt?.seconds||0) : (b[sortKey]||'');
-    if(va<vb) return -1*dir; if(va>vb) return 1*dir; return 0;
   });
   const pages = Math.max(1, Math.ceil(filtered.length/perPage));
   const pageItems = filtered.slice((page-1)*perPage, (page-1)*perPage+perPage);
@@ -304,20 +255,6 @@ export default function Login(){
       </div>
     );
   }
-
-  const SortBtn = ({col, label}) => (
-    <button
-      className="inline-flex items-center gap-1 hover:underline"
-      onClick={()=>{
-        if(sortKey===col){ setSortDir(d=>d==='asc'?'desc':'asc'); } else { setSortKey(col); setSortDir('asc'); }
-        setPage(1);
-      }}
-      title={`${t.sort}: ${label}`}
-    >
-      {label}
-      {sortKey===col && (<span>{sortDir==='asc'? '↑':'↓'}</span>)}
-    </button>
-  );
 
   /** ======= DASHBOARD ======= */
   return (
@@ -372,14 +309,6 @@ export default function Login(){
                 <div><div className="text-gray-500">{t.role}</div><div className="font-medium">{me.role}</div></div>
                 <div className="sm:col-span-2"><div className="text-gray-500">{t.fullname}</div><div className="font-medium">{me.fullname}</div></div>
               </div>
-              {/* Change password */}
-              <div className="mt-5 border-t pt-4">
-                <div className="font-medium mb-2">{t.changePass}</div>
-                <div className="flex gap-2 max-w-sm">
-                  <Input type="text" value={newPass} onChange={e=>setNewPass(e.target.value)} placeholder={t.newPass} />
-                  <button onClick={changeMyPass} disabled={changing} className="rounded-xl bg-sky-600 text-white px-4 py-2 text-sm hover:opacity-90 disabled:opacity-60">{t.confirm}</button>
-                </div>
-              </div>
             </Card>
           )}
 
@@ -404,16 +333,12 @@ export default function Login(){
                 <div className="text-lg font-semibold mb-3">{t.newApp}</div>
                 <form onSubmit={addApp} className="grid sm:grid-cols-2 gap-4 text-sm">
                   <div><label className="font-medium">{t.appNum}</label><Input value={appForm.appNum} onChange={e=>setAppForm(s=>({...s,appNum:e.target.value}))} placeholder="4654563" required/></div>
-                  <div><label className="font-medium">{t.org}</label><select className="mt-1 w-full rounded-xl border px-3 py-2" value={appForm.org} onChange={e=>setAppForm(s=>({...s,org:e.target.value}))}>{ORG_LIST.map(o=>
-                    <option key={o}>{o}</option>)}</select></div>
+                  <div><label className="font-medium">{t.org}</label><select className="mt-1 w-full rounded-xl border px-3 py-2" value={appForm.org} onChange={e=>setAppForm(s=>({...s,org:e.target.value}))}>{ORG_LIST.map(o=><option key={o}>{o}</option>)}</select></div>
                   <div><label className="font-medium">{t.product}</label><Input value={appForm.product} onChange={e=>setAppForm(s=>({...s,product:e.target.value}))} placeholder="Choynak" required/></div>
                   <div><label className="font-medium">{t.client}</label><Input value={appForm.client} onChange={e=>setAppForm(s=>({...s,client:e.target.value}))} placeholder="pskent" required/></div>
-                  <div><label className="font-medium">{t.payStatus}</label><select className="mt-1 w-full rounded-xl border px-3 py-2" value={appForm.pay} onChange={e=>setAppForm(s=>({...s,pay:e.target.value}))}>{STATUS_TOLOV.map(o=>
-                    <option key={o}>{o}</option>)}</select></div>
-                  <div><label className="font-medium">{t.flowStatus}</label><select className="mt-1 w-full rounded-xl border px-3 py-2" value={appForm.flow} onChange={e=>setAppForm(s=>({...s,flow:e.target.value}))}>{STATUS_HOLAT.map(o=>
-                    <option key={o}>{o}</option>)}</select></div>
-                  <div><label className="font-medium">{t.redZone}</label><select className="mt-1 w-full rounded-xl border px-3 py-2" value={appForm.red} onChange={e=>setAppForm(s=>({...s,red:e.target.value}))}>{QIZIL_ZONA.map(o=>
-                    <option key={o}>{o}</option>)}</select></div>
+                  <div><label className="font-medium">{t.payStatus}</label><select className="mt-1 w-full rounded-xl border px-3 py-2" value={appForm.pay} onChange={e=>setAppForm(s=>({...s,pay:e.target.value}))}>{STATUS_TOLOV.map(o=><option key={o}>{o}</option>)}</select></div>
+                  <div><label className="font-medium">{t.flowStatus}</label><select className="mt-1 w-full rounded-xl border px-3 py-2" value={appForm.flow} onChange={e=>setAppForm(s=>({...s,flow:e.target.value}))}>{STATUS_HOLAT.map(o=><option key={o}>{o}</option>)}</select></div>
+                  <div><label className="font-medium">{t.redZone}</label><select className="mt-1 w-full rounded-xl border px-3 py-2" value={appForm.red} onChange={e=>setAppForm(s=>({...s,red:e.target.value}))}>{QIZIL_ZONA.map(o=><option key={o}>{o}</option>)}</select></div>
                   <div className="sm:col-span-1"><label className="font-medium">{t.note}</label><Input value={appForm.note} onChange={e=>setAppForm(s=>({...s,note:e.target.value}))} placeholder="ixtiyoriy"/></div>
                   <div className="sm:col-span-2">
                     <button disabled={savingApp} className="rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-60">{savingApp?t.loading:t.add}</button>
@@ -427,16 +352,10 @@ export default function Login(){
                           // CSV: appNum,org,product,client,pay,flow,red,note
                           const rows=text.split(/\r?\n/).filter(Boolean).slice(1);
                           for(const row of rows){
-                            // parse simple CSV (no commas inside fields). For advanced, use PapaParse in future.
                             const [appNum,org,product,client,pay,flow,red,note] = row.split(",").map(s=>s?.trim());
                             const draft={appNum,org,product,client,pay,flow,red,note};
                             const errs=validateApp(draft); if(errs.length) continue;
-                            try{
-                              // skip duplicates by appNum
-                              const dq=query(collection(db,'applications'), where('appNum','==', (appNum||'').trim()), limit(1));
-                              const ds=await getDocs(dq); if(!ds.empty) continue;
-                              await addDoc(collection(db,"applications"), {...draft, byUser:me.fullname, byUserId:me.id, createdAt:serverTimestamp()});
-                            }catch{}
+                            try{ await addDoc(collection(db,"applications"), {...draft, byUser:me.fullname, byUserId:me.id, createdAt:serverTimestamp()}); }catch{}
                           }
                           alert(t.saved);
                           e.target.value="";
@@ -478,55 +397,39 @@ export default function Login(){
                   <table className="min-w-full text-sm">
                     <thead>
                       <tr className="text-left text-gray-500">
-                        <th className="py-2 pr-3"><SortBtn col="appNum" label={t.appNum} /></th>
-                        <th className="py-2 pr-3"><SortBtn col="org" label={t.org} /></th>
-                        <th className="py-2 pr-3"><SortBtn col="product" label={t.product} /></th>
-                        <th className="py-2 pr-3"><SortBtn col="client" label={t.client} /></th>
-                        <th className="py-2 pr-3"><SortBtn col="pay" label={t.payStatus} /></th>
-                        <th className="py-2 pr-3"><SortBtn col="flow" label={t.flowStatus} /></th>
-                        <th className="py-2 pr-3"><SortBtn col="red" label={t.redZone} /></th>
+                        <th className="py-2 pr-3">{t.appNum}</th>
+                        <th className="py-2 pr-3">{t.org}</th>
+                        <th className="py-2 pr-3">{t.product}</th>
+                        <th className="py-2 pr-3">{t.client}</th>
+                        <th className="py-2 pr-3">{t.payStatus}</th>
+                        <th className="py-2 pr-3">{t.flowStatus}</th>
+                        <th className="py-2 pr-3">{t.redZone}</th>
                         <th className="py-2 pr-3">{t.note}</th>
                         <th className="py-2 pr-3">{t.user}</th>
-                        <th className="py-2 pr-3"><SortBtn col="createdAt" label={t.time} /></th>
+                        <th className="py-2 pr-3">{t.time}</th>
                         <th className="py-2 pr-3">{t.actions}</th>
                       </tr>
                     </thead>
                     <tbody>
                       {pageItems.length===0 && (<tr><td colSpan={11} className="py-4 text-gray-400">{t.none}</td></tr>)}
-                      {pageItems.map(r=>{
-                        const redCell = r.red==="Ha" ? "bg-red-50" : "";
-                        return (
-                        <tr key={r.id} className={`border-t ${redCell}`}>
+                      {pageItems.map(r=>(
+                        <tr key={r.id} className="border-t">
                           <td className="py-2 pr-3">{r.appNum}</td>
                           <td className="py-2 pr-3">{r.org}</td>
                           <td className="py-2 pr-3">{r.product}</td>
                           <td className="py-2 pr-3">{r.client}</td>
-                          <td className="py-2 pr-3">
-                            {canQuickEdit(r) ? (
-                              <select className="rounded border px-2 py-1" value={r.pay} onChange={e=>setPay(r, e.target.value)}>
-                                {STATUS_TOLOV.map(s=> <option key={s}>{s}</option>)}
-                              </select>
-                            ) : (<Pill>{r.pay}</Pill>)}
-                          </td>
-                          <td className="py-2 pr-3">
-                            {canQuickEdit(r) ? (
-                              <select className="rounded border px-2 py-1" value={r.flow} onChange={e=>setFlow(r, e.target.value)}>
-                                {STATUS_HOLAT.map(s=> <option key={s}>{s}</option>)}
-                              </select>
-                            ) : (<Pill>{r.flow}</Pill>)}
-                          </td>
+                          <td className="py-2 pr-3"><Pill>{r.pay}</Pill></td>
+                          <td className="py-2 pr-3"><Pill>{r.flow}</Pill></td>
                           <td className="py-2 pr-3">{r.red==="Ha" ? <span className="px-2 py-0.5 text-xs rounded bg-red-100 text-red-700">Ha</span> : "Yo'q"}</td>
                           <td className="py-2 pr-3">{r.note||"-"}</td>
                           <td className="py-2 pr-3">{r.byUser||"-"}</td>
-                          <td className="py-2 pr-3">{formatDT(r.createdAt)}{r.updatedAt? <span className="text-xs text-gray-400"> • upd {formatDT(r.updatedAt)}</span> : null}</td>
+                          <td className="py-2 pr-3">{r.createdAt?.toDate ? r.createdAt.toDate().toLocaleString():"-"}</td>
                           <td className="py-2 pr-3 flex gap-3">
                             <button className="text-sky-700 hover:underline" onClick={()=>startEdit(r)}>{t.edit}</button>
-                            {(me.role==='admin') && (
-                              <button className="text-red-600 hover:underline" onClick={()=>removeApp(r.id)}>{t.remove}</button>
-                            )}
+                            <button className="text-red-600 hover:underline" onClick={()=>removeApp(r.id)}>{t.remove}</button>
                           </td>
                         </tr>
-                      )})}
+                      ))}
                     </tbody>
                   </table>
                 </div>
@@ -635,7 +538,7 @@ export default function Login(){
                     <div>
                       <div className="font-medium">{m.product} <span className="text-gray-500">×{m.qty}</span></div>
                       <div className="text-xs text-gray-500">
-                        {m.byUser} • {formatDT(m.createdAt)} {m.note?` • ${m.note}`:""}
+                        {m.byUser} • {m.createdAt?.toDate?m.createdAt.toDate().toLocaleString():"-"} {m.note?` • ${m.note}`:""}
                       </div>
                     </div>
                   </div>
