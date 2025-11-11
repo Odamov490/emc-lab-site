@@ -24,6 +24,7 @@ const STAFF_PHOTOS = {
   "Sobirov Doston": "/staff/9.png",
   "Karimov Suxrob": "/staff/10.png",
   "Sharofiddinov Najmiddin": "/staff/11.png",
+   "Suxanov Alijan": "/staff/12.png",
 };
 
 /** ======= ENUM/LISTLAR (Google Sheets dagi ustunlar kabi) ======= */
