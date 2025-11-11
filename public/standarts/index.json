@@ -1,34 +1,20 @@
-
-
 [
   {
     "id": 1,
-    "name": "O‘z DSt IEC 61000-4-2: Elektrostattik razryadga chidamlilik",
-    "file": "/standards/OzDSt_IEC_61000-4-2.pdf",
-    "desc": "Bu standart qurilmalarni elektrostattik razryadlarga nisbatan sinovdan o‘tkazish tartibini belgilaydi."
+    "name": "O‘z DSt IEC 61000-4-2: ESD ga chidamlilik",
+    "file": "/standards/IEC_61000-4-2.pdf",
+    "desc": "Elektrostatik razryad sinovi"
   },
   {
     "id": 2,
-    "name": "O‘z DSt IEC 61000-4-3: Radioto‘lqinli elektromagnit maydonlarga chidamlilik",
-    "file": "/standards/OzDSt_IEC_61000-4-3.pdf",
-    "desc": "Elektron qurilmalarning radioto‘lqinli elektromagnit maydonlarga nisbatan chidamliligini baholash usuli."
+    "name": "O‘z DSt IEC 61000-4-3: RF immunitet",
+    "file": "/standards/IEC_61000-4-3.pdf",
+    "desc": "Radioto‘lqin immuniteti"
   },
   {
     "id": 3,
-    "name": "O‘z DSt IEC 61000-4-4: Tez o‘tuvchi impulsli shovqinlarga chidamlilik",
-    "file": "/standards/OzDSt_IEC_61000-4-4.pdf",
-    "desc": "Bu hujjat qurilmalarning impulsli shovqinlarga chidamliligini aniqlash uchun sinov shartlarini ko‘rsatadi."
-  },
-  {
-    "id": 4,
-    "name": "O‘z DSt IEC 61000-4-5: Tok va kuchlanishning ortiqcha to‘lqinlariga chidamlilik",
-    "file": "/standards/OzDSt_IEC_61000-4-5.pdf",
-    "desc": "Qurilmalarning kuchlanish ortishi (surge) holatlarida himoya darajasini aniqlovchi sinovlar."
-  },
-  {
-    "id": 5,
-    "name": "O‘z DSt IEC 61000-4-6: O‘tkazilgan radiochastotali signallarga chidamlilik",
-    "file": "/standards/OzDSt_IEC_61000-4-6.pdf",
-    "desc": "Ushbu standart qurilmalarga o‘tkazilgan radiochastotali shovqinlarning ta’sirini o‘rganish tartibini belgilaydi."
+    "name": "O‘z DSt IEC 61000-4-4: Tez o‘tuvchi impulslar (EFT/Burst)",
+    "file": "/standards/IEC_61000-4-4.pdf",
+    "desc": "Burst sinovi"
   }
 ]
