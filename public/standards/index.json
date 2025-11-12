@@ -1,34 +1,104 @@
-
-
 [
   {
     "id": 1,
-    "name": "O‘z DSt IEC 61000-4-2: Elektrostattik razryadga chidamlilik",
-    "file": "/standards/OzDSt_IEC_61000-4-2.pdf",
-    "desc": "Bu standart qurilmalarni elektrostattik razryadlarga nisbatan sinovdan o‘tkazish tartibini belgilaydi."
+    "name": "GOST 30805.22-2013: Maishiy va shunga o‘xshash qurilmalar uchun radioto‘lqinli shovqin emissiyasi",
+    "file": "/standards/GOST_30805_22_2013.pdf",
+    "desc": "Bu standart maishiy va sanoat qurilmalarining radioto‘lqinli shovqin emissiyasini o‘lchash va baholash tartibini belgilaydi."
   },
   {
     "id": 2,
-    "name": "O‘z DSt IEC 61000-4-3: Radioto‘lqinli elektromagnit maydonlarga chidamlilik",
-    "file": "/standards/OzDSt_IEC_61000-4-3.pdf",
-    "desc": "Elektron qurilmalarning radioto‘lqinli elektromagnit maydonlarga nisbatan chidamliligini baholash usuli."
+    "name": "GOST CISPR 14-1-2022: Maishiy apparatlar, asbob-uskunalar va o‘xshash qurilmalar uchun shovqin emissiyasi",
+    "file": "/standards/GOST_CISPR_14_1_2022.pdf",
+    "desc": "Bu standart maishiy va shunga o‘xshash apparatlarning o‘tkazilgan va nurlangan elektromagnit shovqinlarini cheklash usullarini belgilaydi."
   },
   {
     "id": 3,
-    "name": "O‘z DSt IEC 61000-4-4: Tez o‘tuvchi impulsli shovqinlarga chidamlilik",
-    "file": "/standards/OzDSt_IEC_61000-4-4.pdf",
-    "desc": "Bu hujjat qurilmalarning impulsli shovqinlarga chidamliligini aniqlash uchun sinov shartlarini ko‘rsatadi."
+    "name": "GOST CISPR 15-2014: Yorug‘lik beruvchi qurilmalarning elektromagnit moslashuvchanligi",
+    "file": "/standards/GOST_CISPR_15_2014.pdf",
+    "desc": "Yoritish moslamalari, LED va gazrazryadli chiroqlarning elektromagnit emissiya va immunitet talablarini belgilaydi."
   },
   {
     "id": 4,
-    "name": "O‘z DSt IEC 61000-4-5: Tok va kuchlanishning ortiqcha to‘lqinlariga chidamlilik",
-    "file": "/standards/OzDSt_IEC_61000-4-5.pdf",
-    "desc": "Qurilmalarning kuchlanish ortishi (surge) holatlarida himoya darajasini aniqlovchi sinovlar."
+    "name": "GOST CISPR 16-2-1-2015: O‘lchov usullari va sinov muhitlari",
+    "file": "/standards/GOST_CISPR_16_2_1_2015.pdf",
+    "desc": "Elektromagnit shovqinlarni o‘lchash uchun uskunalar, tartiblar va sharoitlar bo‘yicha talablarni keltiradi."
   },
   {
     "id": 5,
-    "name": "O‘z DSt IEC 61000-4-6: O‘tkazilgan radiochastotali signallarga chidamlilik",
-    "file": "/standards/OzDSt_IEC_61000-4-6.pdf",
-    "desc": "Ushbu standart qurilmalarga o‘tkazilgan radiochastotali shovqinlarning ta’sirini o‘rganish tartibini belgilaydi."
+    "name": "GOST CISPR 16-2-3-2016: Radioto‘lqinli shovqinlarni o‘lchash usullari",
+    "file": "/standards/GOST_CISPR_16_2_3_2016.pdf",
+    "desc": "Radioto‘lqinli shovqinlarni o‘lchashda qo‘llaniladigan sinov joylari, metodlar va o‘lchov asboblarini belgilaydi."
+  },
+  {
+    "id": 6,
+    "name": "GOST CISPR 16-4-2-2013: O‘lchov noaniqligi va baholash usullari",
+    "file": "/standards/GOST_CISPR_16_4_2_2013.pdf",
+    "desc": "O‘lchov noaniqliklarini hisoblash, tahlil qilish va hisobotda aks ettirish bo‘yicha ko‘rsatmalarni o‘z ichiga oladi."
+  },
+  {
+    "id": 7,
+    "name": "O‘z DSt 35-10:2011: Elektromagnit moslashuvchanlik asosiy tushunchalari",
+    "file": "/standards/OzDSt_35_10_2011.pdf",
+    "desc": "Elektromagnit moslashuvchanlik bo‘yicha asosiy atamalar, ta’riflar va qo‘llanish sohasini belgilaydi."
+  },
+  {
+    "id": 8,
+    "name": "O‘z DSt 1030-2013: Sinov laboratoriyalari uchun umumiy talablar",
+    "file": "/standards/OzDSt_1030_2013.pdf",
+    "desc": "Sinov laboratoriyalarining tashkil etilishi, sifat tizimi va sinov natijalari ishonchliligini ta’minlash talablarini belgilaydi."
+  },
+  {
+    "id": 9,
+    "name": "O‘z DSt 1187-2008: Elektr jihozlarining xavfsizligi",
+    "file": "/standards/OzDSt_1187_2008.pdf",
+    "desc": "Elektr jihozlarining xavfsiz ishlashini ta’minlash bo‘yicha talablar va sinov usullarini belgilaydi."
+  },
+  {
+    "id": 10,
+    "name": "O‘z DSt 2821-2014: Elektr tarmoqlari va uskunalar uchun elektromagnit muvofiqlik",
+    "file": "/standards/OzDSt_2821_2014.pdf",
+    "desc": "Elektr tarmoqlaridagi elektromagnit moslashuvchanlikni ta’minlash choralari va sinov tartiblarini belgilaydi."
+  },
+  {
+    "id": 11,
+    "name": "O‘zMSt IEC 61000-4-2: Elektrostattik razryadga chidamlilik",
+    "file": "/standards/OzMSt_IEC_61000_4_2.pdf",
+    "desc": "Qurilmalarni elektrostattik razryadlarga nisbatan sinovdan o‘tkazish tartibini belgilaydi."
+  },
+  {
+    "id": 12,
+    "name": "O‘zMSt IEC 61000-4-3: Radioto‘lqinli elektromagnit maydonlarga chidamlilik",
+    "file": "/standards/OzMSt_IEC_61000_4_3.pdf",
+    "desc": "Elektron qurilmalarning radioto‘lqinli elektromagnit maydonlarga nisbatan chidamliligini baholash usuli."
+  },
+  {
+    "id": 13,
+    "name": "O‘zMSt IEC 61000-4-4: Tez o‘tuvchi impulsli shovqinlarga chidamlilik",
+    "file": "/standards/OzMSt_IEC_61000_4_4.pdf",
+    "desc": "Qurilmalarning impulsli shovqinlarga chidamliligini aniqlash uchun sinov shartlarini ko‘rsatadi."
+  },
+  {
+    "id": 14,
+    "name": "O‘zMSt IEC 61000-4-5: Tok va kuchlanishning ortiqcha to‘lqinlariga chidamlilik",
+    "file": "/standards/OzMSt_IEC_61000_4_5.pdf",
+    "desc": "Qurilmalarning kuchlanish ortishi (surge) holatlarida himoya darajasini aniqlovchi sinovlar."
+  },
+  {
+    "id": 15,
+    "name": "O‘zMSt IEC 61000-4-6: O‘tkazilgan radiochastotali signallarga chidamlilik",
+    "file": "/standards/OzMSt_IEC_61000_4_6.pdf",
+    "desc": "Qurilmalarga o‘tkazilgan radiochastotali shovqinlarning ta’sirini o‘rganish tartibini belgilaydi."
+  },
+  {
+    "id": 16,
+    "name": "O‘zMSt IEC 61000-4-11: Kuchlanish pasayishi, qisqa uzilishlar va tebranishlarga chidamlilik",
+    "file": "/standards/OzMSt_IEC_61000_4_11.pdf",
+    "desc": "Qurilmalarning kuchlanishning vaqtincha pasayishi va uzilishlariga nisbatan barqarorligini baholash tartibi."
+  },
+  {
+    "id": 17,
+    "name": "O‘zMSt IEC 62764-1-2025: Avtomobillar uchun elektromagnit moslashuvchanlik tahlili",
+    "file": "/standards/OzMSt_IEC_62764_1_2025.pdf",
+    "desc": "Avtomobil elektr tizimlarida elektromagnit moslashuvchanlikni tahlil qilish usullari va talablari."
   }
 ]
