@@ -1,162 +1,122 @@
 [
   {
     "id": 1,
-    "name_uz": "GOST 30805.22-2013: Maishiy va shunga o‘xshash qurilmalar uchun radioto‘lqinli shovqin emissiyasi",
-    "name_ru": "ГОСТ 30805.22-2013: Излучение радиопомех бытовых и аналогичных приборов",
+    "name": "GOST 30805.22-2013: Maishiy va shunga o‘xshash qurilmalar uchun radioto‘lqinli shovqin emissiyasi",
     "file": "/standards/GOST 30805.22-2013.pdf",
-    "desc_uz": "Bu standart maishiy va sanoat qurilmalarining radioto‘lqinli shovqin emissiyasini o‘lchash va baholash tartibini belgilaydi.",
-    "desc_ru": "Стандарт устанавливает методы измерения и оценки радиопомех, создаваемых бытовыми и промышленными устройствами."
+    "desc": "Bu standart maishiy va sanoat qurilmalarining radioto‘lqinli shovqin emissiyasini o‘lchash va baholash tartibini belgilaydi."
   },
   {
     "id": 2,
-    "name_uz": "GOST CISPR 14-1-2022: Maishiy apparatlar va o‘xshash qurilmalar uchun shovqin emissiyasi",
-    "name_ru": "ГОСТ CISPR 14-1-2022: Радиопомехи от бытовых приборов и аналогичного оборудования",
+    "name": "GOST CISPR 14-1-2022: Maishiy apparatlar, asbob-uskunalar va o‘xshash qurilmalar uchun shovqin emissiyasi",
     "file": "/standards/GOST CISPR 14-1-2022.pdf",
-    "desc_uz": "Maishiy va shunga o‘xshash apparatlarning o‘tkazilgan hamda nurlangan elektromagnit shovqinlarini cheklash usullarini belgilaydi.",
-    "desc_ru": "Определяет методы ограничения проводимых и излучаемых электромагнитных помех от бытовых приборов."
+    "desc": "Bu standart maishiy va shunga o‘xshash apparatlarning o‘tkazilgan va nurlangan elektromagnit shovqinlarini cheklash usullarini belgilaydi."
   },
   {
     "id": 3,
-    "name_uz": "GOST CISPR 15-2014: Yoritish qurilmalarining elektromagnit moslashuvchanligi",
-    "name_ru": "ГОСТ CISPR 15-2014: Электромагнитная совместимость осветительного оборудования",
+    "name": "GOST CISPR 15-2014: Yorug‘lik beruvchi qurilmalarning elektromagnit moslashuvchanligi",
     "file": "/standards/GOST CISPR 15-2014.pdf",
-    "desc_uz": "Yoritish moslamalari, LED va gazrazryadli chiroqlarning elektromagnit emissiya va immunitet talablarini belgilaydi.",
-    "desc_ru": "Определяет требования по электромагнитным излучениям и устойчивости для светильников, светодиодных и газоразрядных ламп."
+    "desc": "Yoritish moslamalari, LED va gazrazryadli chiroqlarning elektromagnit emissiya va immunitet talablarini belgilaydi."
   },
   {
     "id": 4,
-    "name_uz": "GOST CISPR 16-2-1-2015: O‘lchov usullari va sinov sharoitlari",
-    "name_ru": "ГОСТ CISPR 16-2-1-2015: Методы измерений и условия испытаний",
+    "name": "GOST CISPR 16-2-1-2015: O‘lchov usullari va sinov muhitlari",
     "file": "/standards/GOST CISPR 16-2-1-2015.pdf",
-    "desc_uz": "Elektromagnit shovqinlarni o‘lchash uchun o‘lchov vositalari, sinov tartiblar va sharoitlarni belgilaydi.",
-    "desc_ru": "Устанавливает средства измерений, процедуры и условия для проведения измерений электромагнитных помех."
+    "desc": "Elektromagnit shovqinlarni o‘lchash uchun uskunalar, tartiblar va sharoitlar bo‘yicha talablarni keltiradi."
   },
   {
     "id": 5,
-    "name_uz": "GOST CISPR 16-2-3-2016: Radioto‘lqinli shovqinlarni o‘lchash usullari",
-    "name_ru": "ГОСТ CISPR 16-2-3-2016: Методы измерений радиопомех",
+    "name": "GOST CISPR 16-2-3-2016: Radioto‘lqinli shovqinlarni o‘lchash usullari",
     "file": "/standards/GOST CISPR 16-2-3-2016.pdf",
-    "desc_uz": "Radioto‘lqinli shovqinlarni o‘lchashda qo‘llaniladigan sinov joylari, metodlar va o‘lchov asboblarini belgilaydi.",
-    "desc_ru": "Определяет испытательные площадки, методы и приборы для измерения радиопомех."
+    "desc": "Radioto‘lqinli shovqinlarni o‘lchashda qo‘llaniladigan sinov joylari, metodlar va o‘lchov asboblarini belgilaydi."
   },
   {
     "id": 6,
-    "name_uz": "GOST CISPR 16-4-2-2013: O‘lchov noaniqligi va baholash usullari",
-    "name_ru": "ГОСТ CISPR 16-4-2-2013: Методы оценки неопределенности измерений",
+    "name": "GOST CISPR 16-4-2-2013: O‘lchov noaniqligi va baholash usullari",
     "file": "/standards/GOST CISPR 16-4-2-2013.pdf",
-    "desc_uz": "O‘lchov noaniqliklarini hisoblash va hisobotda ko‘rsatish bo‘yicha ko‘rsatmalarni o‘z ichiga oladi.",
-    "desc_ru": "Содержит указания по оценке и представлению неопределенности измерений."
+    "desc": "O‘lchov noaniqliklarini hisoblash, tahlil qilish va hisobotda aks ettirish bo‘yicha ko‘rsatmalarni o‘z ichiga oladi."
   },
   {
     "id": 7,
-    "name_uz": "OOH №10: Elektromagnit moslashuvchanlik asosiy tushunchalari",
-    "name_ru": "ООН №10: Основные понятия электромагнитной совместимости",
+    "name": "OOH № 10: Elektromagnit moslashuvchanlik asosiy tushunchalari",
     "file": "/standards/OOH № 10.pdf",
-    "desc_uz": "Elektromagnit moslashuvchanlik bo‘yicha asosiy atamalar, ta’riflar va qo‘llanish sohasini belgilaydi.",
-    "desc_ru": "Определяет основные термины, определения и область применения в области ЭМС."
+    "desc": "Elektromagnit moslashuvchanlik bo‘yicha asosiy atamalar, ta’riflar va qo‘llanish sohasini belgilaydi."
   },
   {
     "id": 8,
-    "name_uz": "O‘z DSt 1033-2013: Sinov laboratoriyalari uchun umumiy talablar",
-    "name_ru": "O‘z DSt 1033-2013: Общие требования к испытательным лабораториям",
+    "name": "O‘z DSt 1033-2013: Sinov laboratoriyalari uchun umumiy talablar",
     "file": "/standards/Oz DSt 1033-2013.pdf",
-    "desc_uz": "Sinov laboratoriyalarining tashkil etilishi, sifat tizimi va natijalar ishonchliligini ta’minlash talablarini belgilaydi.",
-    "desc_ru": "Устанавливает требования к организации, системе качества и надежности результатов испытательных лабораторий."
+    "desc": "Sinov laboratoriyalarining tashkil etilishi, sifat tizimi va sinov natijalari ishonchliligini ta’minlash talablarini belgilaydi."
   },
   {
     "id": 9,
-    "name_uz": "O‘z DSt 1187-2008: Elektr jihozlarining xavfsizligi",
-    "name_ru": "O‘z DSt 1187-2008: Безопасность электрического оборудования",
+    "name": "O‘z DSt 1187-2008: Elektr jihozlarining xavfsizligi",
     "file": "/standards/Oz DSt 1187-2008.pdf",
-    "desc_uz": "Elektr jihozlarining xavfsiz ishlashini ta’minlash bo‘yicha talablar va sinov usullarini belgilaydi.",
-    "desc_ru": "Устанавливает требования и методы испытаний для обеспечения безопасной эксплуатации электрического оборудования."
+    "desc": "Elektr jihozlarining xavfsiz ishlashini ta’minlash bo‘yicha talablar va sinov usullarini belgilaydi."
   },
   {
     "id": 10,
-    "name_uz": "O‘z DSt 2821-2014: Elektr tarmoqlari va uskunalar uchun elektromagnit muvofiqlik",
-    "name_ru": "O‘z DSt 2821-2014: Электромагнитная совместимость электроустановок и оборудования",
+    "name": "O‘z DSt 2821-2014: Elektr tarmoqlari va uskunalar uchun elektromagnit muvofiqlik",
     "file": "/standards/Oz DSt 2821-2014.pdf",
-    "desc_uz": "Elektr tarmoqlaridagi elektromagnit moslashuvchanlikni ta’minlash tartiblarini belgilaydi.",
-    "desc_ru": "Определяет порядок обеспечения электромагнитной совместимости в электрических сетях."
+    "desc": "Elektr tarmoqlaridagi elektromagnit moslashuvchanlikni ta’minlash choralari va sinov tartiblarini belgilaydi."
   },
   {
     "id": 11,
-    "name_uz": "O‘zMSt IEC 61000-4-2: Elektrostattik razryadga chidamlilik sinovlari",
-    "name_ru": "O‘zMSt IEC 61000-4-2: Испытания на устойчивость к электростатическим разрядам",
-    "file": "/standards/OzMSt IEC 61000-4-2-2023.pdf",
-    "desc_uz": "Qurilmalarni elektrostattik razryadlarga nisbatan sinovdan o‘tkazish tartibini belgilaydi.",
-    "desc_ru": "Определяет методы испытаний оборудования на устойчивость к электростатическим разрядам."
+    "name": "O‘zMSt IEC 61000-4-2: Elektrostattik razryadga chidamlilik",
+    "file": "/standards/OzMst IEC 61000-4-2-2023.pdf",
+    "desc": "Qurilmalarni elektrostattik razryadlarga nisbatan sinovdan o‘tkazish tartibini belgilaydi."
   },
   {
     "id": 12,
-    "name_uz": "O‘zMSt IEC 61000-4-3: Radioto‘lqinli elektromagnit maydonlarga chidamlilik sinovlari",
-    "name_ru": "O‘zMSt IEC 61000-4-3: Испытания на устойчивость к радиочастотным электромагнитным полям",
+    "name": "O‘zMSt IEC 61000-4-3: Radioto‘lqinli elektromagnit maydonlarga chidamlilik",
     "file": "/standards/OzMSt IEC 61000-4-3-2023.pdf",
-    "desc_uz": "Elektron qurilmalarning radioto‘lqinli elektromagnit maydonlarga nisbatan chidamliligini baholaydi.",
-    "desc_ru": "Оценивает устойчивость электронных устройств к радиочастотным электромагнитным полям."
+    "desc": "Elektron qurilmalarning radioto‘lqinli elektromagnit maydonlarga nisbatan chidamliligini baholash usuli."
   },
   {
     "id": 13,
-    "name_uz": "O‘zMSt IEC 61000-4-4: Tez o‘tuvchi impulsli shovqinlarga chidamlilik",
-    "name_ru": "O‘zMSt IEC 61000-4-4: Устойчивость к быстропереходным импульсным помехам (EFT/Burst)",
+    "name": "O‘zMSt IEC 61000-4-4: Tez o‘tuvchi impulsli shovqinlarga chidamlilik",
     "file": "/standards/OzMSt IEC 61000-4-4-2023.pdf",
-    "desc_uz": "Qurilmalarning impulsli shovqinlarga chidamliligini aniqlash uchun sinov shartlarini belgilaydi.",
-    "desc_ru": "Определяет условия испытаний оборудования на устойчивость к быстропереходным импульсным помехам."
+    "desc": "Qurilmalarning impulsli shovqinlarga chidamliligini aniqlash uchun sinov shartlarini ko‘rsatadi."
   },
   {
     "id": 14,
-    "name_uz": "O‘zMSt IEC 61000-4-5: Tok va kuchlanishning ortiqcha to‘lqinlariga chidamlilik",
-    "name_ru": "O‘zMSt IEC 61000-4-5: Устойчивость к импульсным перенапряжениям (Surge)",
+    "name": "O‘zMSt IEC 61000-4-5: Tok va kuchlanishning ortiqcha to‘lqinlariga chidamlilik",
     "file": "/standards/OzMSt IEC 61000-4-5-2023.pdf",
-    "desc_uz": "Qurilmalarning kuchlanish ortishi (surge) holatlarida himoya darajasini aniqlovchi sinovlarni belgilaydi.",
-    "desc_ru": "Определяет испытания оборудования на устойчивость к импульсным перенапряжениям."
+    "desc": "Qurilmalarning kuchlanish ortishi (surge) holatlarida himoya darajasini aniqlovchi sinovlar."
   },
   {
     "id": 15,
-    "name_uz": "O‘zMSt IEC 61000-4-6: O‘tkazilgan radiochastotali signallarga chidamlilik",
-    "name_ru": "O‘zMSt IEC 61000-4-6: Устойчивость к наведённым радиочастотным помехам",
+    "name": "O‘zMSt IEC 61000-4-6: O‘tkazilgan radiochastotali signallarga chidamlilik",
     "file": "/standards/OzMSt IEC 61000-4-6-2023.pdf",
-    "desc_uz": "Qurilmalarga o‘tkazilgan radiochastotali shovqinlarning ta’sirini o‘rganish tartibini belgilaydi.",
-    "desc_ru": "Определяет методы испытаний оборудования на воздействие наведённых радиочастотных помех."
+    "desc": "Qurilmalarga o‘tkazilgan radiochastotali shovqinlarning ta’sirini o‘rganish tartibini belgilaydi."
   },
   {
     "id": 16,
-    "name_uz": "O‘zMSt IEC 61000-4-11: Kuchlanish pasayishi va qisqa uzilishlarga chidamlilik",
-    "name_ru": "O‘zMSt IEC 61000-4-11: Устойчивость к провалам и кратковременным перерывам напряжения",
+    "name": "O‘zMSt IEC 61000-4-11: Kuchlanish pasayishi, qisqa uzilishlar va tebranishlarga chidamlilik",
     "file": "/standards/OzMst IEC 61000-4-11-2023.pdf",
-    "desc_uz": "Qurilmalarning kuchlanish pasayishi va qisqa uzilishlarga nisbatan barqarorligini baholash tartibi.",
-    "desc_ru": "Определяет испытания оборудования на устойчивость к провалам, перерывам и колебаниям напряжения."
+    "desc": "Qurilmalarning kuchlanishning vaqtincha pasayishi va uzilishlariga nisbatan barqarorligini baholash tartibi."
   },
   {
     "id": 17,
-    "name_uz": "O‘zMSt IEC 61000-3-2: Tarmoqdagi tok garmonikalari chegaralari",
-    "name_ru": "O‘zMSt IEC 61000-3-2: Пределы гармонических составляющих тока, создаваемых оборудованием",
+    "name": "O‘zMSt IEC 61000-3-2-2023: Avtomobillar uchun elektromagnit moslashuvchanlik tahlili",
     "file": "/standards/OzMSt IEC 61000-3-2-2023.pdf",
-    "desc_uz": "Elektr jihozlari tomonidan tarmoqqa kiritiladigan tok garmonikalari chegaralarini belgilaydi.",
-    "desc_ru": "Определяет допустимые уровни гармонических токов, создаваемых оборудованием, подключаемым к сети."
+    "desc": "Avtomobil elektr tizimlarida elektromagnit moslashuvchanlikni tahlil qilish usullari va talablari."
   },
-  {
+    {
     "id": 18,
-    "name_uz": "O‘z DSt 1032-2010: Elektromagnit moslashuvchanlik. Umumiy talablar",
-    "name_ru": "O‘z DSt 1032-2010: Электромагнитная совместимость. Общие требования",
+    "name": "O‘z DSt 1032-2010: Avtomobillar uchun elektromagnit moslashuvchanlik tahlili",
     "file": "/standards/Oz DSt 1032-2010.pdf",
-    "desc_uz": "Elektromagnit moslashuvchanlikning umumiy tamoyillari va qo‘llanilish sohasini belgilaydi.",
-    "desc_ru": "Определяет общие принципы и область применения стандартов электромагнитной совместимости."
+    "desc": "Avtomobil elektr tizimlarida elektromagnit moslashuvchanlikni tahlil qilish usullari va talablari."
   },
-  {
+    {
     "id": 19,
-    "name_uz": "O‘zMSt IEC 61000-3-3: Kuchlanish tebranishlari va miltillash cheklovlari",
-    "name_ru": "O‘zMSt IEC 61000-3-3: Ограничение колебаний напряжения и фликера",
+    "name": "O‘zMSt IEC 61000-3-3-2023: Avtomobillar uchun elektromagnit moslashuvchanlik tahlili",
     "file": "/standards/OzMSt IEC 61000-3-3-2023.pdf",
-    "desc_uz": "Kuchlanishning tebranishi va yorug‘lik manbalaridagi miltillash darajasini cheklash talablarini belgilaydi.",
-    "desc_ru": "Устанавливает пределы колебаний напряжения и фликера, создаваемых оборудованием."
+    "desc": "Avtomobil elektr tizimlarida elektromagnit moslashuvchanlikni tahlil qilish usullari va talablari."
   },
-  {
+    {
     "id": 20,
-    "name_uz": "O‘zMSt IEC 62764-1-2025: Avtomobillar uchun elektromagnit moslashuvchanlik tahlili",
-    "name_ru": "O‘zMSt IEC 62764-1-2025: Анализ электромагнитной совместимости в автомобильных системах",
+    "name": "O‘zMSt IEC 62764-1-2025: Avtomobillar uchun elektromagnit moslashuvchanlik tahlili",
     "file": "/standards/OzMSt IEC 62764-1-2025.pdf",
-    "desc_uz": "Avtomobil elektr tizimlarida elektromagnit moslashuvchanlikni tahlil qilish usullari va talablari.",
-    "desc_ru": "Определяет методы анализа и оценки электромагнитной совместимости в автомобильных электрических системах."
+    "desc": "Avtomobil elektr tizimlarida elektromagnit moslashuvchanlikni tahlil qilish usullari va talablari."
   }
 ]
