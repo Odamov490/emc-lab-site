@@ -1,462 +1,864 @@
 // src/components/ApplicationChat.jsx
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   collection,
-  query,
-  orderBy,
-  limit,
-  onSnapshot,
   addDoc,
+  onSnapshot,
+  orderBy,
+  query,
   serverTimestamp,
+  doc,
+  updateDoc,
 } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db } from "../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db, storage } from "../firebase";
 
-const storage = getStorage(); // default app uchun
+/**
+ * KICHIK UI KOMPONENTLAR
+ */
+function Chip({ children, className = "" }) {
+  return (
+    <span
+      className={
+        "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium bg-sky-50 text-sky-700 border border-sky-100 " +
+        className
+      }
+    >
+      {children}
+    </span>
+  );
+}
 
-// Yordamchi: vaqtni chiroyli formatlash
-function formatTime(ts) {
-  try {
-    if (!ts) return "";
-    const d = ts.toDate ? ts.toDate() : ts;
-    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  } catch {
-    return "";
+function IconButton({ children, title, onClick, className = "", disabled }) {
+  return (
+    <button
+      type="button"
+      title={title}
+      onClick={onClick}
+      disabled={disabled}
+      className={
+        "inline-flex h-9 w-9 items-center justify-center rounded-xl border border-black/5 bg-white/70 hover:bg-black/5 text-sm disabled:opacity-50 " +
+        className
+      }
+    >
+      {children}
+    </button>
+  );
+}
+
+function TextButton({ children, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="text-[11px] text-sky-600 hover:text-sky-800 hover:underline"
+    >
+      {children}
+    </button>
+  );
+}
+
+/**
+ * Xabar turi bo‘yicha ko‘rinish
+ */
+function MessageContent({ msg }) {
+  const { kind, text, fileUrl, fileName } = msg;
+
+  if (kind === "image" && fileUrl) {
+    return (
+      <div className="space-y-1">
+        {text && <div className="whitespace-pre-wrap text-sm">{text}</div>}
+        <img
+          src={fileUrl}
+          alt={fileName || "image"}
+          className="max-h-64 rounded-xl border border-black/10 object-cover"
+        />
+      </div>
+    );
   }
+
+  if ((kind === "video" || kind === "audio") && fileUrl) {
+    const isAudio = kind === "audio";
+    return (
+      <div className="space-y-1">
+        {text && <div className="whitespace-pre-wrap text-sm">{text}</div>}
+        {isAudio ? (
+          <audio controls className="w-full">
+            <source src={fileUrl} />
+          </audio>
+        ) : (
+          <video controls className="rounded-xl max-h-64 w-full">
+            <source src={fileUrl} />
+          </video>
+        )}
+        {fileName && (
+          <a
+            href={fileUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="text-[11px] text-sky-600 hover:underline"
+          >
+            {fileName}
+          </a>
+        )}
+      </div>
+    );
+  }
+
+  if (kind === "file" && fileUrl) {
+    return (
+      <div className="space-y-1">
+        {text && <div className="whitespace-pre-wrap text-sm">{text}</div>}
+        <a
+          href={fileUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center gap-2 rounded-lg border border-black/10 bg-white/50 px-3 py-2 text-xs hover:bg-black/5"
+        >
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-sky-100 text-sky-700 text-xs font-semibold">
+            📎
+          </span>
+          <span className="truncate">{fileName || "Faylni ochish"}</span>
+        </a>
+      </div>
+    );
+  }
+
+  // Oddiy text
+  return <div className="whitespace-pre-wrap text-sm">{text}</div>;
 }
 
-// Yordamchi: fayl turini aniqlash
-function detectType(file) {
-  if (!file || !file.type) return "file";
-  if (file.type.startsWith("image/")) return "image";
-  if (file.type.startsWith("audio/")) return "audio";
-  if (file.type.startsWith("video/")) return "video";
-  return "file";
-}
+/**
+ * EMOJI REAKSIYALAR
+ */
+const REACTION_EMOJIS = ["👍", "😀", "✅", "❗"];
 
-export default function ApplicationChat({ me, roomId = "global" }) {
+/**
+ * ASOSIY CHAT KOMPONENT
+ * props: me { id, fullname, photoUrl, role, username }
+ */
+export default function ApplicationChat({ me }) {
+  const [rooms, setRooms] = useState([]);
+  const [activeRoomId, setActiveRoomId] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
+
+  const [loadingRooms, setLoadingRooms] = useState(true);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+
+  const [newRoomName, setNewRoomName] = useState("");
+  const [newRoomDesc, setNewRoomDesc] = useState("");
+  const [showNewRoom, setShowNewRoom] = useState(false);
+
+  const [messageText, setMessageText] = useState("");
   const [sending, setSending] = useState(false);
 
   const [uploading, setUploading] = useState(false);
+  const [uploadInfo, setUploadInfo] = useState("");
+
+  const [search, setSearch] = useState("");
+  const [replyTo, setReplyTo] = useState(null);
+
+  const [pinnedHidden, setPinnedHidden] = useState(false);
+
+  const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  // pinned banner
-  const [showPinned, setShowPinned] = useState(true);
-
-  // audio recording
-  const [recording, setRecording] = useState(false);
-  const [recordSeconds, setRecordSeconds] = useState(0);
-  const recordIntervalRef = useRef(null);
-  const mediaRecorderRef = useRef(null);
-  const audioChunksRef = useRef([]);
-
-  const bottomRef = useRef(null);
-
-  // === Real-time xabarlar ===
+  /** ====== XONALAR (chatRooms) ni real-time olish ====== */
   useEffect(() => {
-    const q = query(
-      collection(db, "messages"),
-      orderBy("createdAt", "asc"),
-      limit(300)
+    const qRooms = query(
+      collection(db, "chatRooms"),
+      orderBy("createdAt", "asc")
     );
-
-    const unsub = onSnapshot(q, (snap) => {
-      const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      setMessages(list);
-      // scroll to bottom
-      setTimeout(() => {
-        if (bottomRef.current) {
-          bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    const unsub = onSnapshot(
+      qRooms,
+      (snap) => {
+        const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        setRooms(list);
+        setLoadingRooms(false);
+        // Agar aktiv xona tanlanmagan bo‘lsa — birinchisini tanlaymiz
+        if (!activeRoomId && list.length > 0) {
+          setActiveRoomId(list[0].id);
         }
-      }, 50);
-    });
-
+      },
+      (err) => {
+        console.error("chatRooms snapshot error:", err);
+        setLoadingRooms(false);
+      }
+    );
     return () => unsub();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // === Text yuborish ===
-  const sendText = async (e) => {
-    e?.preventDefault();
-    if (!me) return;
-    const text = input.trim();
-    if (!text) return;
+  /** ====== XONA O‘ZGARGANDA — xabarlarni olish ====== */
+  useEffect(() => {
+    if (!activeRoomId) {
+      setMessages([]);
+      return;
+    }
+    setLoadingMessages(true);
+    setPinnedHidden(false); // xona almashganda pinned banner qayta ko‘rinsin
+
+    const qMsgs = query(
+      collection(db, "chatRooms", activeRoomId, "messages"),
+      orderBy("createdAt", "asc")
+    );
+
+    const unsub = onSnapshot(
+      qMsgs,
+      (snap) => {
+        const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        setMessages(list);
+        setLoadingMessages(false);
+      },
+      (err) => {
+        console.error("messages snapshot error:", err);
+        setLoadingMessages(false);
+      }
+    );
+
+    return () => unsub();
+  }, [activeRoomId]);
+
+  /** ====== Scroll to bottom ====== */
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+  }, [messages, activeRoomId]);
+
+  const activeRoom = useMemo(
+    () => rooms.find((r) => r.id === activeRoomId) || null,
+    [rooms, activeRoomId]
+  );
+
+  const pinnedMessage = useMemo(() => {
+    if (!activeRoom?.pinnedMessageId) return null;
+    return messages.find((m) => m.id === activeRoom.pinnedMessageId) || null;
+  }, [activeRoom, messages]);
+
+  /** ====== Yangi xona yaratish ====== */
+  const handleCreateRoom = async (e) => {
+    e.preventDefault();
+    if (!newRoomName.trim() || !me) return;
+    try {
+      const docRef = await addDoc(collection(db, "chatRooms"), {
+        name: newRoomName.trim(),
+        description: newRoomDesc.trim() || "",
+        createdAt: serverTimestamp(),
+        createdBy: me.id,
+        createdByName: me.fullname,
+        pinnedMessageId: null,
+      });
+      setNewRoomName("");
+      setNewRoomDesc("");
+      setShowNewRoom(false);
+      setActiveRoomId(docRef.id);
+    } catch (err) {
+      console.error("create room error:", err);
+      alert("Xona yaratishda xatolik!");
+    }
+  };
+
+  /** ====== Xabar yuborish (text + reply + (fayl bo‘lmasa)) ====== */
+  const handleSend = async () => {
+    const text = messageText.trim();
+    if (!activeRoomId || !me) return;
+    if (!text && !replyTo) return; // faylsiz bo‘lsa, faqat text/reply bilan yuboramiz
 
     setSending(true);
     try {
-      await addDoc(collection(db, "messages"), {
-        roomId,
-        type: "text",
+      const msgBody = {
         text,
+        kind: "text",
+        senderId: me.id,
+        senderName: me.fullname,
+        senderPhoto: me.photoUrl || "",
         createdAt: serverTimestamp(),
-        userId: me.id,
-        userName: me.fullname || me.username || "Noma’lum",
-        userPhoto: me.photoUrl || "",
-      });
-      setInput("");
+        reactions: {},
+      };
+
+      if (replyTo) {
+        msgBody.replyTo = {
+          id: replyTo.id,
+          senderName: replyTo.senderName,
+          preview:
+            (replyTo.text || replyTo.fileName || "")
+              .toString()
+              .slice(0, 120) || "Xabar",
+        };
+      }
+
+      await addDoc(collection(db, "chatRooms", activeRoomId, "messages"), msgBody);
+
+      // room yangilash: lastMessage, lastMessageAt
+      if (activeRoomId) {
+        try {
+          await updateDoc(doc(db, "chatRooms", activeRoomId), {
+            lastMessageText: text || "Reply",
+            lastMessageAt: serverTimestamp(),
+          });
+        } catch (e) {
+          // optional
+        }
+      }
+
+      setMessageText("");
+      setReplyTo(null);
     } catch (err) {
-      console.error(err);
-      alert("Xabar yuborishda xato bo‘ldi");
+      console.error("send message error:", err);
+      alert("Xabar yuborishda xato!");
     } finally {
       setSending(false);
     }
   };
 
-  // === Fayl yuborish (rasm, video, pdf va h.k.) ===
-  const handleFilePick = () => {
-    if (fileInputRef.current) fileInputRef.current.click();
-  };
-
+  /** ====== Fayl tanlash (image / video / audio / file) ====== */
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
-    if (!file || !me) return;
+    if (!file || !activeRoomId || !me) return;
+
     setUploading(true);
+    setUploadInfo("Yuklanmoqda: " + file.name);
 
     try {
-      const path = `chatUploads/${roomId}/${me.id}/${Date.now()}_${file.name}`;
+      const path = `chatUploads/${activeRoomId}/${Date.now()}_${file.name}`;
       const storageRef = ref(storage, path);
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
 
-      const msgType = detectType(file);
+      let kind = "file";
+      if (file.type.startsWith("image/")) kind = "image";
+      else if (file.type.startsWith("video/")) kind = "video";
+      else if (file.type.startsWith("audio/")) kind = "audio";
 
-      await addDoc(collection(db, "messages"), {
-        roomId,
-        type: msgType,
+      const msgBody = {
+        text: messageText.trim(), // caption bo‘lishi mumkin
+        kind,
         fileUrl: url,
         fileName: file.name,
-        fileType: file.type,
+        senderId: me.id,
+        senderName: me.fullname,
+        senderPhoto: me.photoUrl || "",
         createdAt: serverTimestamp(),
-        userId: me.id,
-        userName: me.fullname || me.username || "Noma’lum",
-        userPhoto: me.photoUrl || "",
-      });
+        reactions: {},
+      };
+
+      if (replyTo) {
+        msgBody.replyTo = {
+          id: replyTo.id,
+          senderName: replyTo.senderName,
+          preview:
+            (replyTo.text || replyTo.fileName || "")
+              .toString()
+              .slice(0, 120) || "Xabar",
+        };
+      }
+
+      await addDoc(collection(db, "chatRooms", activeRoomId, "messages"), msgBody);
+
+      // room yangilash
+      try {
+        await updateDoc(doc(db, "chatRooms", activeRoomId), {
+          lastMessageText:
+            msgBody.text || (kind === "image" ? "Rasm" : kind.toUpperCase()),
+          lastMessageAt: serverTimestamp(),
+        });
+      } catch (e) {
+        // optional
+      }
+
+      setMessageText("");
+      setReplyTo(null);
+      e.target.value = "";
+      setUploadInfo("Yuklandi: " + file.name);
+      setTimeout(() => setUploadInfo(""), 1500);
     } catch (err) {
-      console.error(err);
-      alert("Fayl yuborishda xato bo‘ldi");
+      console.error("file upload error:", err);
+      alert("Fayl yuklashda xato!");
     } finally {
       setUploading(false);
-      e.target.value = "";
     }
   };
 
-  // === Audio (ovoza) yozish ===
-  const startRecording = async () => {
-    if (recording) {
-      // to‘xtatamiz
-      mediaRecorderRef.current?.stop();
-      return;
-    }
-
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      alert("Sizning brauzeringiz audio yozishni qo‘llamaydi.");
-      return;
-    }
-
+  /** ====== Reaksiya toggle ====== */
+  const toggleReaction = async (msg, emoji) => {
+    if (!activeRoomId || !me) return;
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mr = new MediaRecorder(stream);
-      mediaRecorderRef.current = mr;
-      audioChunksRef.current = [];
-
-      mr.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          audioChunksRef.current.push(e.data);
-        }
-      };
-
-      mr.onstop = async () => {
-        // recording timer to‘xtatish
-        clearInterval(recordIntervalRef.current);
-        setRecordSeconds(0);
-        setRecording(false);
-
-        const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-        if (blob.size === 0) return;
-
-        try {
-          setUploading(true);
-          const path = `chatUploads/${roomId}/${me.id}/audio_${Date.now()}.webm`;
-          const storageRef = ref(storage, path);
-          await uploadBytes(storageRef, blob);
-          const url = await getDownloadURL(storageRef);
-
-          await addDoc(collection(db, "messages"), {
-            roomId,
-            type: "audio",
-            fileUrl: url,
-            fileName: `audio_${new Date().toLocaleString()}.webm`,
-            fileType: "audio/webm",
-            createdAt: serverTimestamp(),
-            userId: me.id,
-            userName: me.fullname || me.username || "Noma’lum",
-            userPhoto: me.photoUrl || "",
-          });
-        } catch (err) {
-          console.error(err);
-          alert("Audio yuborishda xato bo‘ldi");
-        } finally {
-          setUploading(false);
-        }
-
-        // stream’ni to‘xtatish
-        stream.getTracks().forEach((t) => t.stop());
-      };
-
-      // start
-      mr.start();
-      setRecording(true);
-      setRecordSeconds(0);
-      recordIntervalRef.current = setInterval(() => {
-        setRecordSeconds((s) => s + 1);
-      }, 1000);
+      const current = msg.reactions || {};
+      const users = new Set(current[emoji] || []);
+      if (users.has(me.id)) {
+        users.delete(me.id);
+      } else {
+        users.add(me.id);
+      }
+      const updated = { ...current, [emoji]: Array.from(users) };
+      await updateDoc(
+        doc(db, "chatRooms", activeRoomId, "messages", msg.id),
+        { reactions: updated }
+      );
     } catch (err) {
-      console.error(err);
-      alert("Mikrofonga ruxsat berilmadi yoki xato yuz berdi.");
+      console.error("toggle reaction error:", err);
     }
   };
 
-  const formatSeconds = (sec) => {
-    const m = Math.floor(sec / 60)
-      .toString()
-      .padStart(2, "0");
-    const s = (sec % 60).toString().padStart(2, "0");
-    return `${m}:${s}`;
+  /** ====== Pin / Unpin ====== */
+  const pinMessage = async (msg) => {
+    if (!activeRoomId) return;
+    try {
+      await updateDoc(doc(db, "chatRooms", activeRoomId), {
+        pinnedMessageId: msg.id,
+      });
+      setPinnedHidden(false);
+    } catch (err) {
+      console.error("pin error:", err);
+    }
   };
 
-  // === UI: bitta xabar bubbleni chizish ===
-  const renderMessage = (m) => {
-    const isMe = m.userId === me?.id;
-    const base =
-      "relative max-w-[70%] rounded-2xl px-3 py-2 text-sm shadow-sm";
+  const unpinMessage = async () => {
+    if (!activeRoomId) return;
+    try {
+      await updateDoc(doc(db, "chatRooms", activeRoomId), {
+        pinnedMessageId: null,
+      });
+    } catch (err) {
+      console.error("unpin error:", err);
+    }
+  };
 
-    let bubbleClass = isMe
-      ? "bg-sky-600 text-white rounded-br-sm"
-      : "bg-white text-gray-900 rounded-bl-sm border border-black/5";
-    const alignClass = isMe ? "justify-end" : "justify-start";
+  /** ====== Qidiruv bo‘yicha filtrlangan xabarlar ====== */
+  const visibleMessages = useMemo(() => {
+    if (!search.trim()) return messages;
+    const q = search.toLowerCase();
+    return messages.filter((m) => {
+      const t = (m.text || "").toLowerCase();
+      const s = (m.senderName || "").toLowerCase();
+      const f = (m.fileName || "").toLowerCase();
+      return t.includes(q) || s.includes(q) || f.includes(q);
+    });
+  }, [messages, search]);
 
-    return (
-      <div key={m.id} className={`flex gap-2 mb-2 ${alignClass}`}>
-        {!isMe && (
-          <div className="mt-5 h-7 w-7 shrink-0 rounded-full bg-gray-200 overflow-hidden">
-            {m.userPhoto ? (
+  /** ====== Xona nomining bosh harfini avatar sifatida ====== */
+  const roomInitial = (room) =>
+    (room?.name || "C")[0]?.toUpperCase?.() || "C";
+
+  /** ====== Sana format ====== */
+  const formatTime = (ts) => {
+    try {
+      const d = ts?.toDate ? ts.toDate() : null;
+      if (!d) return "";
+      return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    } catch {
+      return "";
+    }
+  };
+
+  return (
+    <div className="h-[600px] rounded-3xl border border-black/10 bg-gradient-to-br from-sky-50 via-white to-indigo-50 shadow-lg overflow-hidden flex text-sm">
+      {/* LEFT SIDEBAR: Xonalar */}
+      <div className="w-64 border-r border-black/10 bg-white/70 backdrop-blur flex flex-col">
+        <div className="px-4 pt-3 pb-2 border-b border-black/10 flex items-center justify-between">
+          <div>
+            <div className="text-xs text-gray-500">Messenger</div>
+            <div className="text-sm font-semibold">Lab chat xonalari</div>
+          </div>
+          <IconButton
+            title="Yangi xona"
+            onClick={() => setShowNewRoom(true)}
+          >
+            +
+          </IconButton>
+        </div>
+
+        {loadingRooms ? (
+          <div className="flex-1 grid place-items-center text-xs text-gray-500">
+            Xonalar yuklanmoqda...
+          </div>
+        ) : rooms.length === 0 ? (
+          <div className="flex-1 grid place-items-center text-xs text-gray-500 p-3 text-center">
+            Hozircha chat xonalari yo‘q.
+            <br />
+            Yuqoridagi + tugmasi bilan yangi xona yarating.
+          </div>
+        ) : (
+          <div className="flex-1 overflow-y-auto py-2">
+            {rooms.map((room) => {
+              const isActive = room.id === activeRoomId;
+              return (
+                <button
+                  key={room.id}
+                  onClick={() => setActiveRoomId(room.id)}
+                  className={
+                    "w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-sky-50/80 " +
+                    (isActive ? "bg-sky-50/80" : "")
+                  }
+                >
+                  <div className="h-8 w-8 rounded-2xl bg-gradient-to-br from-sky-400 to-cyan-400 text-white text-xs font-semibold grid place-items-center shadow-sm">
+                    {roomInitial(room)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1">
+                      <div className="text-xs font-semibold truncate">
+                        {room.name}
+                      </div>
+                      {room.pinnedMessageId && (
+                        <span className="text-[11px]">📌</span>
+                      )}
+                    </div>
+                    {room.lastMessageText && (
+                      <div className="text-[11px] text-gray-500 truncate">
+                        {room.lastMessageText}
+                      </div>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Hozirgi foydalanuvchi pastda */}
+        <div className="border-t border-black/10 px-3 py-2 flex items-center gap-2 bg-white/80">
+          <div className="h-7 w-7 rounded-full bg-black/5 overflow-hidden grid place-items-center">
+            {me?.photoUrl ? (
               <img
-                src={m.userPhoto}
+                src={me.photoUrl}
                 alt=""
                 className="h-7 w-7 object-cover"
               />
             ) : (
-              <div className="h-full w-full grid place-items-center text-[10px]">
-                👤
-              </div>
+              <span className="text-xs">👤</span>
             )}
           </div>
-        )}
-
-        <div className="flex flex-col items-start">
-          <div className="text-[10px] text-gray-500 mb-0.5 px-1">
-            {isMe ? "Siz" : m.userName || "Noma’lum"}
-          </div>
-
-          <div className={`${base} ${bubbleClass}`}>
-            {/* matn / media / audio */}
-            {m.type === "text" && <div className="whitespace-pre-wrap">{m.text}</div>}
-
-            {m.type === "image" && m.fileUrl && (
-              <div className="space-y-1">
-                <img
-                  src={m.fileUrl}
-                  alt={m.fileName || ""}
-                  className="max-h-64 rounded-xl object-cover"
-                />
-                {m.fileName && (
-                  <div className="text-[10px] opacity-80 break-all">
-                    {m.fileName}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {m.type === "video" && m.fileUrl && (
-              <div className="space-y-1">
-                <video
-                  controls
-                  src={m.fileUrl}
-                  className="max-h-64 rounded-xl"
-                />
-                {m.fileName && (
-                  <div className="text-[10px] opacity-80 break-all">
-                    {m.fileName}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {m.type === "audio" && m.fileUrl && (
-              <div className="space-y-1">
-                <audio controls src={m.fileUrl} className="w-52" />
-                {m.fileName && (
-                  <div className="text-[10px] opacity-80 break-all">
-                    {m.fileName}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {m.type === "file" && m.fileUrl && (
-              <a
-                href={m.fileUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 text-xs underline break-all"
-              >
-                📎 {m.fileName || "Faylni ochish"}
-              </a>
-            )}
-
-            <div
-              className={`mt-1 text-[10px] ${
-                isMe ? "text-sky-100/80" : "text-gray-400"
-              } text-right`}
-            >
-              {formatTime(m.createdAt)}
+          <div className="min-w-0">
+            <div className="text-xs font-semibold truncate">
+              {me?.fullname || "Foydalanuvchi"}
+            </div>
+            <div className="text-[10px] text-gray-500 truncate">
+              {me?.role || "user"}
             </div>
           </div>
         </div>
       </div>
-    );
-  };
 
-  return (
-    <div className="flex flex-col h-[520px]">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-black/10 pb-2 mb-2">
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-400 grid place-items-center text-white text-lg">
-            💬
-          </div>
-          <div>
-            <div className="text-sm font-semibold">Ichki chat (Messenger)</div>
-            <div className="text-[11px] text-gray-500">
-              Hodimlar o‘rtasida tezkor yozishmalar
+      {/* RIGHT: Chat oynasi */}
+      <div className="flex-1 flex flex-col bg-gradient-to-br from-sky-50/60 via-white to-indigo-50/60">
+        {/* HEADER */}
+        <div className="h-14 border-b border-black/10 px-4 flex items-center justify-between bg-white/70 backdrop-blur">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-500 text-white text-xs font-semibold grid place-items-center shadow">
+              {roomInitial(activeRoom)}
             </div>
-          </div>
-        </div>
-        <div className="text-[11px] text-gray-400">
-          Global xona: <span className="font-mono">{roomId}</span>
-        </div>
-      </div>
-
-      {/* Pinned banner */}
-      {showPinned && (
-        <div className="mb-2 flex items-start justify-between rounded-xl bg-sky-50 border border-sky-100 px-3 py-2 text-[11px] text-sky-900">
-          <div className="pr-2">
-            <div className="font-semibold mb-0.5">📌 Pinned xabar</div>
             <div>
-              Bu chat faqat laboratoriya ichki ishchi yozishmalari uchun.
-              Maxfiy ma’lumotlarni tashqariga ulashmang. Qoidalar buzilganda
-              ogohlantirish berilishi mumkin.
+              <div className="text-sm font-semibold">
+                {activeRoom?.name || "Xona tanlanmagan"}
+              </div>
+              <div className="text-[11px] text-gray-500 truncate max-w-[260px]">
+                {activeRoom?.description || "Umumiy ichki muloqot xonasi"}
+              </div>
             </div>
           </div>
-          <button
-            onClick={() => setShowPinned(false)}
-            className="ml-2 text-xs text-sky-700 hover:text-sky-900"
-            title="Yopish"
-          >
-            ✕
-          </button>
+          <div className="flex items-center gap-2">
+            <input
+              className="rounded-2xl border border-black/10 bg-white/70 px-3 py-1.5 text-[11px] w-40 focus:outline-none focus:ring-1 focus:ring-sky-400"
+              placeholder="Chat ichida qidirish"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
         </div>
-      )}
 
-      {/* Xabarlar ro‘yxati */}
-      <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar">
-        {messages.length === 0 && (
-          <div className="h-full flex items-center justify-center text-xs text-gray-400">
-            Hozircha xabar yo‘q. Birinchi bo‘lib yozib ko‘ring 🙂
+        {/* PINNED BANNER */}
+        {activeRoom && pinnedMessage && !pinnedHidden && (
+          <div className="px-4 pt-2">
+            <div className="flex items-start gap-2 rounded-2xl border border-amber-200 bg-amber-50/60 px-3 py-2 text-[11px] text-amber-900">
+              <span className="mt-0.5">📌</span>
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="font-semibold text-[11px]">
+                    Pinned xabar — {pinnedMessage.senderName}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <TextButton onClick={() => setPinnedHidden(true)}>
+                      Yopish
+                    </TextButton>
+                    <TextButton onClick={unpinMessage}>Unpin</TextButton>
+                  </div>
+                </div>
+                <div className="line-clamp-2">
+                  <MessageContent msg={pinnedMessage} />
+                </div>
+              </div>
+            </div>
           </div>
         )}
-        {messages.map(renderMessage)}
-        <div ref={bottomRef} />
-      </div>
 
-      {/* Pastki panel: input + tugmalar */}
-      <form onSubmit={sendText} className="mt-2 pt-2 border-t border-black/10">
-        {/* Audio recording indikator */}
-        {recording && (
-          <div className="mb-2 flex items-center gap-2 text-[11px] text-red-600">
-            <span className="inline-flex h-2 w-2 rounded-full bg-red-500 animate-ping" />
-            <span className="inline-flex h-2 w-2 rounded-full bg-red-500" />
-            <span>Yozilmoqda... {formatSeconds(recordSeconds)}</span>
+        {/* MESSAGES LIST */}
+        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
+          {loadingMessages && (
+            <div className="text-xs text-gray-500 text-center mt-4">
+              Xabarlar yuklanmoqda...
+            </div>
+          )}
+
+          {!loadingMessages && visibleMessages.length === 0 && (
+            <div className="text-xs text-gray-400 text-center mt-8">
+              Hozircha xabar yo‘q. Birinchi bo‘lib yozib ko‘ring 😊
+            </div>
+          )}
+
+          {visibleMessages.map((msg) => {
+            const isMe = msg.senderId === me?.id;
+            const bubbleAlign = isMe ? "items-end" : "items-start";
+            const bubbleBg = isMe
+              ? "bg-sky-500 text-white"
+              : "bg-white text-gray-900";
+            const bubbleExtra = isMe ? "rounded-br-sm" : "rounded-bl-sm";
+
+            const reactions = msg.reactions || {};
+            const hasReactions = Object.keys(reactions).length > 0;
+
+            return (
+              <div
+                key={msg.id}
+                className={`flex flex-col ${bubbleAlign} gap-1`}
+              >
+                {/* Reply preview (bu xabar kimnidir javobi bo‘lsa) */}
+                {msg.replyTo && (
+                  <div className="max-w-[70%] text-[10px] text-gray-500 border border-dashed border-gray-200 bg-white/60 rounded-xl px-2 py-1 mb-0.5">
+                    <div className="font-semibold text-[10px]">
+                      Javob: {msg.replyTo.senderName}
+                    </div>
+                    <div className="line-clamp-2">
+                      {msg.replyTo.preview || "Xabar"}
+                    </div>
+                  </div>
+                )}
+
+                {/* Bubble */}
+                <div className="flex items-end gap-2 max-w-[80%]">
+                  {!isMe && (
+                    <div className="h-7 w-7 rounded-full bg-black/5 overflow-hidden grid place-items-center">
+                      {msg.senderPhoto ? (
+                        <img
+                          src={msg.senderPhoto}
+                          alt=""
+                          className="h-7 w-7 object-cover"
+                        />
+                      ) : (
+                        <span className="text-[11px]">
+                          {msg.senderName?.[0] || "👤"}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  <div
+                    className={
+                      "rounded-2xl px-3 py-2 shadow-sm border border-black/5 text-xs " +
+                      bubbleBg +
+                      " " +
+                      bubbleExtra
+                    }
+                  >
+                    <div className="flex items-center justify-between gap-2 mb-0.5">
+                      <div className="font-semibold text-[11px]">
+                        {msg.senderName}
+                      </div>
+                      <div className="text-[9px] opacity-80">
+                        {formatTime(msg.createdAt)}
+                      </div>
+                    </div>
+                    <MessageContent msg={msg} />
+
+                    {/* Reaksiyalar */}
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="flex gap-1">
+                        {REACTION_EMOJIS.map((emoji) => {
+                          const userList = reactions[emoji] || [];
+                          const active = userList.includes(me?.id);
+                          const count = userList.length;
+                          return (
+                            <button
+                              key={emoji}
+                              type="button"
+                              onClick={() => toggleReaction(msg, emoji)}
+                              className={
+                                "h-6 px-1.5 rounded-full border text-[10px] flex items-center gap-1 " +
+                                (active
+                                  ? "bg-sky-600 text-white border-sky-600"
+                                  : "bg-black/5 text-gray-700 border-black/10")
+                              }
+                            >
+                              <span>{emoji}</span>
+                              {count > 0 && <span>{count}</span>}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <div className="flex-1" />
+                      <div className="flex gap-1">
+                        <TextButton onClick={() => setReplyTo(msg)}>
+                          Reply
+                        </TextButton>
+                        <TextButton onClick={() => pinMessage(msg)}>
+                          📌 Pin
+                        </TextButton>
+                      </div>
+                    </div>
+                  </div>
+                  {isMe && (
+                    <div className="h-7 w-7 rounded-full bg-black/5 overflow-hidden grid place-items-center">
+                      {me?.photoUrl ? (
+                        <img
+                          src={me.photoUrl}
+                          alt=""
+                          className="h-7 w-7 object-cover"
+                        />
+                      ) : (
+                        <span className="text-[11px]">
+                          {me?.fullname?.[0] || "👤"}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* REPLY BAR */}
+        {replyTo && (
+          <div className="px-4 pb-1">
+            <div className="flex items-center justify-between gap-2 rounded-2xl border border-sky-200 bg-sky-50/70 px-3 py-1.5 text-[11px]">
+              <div className="flex items-start gap-2">
+                <span>↩️</span>
+                <div>
+                  <div className="font-semibold text-[11px]">
+                    {replyTo.senderName} xabariga javob
+                  </div>
+                  <div className="line-clamp-1 text-gray-600">
+                    {(replyTo.text ||
+                      replyTo.fileName ||
+                      "Xabar")?.toString()}
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setReplyTo(null)}
+                className="text-[11px] text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* INPUT AREA */}
+        <div className="border-t border-black/10 bg-white/80 backdrop-blur px-4 py-2">
+          {uploadInfo && (
+            <div className="text-[11px] text-gray-500 mb-1 flex items-center gap-2">
+              <span className="inline-block h-2 w-2 rounded-full bg-sky-400 animate-pulse" />
+              {uploadInfo}
+            </div>
+          )}
+          <div className="flex items-end gap-2">
+            <IconButton
+              title="Fayl (rasm, video, audio, hujjat)"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={!activeRoomId || uploading}
+            >
+              📎
+            </IconButton>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*,video/*,audio/*,application/pdf,.doc,.docx,.xls,.xlsx,.zip"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+
+            <div className="flex-1">
+              <textarea
+                rows={1}
+                value={messageText}
+                onChange={(e) => setMessageText(e.target.value)}
+                placeholder={
+                  activeRoom
+                    ? `${activeRoom.name} xonasiga xabar yozing...`
+                    : "Avval chat xonasini tanlang"
+                }
+                className="w-full max-h-32 rounded-2xl border border-black/10 bg-white/80 px-3 py-2 text-xs resize-none focus:outline-none focus:ring-1 focus:ring-sky-400"
+              />
+            </div>
             <button
               type="button"
-              onClick={startRecording}
-              className="ml-auto rounded-full border border-red-500 px-2 py-[2px] text-[11px] text-red-600 hover:bg-red-50"
+              onClick={handleSend}
+              disabled={!activeRoomId || sending || (!messageText.trim() && !replyTo)}
+              className="inline-flex items-center gap-1 rounded-2xl bg-gradient-to-r from-sky-600 to-cyan-500 px-4 py-2 text-xs font-medium text-white shadow hover:opacity-90 disabled:opacity-50"
             >
-              To‘xtatish
+              {sending ? "Yuborilmoqda..." : "Yuborish"}
+              <span>➤</span>
             </button>
           </div>
-        )}
-
-        <div className="flex items-end gap-2">
-          <button
-            type="button"
-            onClick={handleFilePick}
-            className="h-9 w-9 shrink-0 rounded-full border border-black/10 grid place-items-center text-lg hover:bg-black/5"
-            title="Media / fayl yuborish"
-          >
-            📎
-          </button>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            className="hidden"
-            onChange={handleFileChange}
-            accept="image/*,video/*,audio/*,application/pdf"
-          />
-
-          <textarea
-            className="flex-1 max-h-24 min-h-[36px] rounded-2xl border border-black/15 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 resize-none"
-            placeholder="Xabar yozing..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                sendText();
-              }
-            }}
-          />
-
-          <button
-            type="button"
-            onClick={startRecording}
-            className={`h-9 w-9 shrink-0 rounded-full grid place-items-center text-lg border ${
-              recording
-                ? "border-red-500 bg-red-50 text-red-600"
-                : "border-black/10 hover:bg-black/5"
-            }`}
-            title="Ovozli xabar"
-          >
-            🎙️
-          </button>
-
-          <button
-            type="submit"
-            disabled={sending || (!input.trim() && !uploading)}
-            className="h-9 px-4 shrink-0 rounded-full bg-sky-600 text-white text-sm font-medium hover:bg-sky-700 disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {sending ? "Yuborilmoqda..." : "Yuborish"}
-          </button>
         </div>
+      </div>
 
-        {uploading && (
-          <div className="mt-1 text-[11px] text-gray-500">
-            Fayl yuborilmoqda...
+      {/* YANGI XONA MODALI */}
+      {showNewRoom && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="w-full max-w-sm rounded-2xl bg-white shadow-lg border border-black/10 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-semibold">Yangi chat xonasi</div>
+              <button
+                className="text-xs text-gray-500 hover:text-gray-800"
+                onClick={() => setShowNewRoom(false)}
+              >
+                ✕
+              </button>
+            </div>
+            <form onSubmit={handleCreateRoom} className="space-y-3 text-xs">
+              <div>
+                <div className="mb-1 font-medium">Xona nomi</div>
+                <input
+                  value={newRoomName}
+                  onChange={(e) => setNewRoomName(e.target.value)}
+                  className="w-full rounded-xl border border-black/10 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-sky-400"
+                  placeholder="Masalan: Laboratoriya ichki"
+                  required
+                />
+              </div>
+              <div>
+                <div className="mb-1 font-medium">Izoh (ixtiyoriy)</div>
+                <textarea
+                  value={newRoomDesc}
+                  onChange={(e) => setNewRoomDesc(e.target.value)}
+                  className="w-full rounded-xl border border-black/10 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-sky-400"
+                  rows={2}
+                  placeholder="Masalan: EMC laboratoriya xodimlari uchun ichki muloqot"
+                />
+              </div>
+              <div className="flex items-center justify-end gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setShowNewRoom(false)}
+                  className="rounded-xl border border-black/10 px-3 py-1.5 text-xs hover:bg-black/5"
+                >
+                  Bekor qilish
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-3 py-1.5 text-xs font-medium hover:opacity-90"
+                >
+                  Yaratish
+                </button>
+              </div>
+            </form>
           </div>
-        )}
-      </form>
+        </div>
+      )}
     </div>
   );
 }
