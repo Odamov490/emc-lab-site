@@ -1,6 +1,7 @@
 // src/pages/Login.jsx (enhanced + Standartlar)
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import ApplicationChat from "../components/ApplicationChat";
 import { db } from "../firebase";
 import {
   collection, query, where, getDocs, addDoc, onSnapshot,
@@ -38,7 +39,7 @@ const T = {
   uz: {
     title:"Kirish", username:"Login", password:"Parol", signIn:"Kirish", wrong:"Login yoki parol noto‘g‘ri",
     loading:"Yuklanmoqda...", dashboard:"Boshqaruv paneli", logout:"Chiqish", hello:"Salom", role:"Roli",
-    profile:"Profil", activity:"Faollik", employees:"Hodimlar", standards:"Standartlar",
+    profile:"Profil", activity:"Faollik", employees:"Hodimlar", standards:"Standartlar",chat:"Chat",
     combo:"Arizalar & Harakat", stats:"Statistika", total:"Jami", inprog:"Jarayonda", done:"Sinov tugatildi",
     canceled:"Bekor qilindi", payyes:"To‘lov bor", payno:"To‘lov yo‘q",
     newApp:"Yangi ariza", appNum:"Ariza raqami", org:"Organ Sertifikatsiya", product:"Mahsulot",
@@ -58,7 +59,7 @@ const T = {
   ru: {
     title:"Вход", username:"Логин", password:"Пароль", signIn:"Войти", wrong:"Логин или пароль неверны",
     loading:"Загрузка...", dashboard:"Панель", logout:"Выйти", hello:"Здравствуйте", role:"Роль",
-    profile:"Профиль", activity:"Лента", employees:"Сотрудники", standards:"Стандарты",
+    profile:"Профиль", activity:"Лента", employees:"Сотрудники", standards:"Стандарты",chat:"Чат",
     combo:"Заявки & Движение", stats:"Статистика", total:"Всего", inprog:"В процессе", done:"Завершено",
     canceled:"Отменено", payyes:"Оплачено", payno:"Без оплаты",
     newApp:"Новая заявка", appNum:"№ заявки", org:"Орган сертиф.", product:"Изделие",
@@ -74,6 +75,7 @@ const T = {
     stdTitle:"Каталог стандартов", stdHint:"Положите файлы в /public/standards/ и заполните index.json",
     stdRefresh:"Обновить", stdDownload:"Скачать", stdOpenFolder:"Открыть папку", stdCount:"Всего файлов",
     stdBadJson:"index.json поврежден или неполный", stdEmpty:"Пока нет стандартов",
+  
   }
 };
 
@@ -377,28 +379,93 @@ export default function Login(){
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 py-6 grid md:grid-cols-[230px_1fr] gap-6">
-        {/* Sidebar */}
-        <Card className="p-0 overflow-hidden">
-          <div className="p-4 border-b border-black/10">
-            <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-full bg-black/10 grid place-items-center overflow-hidden">
-                {me.photoUrl ? <img src={me.photoUrl} alt="" className="h-12 w-12 object-cover"/> : <span className="text-sm">👤</span>}
-              </div>
-              <div>
-                <div className="font-semibold">{t.hello}, {me.fullname}</div>
-                <div className="text-xs text-gray-500">{t.role}: {me.role}</div>
-              </div>
-            </div>
-          </div>
-          <nav className="p-2">
-            <button onClick={()=>setTab("combo")} className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${tab==="combo"?"bg-black/5 font-semibold":""}`}>{t.combo}</button>
-            <button onClick={()=>setTab("profile")} className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${tab==="profile"?"bg-black/5 font-semibold":""}`}>{t.profile}</button>
-            {me.role==="admin" && <button onClick={()=>setTab("employees")} className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${tab==="employees"?"bg-black/5 font-semibold":""}`}>{t.employees}</button>}
-            <button onClick={()=>setTab("activity")} className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${tab==="activity"?"bg-black/5 font-semibold":""}`}>{t.activity}</button>
-            {/* NEW: Standards button */}
-            <button onClick={()=>setTab("standards")} className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${tab==="standards"?"bg-black/5 font-semibold":""}`}>{t.standards}</button>
-          </nav>
-        </Card>
+    {/* Sidebar */}
+<Card className="p-0 overflow-hidden">
+  <div className="p-4 border-b border-black/10">
+    <div className="flex items-center gap-3">
+      <div className="h-12 w-12 rounded-full bg-black/10 grid place-items-center overflow-hidden">
+        {me.photoUrl ? (
+          <img src={me.photoUrl} alt="" className="h-12 w-12 object-cover" />
+        ) : (
+          <span className="text-sm">👤</span>
+        )}
+      </div>
+      <div>
+        <div className="font-semibold">
+          {t.hello}, {me.fullname}
+        </div>
+        <div className="text-xs text-gray-500">
+          {t.role}: {me.role}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav className="p-2">
+    {/* ARIZALAR & HARAKAT */}
+    <button
+      onClick={() => setTab("combo")}
+      className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${
+        tab === "combo" ? "bg-black/5 font-semibold" : ""
+      }`}
+    >
+      {t.combo}
+    </button>
+
+    {/* PROFILE */}
+    <button
+      onClick={() => setTab("profile")}
+      className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${
+        tab === "profile" ? "bg-black/5 font-semibold" : ""
+      }`}
+    >
+      {t.profile}
+    </button>
+
+    {/* EMPLOYEES (Adminlarga) */}
+    {me.role === "admin" && (
+      <button
+        onClick={() => setTab("employees")}
+        className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${
+          tab === "employees" ? "bg-black/5 font-semibold" : ""
+        }`}
+      >
+        {t.employees}
+      </button>
+    )}
+
+    {/* FAOLLIK */}
+    <button
+      onClick={() => setTab("activity")}
+      className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${
+        tab === "activity" ? "bg-black/5 font-semibold" : ""
+      }`}
+    >
+      {t.activity}
+    </button>
+
+    {/* YANGI – CHAT */}
+    <button
+      onClick={() => setTab("chat")}
+      className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${
+        tab === "chat" ? "bg-black/5 font-semibold" : ""
+      }`}
+    >
+      {t.chat}
+    </button>
+
+    {/* STANDARDS */}
+    <button
+      onClick={() => setTab("standards")}
+      className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${
+        tab === "standards" ? "bg-black/5 font-semibold" : ""
+      }`}
+    >
+      {t.standards}
+    </button>
+  </nav>
+</Card>
+
 
         {/* Main */}
         <div className="space-y-6">
@@ -720,7 +787,16 @@ export default function Login(){
                 ))}
               </div>
             </Card>
-          )}
+          ) }
+
+{/* CHAT */}
+{tab === "chat" && (
+  <Card>
+      <ApplicationChat me={me} />
+  </Card>
+)}
+
+
         </div>
       </div>
     </div>
