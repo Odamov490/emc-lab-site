@@ -16,19 +16,6 @@ import { db, storage } from "../firebase";
 /**
  * KICHIK UI KOMPONENTLAR
  */
-function Chip({ children, className = "" }) {
-  return (
-    <span
-      className={
-        "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium bg-sky-50 text-sky-700 border border-sky-100 " +
-        className
-      }
-    >
-      {children}
-    </span>
-  );
-}
-
 function IconButton({ children, title, onClick, className = "", disabled }) {
   return (
     <button
@@ -46,12 +33,13 @@ function IconButton({ children, title, onClick, className = "", disabled }) {
   );
 }
 
-function TextButton({ children, onClick }) {
+function TextButton({ children, onClick, disabled }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="text-[11px] text-sky-600 hover:text-sky-800 hover:underline"
+      disabled={disabled}
+      className="text-[11px] text-sky-600 hover:text-sky-800 hover:underline disabled:opacity-50"
     >
       {children}
     </button>
@@ -96,7 +84,7 @@ function MessageContent({ msg }) {
             href={fileUrl}
             target="_blank"
             rel="noreferrer"
-            className="text-[11px] text-sky-600 hover:underline"
+            className="text-[11px] text-sky-100 underline"
           >
             {fileName}
           </a>
@@ -138,70 +126,76 @@ const REACTION_EMOJIS = ["👍", "😀", "✅", "❗"];
  * props: me { id, fullname, photoUrl, role, username }
  */
 export default function ApplicationChat({ me }) {
-  const [rooms, setRooms] = useState([]);
-  const [activeRoomId, setActiveRoomId] = useState(null);
+  const [employees, setEmployees] = useState([]);
   const [messages, setMessages] = useState([]);
-
-  const [loadingRooms, setLoadingRooms] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(false);
 
-  const [newRoomName, setNewRoomName] = useState("");
-  const [newRoomDesc, setNewRoomDesc] = useState("");
-  const [showNewRoom, setShowNewRoom] = useState(false);
-
+  const [search, setSearch] = useState("");
   const [messageText, setMessageText] = useState("");
   const [sending, setSending] = useState(false);
 
   const [uploading, setUploading] = useState(false);
   const [uploadInfo, setUploadInfo] = useState("");
 
-  const [search, setSearch] = useState("");
   const [replyTo, setReplyTo] = useState(null);
+
+  const [activeEmployee, setActiveEmployee] = useState(null); // null => umumiy chat
 
   const [pinnedHidden, setPinnedHidden] = useState(false);
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  /** ====== XONALAR (chatRooms) ni real-time olish ====== */
+  // Voice recording
+  const mediaRecorderRef = useRef(null);
+  const chunksRef = useRef([]);
+  const [recording, setRecording] = useState(false);
+  const [recordTimer, setRecordTimer] = useState(0);
+  const recordIntervalRef = useRef(null);
+
+  /** ====== Hodimlar ro‘yxatini olish (employees) ====== */
   useEffect(() => {
-    const qRooms = query(
-      collection(db, "chatRooms"),
-      orderBy("createdAt", "asc")
-    );
+    const qEmp = query(collection(db, "employees"), orderBy("fullname", "asc"));
     const unsub = onSnapshot(
-      qRooms,
+      qEmp,
       (snap) => {
         const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        setRooms(list);
-        setLoadingRooms(false);
-        // Agar aktiv xona tanlanmagan bo‘lsa — birinchisini tanlaymiz
-        if (!activeRoomId && list.length > 0) {
-          setActiveRoomId(list[0].id);
-        }
+        setEmployees(list);
       },
-      (err) => {
-        console.error("chatRooms snapshot error:", err);
-        setLoadingRooms(false);
-      }
+      (err) => console.error("employees snapshot error:", err)
     );
     return () => unsub();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /** ====== XONA O‘ZGARGANDA — xabarlarni olish ====== */
-  useEffect(() => {
-    if (!activeRoomId) {
-      setMessages([]);
-      return;
-    }
-    setLoadingMessages(true);
-    setPinnedHidden(false); // xona almashganda pinned banner qayta ko‘rinsin
+  /** ====== Qaysi chat? umumiymi yoki DM? ====== */
+  const chatKey = useMemo(() => {
+    if (!me) return null;
+    if (!activeEmployee) return "global";
+    const a = me.id;
+    const b = activeEmployee.id;
+    if (!a || !b) return "global";
+    const [minId, maxId] = a < b ? [a, b] : [b, a];
+    return `dm_${minId}_${maxId}`;
+  }, [me, activeEmployee]);
 
-    const qMsgs = query(
-      collection(db, "chatRooms", activeRoomId, "messages"),
-      orderBy("createdAt", "asc")
-    );
+  /** ====== Xabarlarni olish (global yoki DM) ====== */
+  useEffect(() => {
+    if (!chatKey) return;
+    setLoadingMessages(true);
+    setPinnedHidden(false);
+
+    let qMsgs;
+    if (chatKey === "global") {
+      qMsgs = query(
+        collection(db, "chatGlobal"),
+        orderBy("createdAt", "asc")
+      );
+    } else {
+      qMsgs = query(
+        collection(db, "directChats", chatKey, "messages"),
+        orderBy("createdAt", "asc")
+      );
+    }
 
     const unsub = onSnapshot(
       qMsgs,
@@ -217,56 +211,61 @@ export default function ApplicationChat({ me }) {
     );
 
     return () => unsub();
-  }, [activeRoomId]);
+  }, [chatKey]);
 
   /** ====== Scroll to bottom ====== */
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
     }
-  }, [messages, activeRoomId]);
+  }, [messages, chatKey]);
 
-  const activeRoom = useMemo(
-    () => rooms.find((r) => r.id === activeRoomId) || null,
-    [rooms, activeRoomId]
+  /** ====== Pinned xabar ====== */
+  const pinnedMessage = useMemo(
+    () => messages.find((m) => m.pinned) || null,
+    [messages]
   );
 
-  const pinnedMessage = useMemo(() => {
-    if (!activeRoom?.pinnedMessageId) return null;
-    return messages.find((m) => m.id === activeRoom.pinnedMessageId) || null;
-  }, [activeRoom, messages]);
-
-  /** ====== Yangi xona yaratish ====== */
-  const handleCreateRoom = async (e) => {
-    e.preventDefault();
-    if (!newRoomName.trim() || !me) return;
+  /** ====== Sana format ====== */
+  const formatTime = (ts) => {
     try {
-      const docRef = await addDoc(collection(db, "chatRooms"), {
-        name: newRoomName.trim(),
-        description: newRoomDesc.trim() || "",
-        createdAt: serverTimestamp(),
-        createdBy: me.id,
-        createdByName: me.fullname,
-        pinnedMessageId: null,
-      });
-      setNewRoomName("");
-      setNewRoomDesc("");
-      setShowNewRoom(false);
-      setActiveRoomId(docRef.id);
-    } catch (err) {
-      console.error("create room error:", err);
-      alert("Xona yaratishda xatolik!");
+      const d = ts?.toDate ? ts.toDate() : null;
+      if (!d) return "";
+      return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    } catch {
+      return "";
     }
   };
 
-  /** ====== Xabar yuborish (text + reply + (fayl bo‘lmasa)) ====== */
+  /** ====== Ko‘rinadigan xabarlar (qidiruv bo‘yicha) ====== */
+  const visibleMessages = useMemo(() => {
+    if (!search.trim()) return messages;
+    const q = search.toLowerCase();
+    return messages.filter((m) => {
+      const t = (m.text || "").toLowerCase();
+      const s = (m.senderName || "").toLowerCase();
+      const f = (m.fileName || "").toLowerCase();
+      return t.includes(q) || s.includes(q) || f.includes(q);
+    });
+  }, [messages, search]);
+
+  /** ====== Yuboriladigan collecction linki ====== */
+  const getMessagesCollectionRef = () => {
+    if (chatKey === "global") {
+      return collection(db, "chatGlobal");
+    }
+    return collection(db, "directChats", chatKey, "messages");
+  };
+
+  /** ====== Xabar yuborish (matn) ====== */
   const handleSend = async () => {
     const text = messageText.trim();
-    if (!activeRoomId || !me) return;
-    if (!text && !replyTo) return; // faylsiz bo‘lsa, faqat text/reply bilan yuboramiz
+    if (!me || !chatKey) return;
+    if (!text && !replyTo) return;
 
     setSending(true);
     try {
+      const colRef = getMessagesCollectionRef();
       const msgBody = {
         text,
         kind: "text",
@@ -282,26 +281,12 @@ export default function ApplicationChat({ me }) {
           id: replyTo.id,
           senderName: replyTo.senderName,
           preview:
-            (replyTo.text || replyTo.fileName || "")
-              .toString()
-              .slice(0, 120) || "Xabar",
+            (replyTo.text || replyTo.fileName || "").toString().slice(0, 120) ||
+            "Xabar",
         };
       }
 
-      await addDoc(collection(db, "chatRooms", activeRoomId, "messages"), msgBody);
-
-      // room yangilash: lastMessage, lastMessageAt
-      if (activeRoomId) {
-        try {
-          await updateDoc(doc(db, "chatRooms", activeRoomId), {
-            lastMessageText: text || "Reply",
-            lastMessageAt: serverTimestamp(),
-          });
-        } catch (e) {
-          // optional
-        }
-      }
-
+      await addDoc(colRef, msgBody);
       setMessageText("");
       setReplyTo(null);
     } catch (err) {
@@ -312,16 +297,19 @@ export default function ApplicationChat({ me }) {
     }
   };
 
-  /** ====== Fayl tanlash (image / video / audio / file) ====== */
+  /** ====== Fayl yuklash ====== */
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
-    if (!file || !activeRoomId || !me) return;
+    if (!file || !me || !chatKey) return;
 
     setUploading(true);
     setUploadInfo("Yuklanmoqda: " + file.name);
 
     try {
-      const path = `chatUploads/${activeRoomId}/${Date.now()}_${file.name}`;
+      const colRef = getMessagesCollectionRef();
+      const basePath =
+        chatKey === "global" ? "chatUploads/global" : `chatUploads/${chatKey}`;
+      const path = `${basePath}/${Date.now()}_${file.name}`;
       const storageRef = ref(storage, path);
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
@@ -348,25 +336,12 @@ export default function ApplicationChat({ me }) {
           id: replyTo.id,
           senderName: replyTo.senderName,
           preview:
-            (replyTo.text || replyTo.fileName || "")
-              .toString()
-              .slice(0, 120) || "Xabar",
+            (replyTo.text || replyTo.fileName || "").toString().slice(0, 120) ||
+            "Xabar",
         };
       }
 
-      await addDoc(collection(db, "chatRooms", activeRoomId, "messages"), msgBody);
-
-      // room yangilash
-      try {
-        await updateDoc(doc(db, "chatRooms", activeRoomId), {
-          lastMessageText:
-            msgBody.text || (kind === "image" ? "Rasm" : kind.toUpperCase()),
-          lastMessageAt: serverTimestamp(),
-        });
-      } catch (e) {
-        // optional
-      }
-
+      await addDoc(colRef, msgBody);
       setMessageText("");
       setReplyTo(null);
       e.target.value = "";
@@ -380,9 +355,127 @@ export default function ApplicationChat({ me }) {
     }
   };
 
+  /** ====== Voice message: audio blobni Firestore'ga yuborish ====== */
+  const uploadVoiceBlob = async (blob) => {
+    if (!me || !chatKey) return;
+    setUploading(true);
+    setUploadInfo("Ovozli xabar yuklanmoqda...");
+
+    try {
+      const colRef = getMessagesCollectionRef();
+      const basePath =
+        chatKey === "global"
+          ? "voiceMessages/global"
+          : `voiceMessages/${chatKey}`;
+      const fileName = `voice_${Date.now()}.webm`;
+      const storageRef = ref(storage, `${basePath}/${fileName}`);
+
+      await uploadBytes(storageRef, blob);
+      const url = await getDownloadURL(storageRef);
+
+      const msgBody = {
+        text: "",
+        kind: "audio",
+        fileUrl: url,
+        fileName,
+        senderId: me.id,
+        senderName: me.fullname,
+        senderPhoto: me.photoUrl || "",
+        createdAt: serverTimestamp(),
+        reactions: {},
+      };
+
+      if (replyTo) {
+        msgBody.replyTo = {
+          id: replyTo.id,
+          senderName: replyTo.senderName,
+          preview:
+            (replyTo.text || replyTo.fileName || "").toString().slice(0, 120) ||
+            "Xabar",
+        };
+      }
+
+      await addDoc(colRef, msgBody);
+      setReplyTo(null);
+      setUploadInfo("Ovozli xabar yuborildi");
+      setTimeout(() => setUploadInfo(""), 1500);
+    } catch (err) {
+      console.error("voice upload error:", err);
+      alert("Ovozli xabarni yuklashda xato!");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  /** ====== Voice recording bosh/stop ====== */
+  const startRecording = async () => {
+    if (recording) return;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert("Mikrofonga ruxsat yo‘q yoki brauzer qo‘llab-quvvatlamaydi.");
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = recorder;
+      chunksRef.current = [];
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
+
+      recorder.onstop = async () => {
+        try {
+          const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+          chunksRef.current = [];
+          stream.getTracks().forEach((t) => t.stop());
+          if (blob.size > 0) {
+            await uploadVoiceBlob(blob);
+          }
+        } catch (err) {
+          console.error("record stop error:", err);
+        }
+      };
+
+      recorder.start();
+      setRecording(true);
+      setRecordTimer(0);
+      recordIntervalRef.current = setInterval(() => {
+        setRecordTimer((t) => t + 1);
+      }, 1000);
+    } catch (err) {
+      console.error("startRecording error:", err);
+      alert("Mikrofonni ishga tushirib bo‘lmadi.");
+    }
+  };
+
+  const stopRecording = () => {
+    if (!recording) return;
+    try {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+        mediaRecorderRef.current.stop();
+      }
+    } catch (err) {
+      console.error("stopRecording error:", err);
+    }
+    setRecording(false);
+    clearInterval(recordIntervalRef.current);
+    recordIntervalRef.current = null;
+  };
+
+  useEffect(() => {
+    return () => {
+      // cleanup
+      if (recordIntervalRef.current) clearInterval(recordIntervalRef.current);
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+        mediaRecorderRef.current.stop();
+      }
+    };
+  }, []);
+
   /** ====== Reaksiya toggle ====== */
   const toggleReaction = async (msg, emoji) => {
-    if (!activeRoomId || !me) return;
+    if (!me || !chatKey) return;
     try {
       const current = msg.reactions || {};
       const users = new Set(current[emoji] || []);
@@ -392,10 +485,11 @@ export default function ApplicationChat({ me }) {
         users.add(me.id);
       }
       const updated = { ...current, [emoji]: Array.from(users) };
-      await updateDoc(
-        doc(db, "chatRooms", activeRoomId, "messages", msg.id),
-        { reactions: updated }
-      );
+      const msgRef =
+        chatKey === "global"
+          ? doc(db, "chatGlobal", msg.id)
+          : doc(db, "directChats", chatKey, "messages", msg.id);
+      await updateDoc(msgRef, { reactions: updated });
     } catch (err) {
       console.error("toggle reaction error:", err);
     }
@@ -403,11 +497,23 @@ export default function ApplicationChat({ me }) {
 
   /** ====== Pin / Unpin ====== */
   const pinMessage = async (msg) => {
-    if (!activeRoomId) return;
+    if (!chatKey) return;
     try {
-      await updateDoc(doc(db, "chatRooms", activeRoomId), {
-        pinnedMessageId: msg.id,
-      });
+      const currentPinned = messages.find((m) => m.pinned);
+      const colRef = getMessagesCollectionRef();
+      // old pinnedni olib tashlaymiz
+      if (currentPinned) {
+        const oldRef =
+          chatKey === "global"
+            ? doc(db, "chatGlobal", currentPinned.id)
+            : doc(db, "directChats", chatKey, "messages", currentPinned.id);
+        await updateDoc(oldRef, { pinned: false });
+      }
+      const msgRef =
+        chatKey === "global"
+          ? doc(db, "chatGlobal", msg.id)
+          : doc(db, "directChats", chatKey, "messages", msg.id);
+      await updateDoc(msgRef, { pinned: true });
       setPinnedHidden(false);
     } catch (err) {
       console.error("pin error:", err);
@@ -415,118 +521,118 @@ export default function ApplicationChat({ me }) {
   };
 
   const unpinMessage = async () => {
-    if (!activeRoomId) return;
+    if (!chatKey) return;
     try {
-      await updateDoc(doc(db, "chatRooms", activeRoomId), {
-        pinnedMessageId: null,
-      });
+      const currentPinned = messages.find((m) => m.pinned);
+      if (!currentPinned) return;
+      const msgRef =
+        chatKey === "global"
+          ? doc(db, "chatGlobal", currentPinned.id)
+          : doc(db, "directChats", chatKey, "messages", currentPinned.id);
+      await updateDoc(msgRef, { pinned: false });
     } catch (err) {
       console.error("unpin error:", err);
     }
   };
 
-  /** ====== Qidiruv bo‘yicha filtrlangan xabarlar ====== */
-  const visibleMessages = useMemo(() => {
-    if (!search.trim()) return messages;
-    const q = search.toLowerCase();
-    return messages.filter((m) => {
-      const t = (m.text || "").toLowerCase();
-      const s = (m.senderName || "").toLowerCase();
-      const f = (m.fileName || "").toLowerCase();
-      return t.includes(q) || s.includes(q) || f.includes(q);
-    });
-  }, [messages, search]);
+  /** ====== Umumiy / DM sarlavha va izoh ====== */
+  const headerTitle = activeEmployee
+    ? activeEmployee.fullname
+    : "Umumiy chat (barcha hodimlar)";
 
-  /** ====== Xona nomining bosh harfini avatar sifatida ====== */
-  const roomInitial = (room) =>
-    (room?.name || "C")[0]?.toUpperCase?.() || "C";
+  const headerSubtitle = activeEmployee
+    ? "Shaxsiy xabar almashish (DM)"
+    : "Laboratoriya ichki umumiy muloqot xonasi";
 
-  /** ====== Sana format ====== */
-  const formatTime = (ts) => {
-    try {
-      const d = ts?.toDate ? ts.toDate() : null;
-      if (!d) return "";
-      return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    } catch {
-      return "";
-    }
-  };
+  if (!me) {
+    return (
+      <div className="h-[400px] grid place-items-center text-sm text-gray-500">
+        Avval tizimga kiring.
+      </div>
+    );
+  }
 
   return (
     <div className="h-[600px] rounded-3xl border border-black/10 bg-gradient-to-br from-sky-50 via-white to-indigo-50 shadow-lg overflow-hidden flex text-sm">
-      {/* LEFT SIDEBAR: Xonalar */}
-      <div className="w-64 border-r border-black/10 bg-white/70 backdrop-blur flex flex-col">
-        <div className="px-4 pt-3 pb-2 border-b border-black/10 flex items-center justify-between">
-          <div>
-            <div className="text-xs text-gray-500">Messenger</div>
-            <div className="text-sm font-semibold">Lab chat xonalari</div>
-          </div>
-          <IconButton
-            title="Yangi xona"
-            onClick={() => setShowNewRoom(true)}
-          >
-            +
-          </IconButton>
+      {/* LEFT SIDEBAR: Umumiy + Hodimlar */}
+      <div className="w-64 border-r border-black/10 bg-white/75 backdrop-blur flex flex-col">
+        <div className="px-4 pt-3 pb-2 border-b border-black/10">
+          <div className="text-xs text-gray-500">Chat</div>
+          <div className="text-sm font-semibold">EMC Lab messenger</div>
         </div>
 
-        {loadingRooms ? (
-          <div className="flex-1 grid place-items-center text-xs text-gray-500">
-            Xonalar yuklanmoqda...
+        <div className="flex-1 overflow-y-auto py-2">
+          {/* Umumiy chat tugmasi */}
+          <button
+            onClick={() => setActiveEmployee(null)}
+            className={
+              "w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-sky-50/80 " +
+              (!activeEmployee ? "bg-sky-50/80" : "")
+            }
+          >
+            <div className="h-8 w-8 rounded-2xl bg-gradient-to-br from-sky-400 to-cyan-400 text-white text-xs font-semibold grid place-items-center shadow-sm">
+              💬
+            </div>
+            <div className="min-w-0">
+              <div className="text-xs font-semibold truncate">
+                Umumiy chat
+              </div>
+              <div className="text-[10px] text-gray-500 truncate">
+                Barcha hodimlar uchun
+              </div>
+            </div>
+          </button>
+
+          {/* Hodimlar ro‘yxati */}
+          <div className="mt-2 px-3 text-[10px] uppercase tracking-wide text-gray-500">
+            Hodimlar
           </div>
-        ) : rooms.length === 0 ? (
-          <div className="flex-1 grid place-items-center text-xs text-gray-500 p-3 text-center">
-            Hozircha chat xonalari yo‘q.
-            <br />
-            Yuqoridagi + tugmasi bilan yangi xona yarating.
-          </div>
-        ) : (
-          <div className="flex-1 overflow-y-auto py-2">
-            {rooms.map((room) => {
-              const isActive = room.id === activeRoomId;
+          {employees
+            .filter((e) => e.id !== me.id)
+            .map((e) => {
+              const active = activeEmployee?.id === e.id;
               return (
                 <button
-                  key={room.id}
-                  onClick={() => setActiveRoomId(room.id)}
+                  key={e.id}
+                  onClick={() => setActiveEmployee(e)}
                   className={
                     "w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-sky-50/80 " +
-                    (isActive ? "bg-sky-50/80" : "")
+                    (active ? "bg-sky-50/80" : "")
                   }
                 >
-                  <div className="h-8 w-8 rounded-2xl bg-gradient-to-br from-sky-400 to-cyan-400 text-white text-xs font-semibold grid place-items-center shadow-sm">
-                    {roomInitial(room)}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1">
-                      <div className="text-xs font-semibold truncate">
-                        {room.name}
-                      </div>
-                      {room.pinnedMessageId && (
-                        <span className="text-[11px]">📌</span>
-                      )}
-                    </div>
-                    {room.lastMessageText && (
-                      <div className="text-[11px] text-gray-500 truncate">
-                        {room.lastMessageText}
-                      </div>
+                  <div className="h-8 w-8 rounded-full bg-black/5 overflow-hidden grid place-items-center">
+                    {e.photoUrl ? (
+                      <img
+                        src={e.photoUrl}
+                        alt=""
+                        className="h-8 w-8 object-cover"
+                      />
+                    ) : (
+                      <span className="text-xs">
+                        {e.fullname?.[0] || "👤"}
+                      </span>
                     )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs font-semibold truncate">
+                      {e.fullname}
+                    </div>
+                    <div className="text-[10px] text-gray-500 truncate">
+                      {e.role || "Hodim"}
+                    </div>
                   </div>
                 </button>
               );
             })}
-          </div>
-        )}
+        </div>
 
         {/* Hozirgi foydalanuvchi pastda */}
-        <div className="border-t border-black/10 px-3 py-2 flex items-center gap-2 bg-white/80">
+        <div className="border-t border-black/10 px-3 py-2 flex items-center gap-2 bg-white/85">
           <div className="h-7 w-7 rounded-full bg-black/5 overflow-hidden grid place-items-center">
             {me?.photoUrl ? (
-              <img
-                src={me.photoUrl}
-                alt=""
-                className="h-7 w-7 object-cover"
-              />
+              <img src={me.photoUrl} alt="" className="h-7 w-7 object-cover" />
             ) : (
-              <span className="text-xs">👤</span>
+              <span className="text-xs">{me?.fullname?.[0] || "👤"}</span>
             )}
           </div>
           <div className="min-w-0">
@@ -543,17 +649,22 @@ export default function ApplicationChat({ me }) {
       {/* RIGHT: Chat oynasi */}
       <div className="flex-1 flex flex-col bg-gradient-to-br from-sky-50/60 via-white to-indigo-50/60">
         {/* HEADER */}
-        <div className="h-14 border-b border-black/10 px-4 flex items-center justify-between bg-white/70 backdrop-blur">
+        <div className="h-14 border-b border-black/10 px-4 flex items-center justify-between bg-white/80 backdrop-blur">
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-500 text-white text-xs font-semibold grid place-items-center shadow">
-              {roomInitial(activeRoom)}
+              {activeEmployee ? activeEmployee.fullname?.[0] || "👤" : "💬"}
             </div>
             <div>
-              <div className="text-sm font-semibold">
-                {activeRoom?.name || "Xona tanlanmagan"}
+              <div className="flex items-center gap-2">
+                <div className="text-sm font-semibold">{headerTitle}</div>
+                {activeEmployee && (
+                  <span className="text-[10px] rounded-full bg-sky-100 text-sky-700 px-2 py-0.5">
+                    DM
+                  </span>
+                )}
               </div>
               <div className="text-[11px] text-gray-500 truncate max-w-[260px]">
-                {activeRoom?.description || "Umumiy ichki muloqot xonasi"}
+                {headerSubtitle}
               </div>
             </div>
           </div>
@@ -568,7 +679,7 @@ export default function ApplicationChat({ me }) {
         </div>
 
         {/* PINNED BANNER */}
-        {activeRoom && pinnedMessage && !pinnedHidden && (
+        {pinnedMessage && !pinnedHidden && (
           <div className="px-4 pt-2">
             <div className="flex items-start gap-2 rounded-2xl border border-amber-200 bg-amber-50/60 px-3 py-2 text-[11px] text-amber-900">
               <span className="mt-0.5">📌</span>
@@ -704,6 +815,21 @@ export default function ApplicationChat({ me }) {
                         </TextButton>
                       </div>
                     </div>
+
+                    {/* Agar reaksiya bor bo‘lsa, kichkina banda ko‘rsatamiz (ixtiyoriy) */}
+                    {hasReactions && (
+                      <div className="mt-1 flex flex-wrap gap-1 text-[9px] opacity-75">
+                        {Object.entries(reactions).map(([emoji, users]) => (
+                          <span
+                            key={emoji}
+                            className="inline-flex items-center gap-1 rounded-full bg-black/10 px-1.5 py-0.5"
+                          >
+                            <span>{emoji}</span>
+                            <span>{users.length}</span>
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   {isMe && (
                     <div className="h-7 w-7 rounded-full bg-black/5 overflow-hidden grid place-items-center">
@@ -739,9 +865,7 @@ export default function ApplicationChat({ me }) {
                     {replyTo.senderName} xabariga javob
                   </div>
                   <div className="line-clamp-1 text-gray-600">
-                    {(replyTo.text ||
-                      replyTo.fileName ||
-                      "Xabar")?.toString()}
+                    {(replyTo.text || replyTo.fileName || "Xabar")?.toString()}
                   </div>
                 </div>
               </div>
@@ -757,7 +881,7 @@ export default function ApplicationChat({ me }) {
         )}
 
         {/* INPUT AREA */}
-        <div className="border-t border-black/10 bg-white/80 backdrop-blur px-4 py-2">
+        <div className="border-t border-black/10 bg-white/85 backdrop-blur px-4 py-2">
           {uploadInfo && (
             <div className="text-[11px] text-gray-500 mb-1 flex items-center gap-2">
               <span className="inline-block h-2 w-2 rounded-full bg-sky-400 animate-pulse" />
@@ -765,10 +889,11 @@ export default function ApplicationChat({ me }) {
             </div>
           )}
           <div className="flex items-end gap-2">
+            {/* Fayl tanlash */}
             <IconButton
               title="Fayl (rasm, video, audio, hujjat)"
               onClick={() => fileInputRef.current?.click()}
-              disabled={!activeRoomId || uploading}
+              disabled={uploading}
             >
               📎
             </IconButton>
@@ -780,15 +905,35 @@ export default function ApplicationChat({ me }) {
               onChange={handleFileChange}
             />
 
+            {/* Ovozli xabar tugmasi */}
+            <IconButton
+              title="Ovozli xabar"
+              onClick={recording ? stopRecording : startRecording}
+              disabled={uploading}
+              className={
+                recording
+                  ? "border-red-400 bg-red-50 text-red-600"
+                  : "border-black/5"
+              }
+            >
+              {recording ? "⏺" : "🎤"}
+            </IconButton>
+
             <div className="flex-1">
+              {recording && (
+                <div className="text-[11px] text-red-600 mb-0.5 flex items-center gap-1">
+                  <span className="inline-block h-2 w-2 rounded-full bg-red-500 animate-ping" />
+                  Yozilmoqda... {recordTimer}s
+                </div>
+              )}
               <textarea
                 rows={1}
                 value={messageText}
                 onChange={(e) => setMessageText(e.target.value)}
                 placeholder={
-                  activeRoom
-                    ? `${activeRoom.name} xonasiga xabar yozing...`
-                    : "Avval chat xonasini tanlang"
+                  activeEmployee
+                    ? `${activeEmployee.fullname} bilan chat...`
+                    : "Umumiy chatga xabar yozing..."
                 }
                 className="w-full max-h-32 rounded-2xl border border-black/10 bg-white/80 px-3 py-2 text-xs resize-none focus:outline-none focus:ring-1 focus:ring-sky-400"
               />
@@ -796,7 +941,7 @@ export default function ApplicationChat({ me }) {
             <button
               type="button"
               onClick={handleSend}
-              disabled={!activeRoomId || sending || (!messageText.trim() && !replyTo)}
+              disabled={sending || (!messageText.trim() && !replyTo)}
               className="inline-flex items-center gap-1 rounded-2xl bg-gradient-to-r from-sky-600 to-cyan-500 px-4 py-2 text-xs font-medium text-white shadow hover:opacity-90 disabled:opacity-50"
             >
               {sending ? "Yuborilmoqda..." : "Yuborish"}
@@ -805,60 +950,6 @@ export default function ApplicationChat({ me }) {
           </div>
         </div>
       </div>
-
-      {/* YANGI XONA MODALI */}
-      {showNewRoom && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="w-full max-w-sm rounded-2xl bg-white shadow-lg border border-black/10 p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-semibold">Yangi chat xonasi</div>
-              <button
-                className="text-xs text-gray-500 hover:text-gray-800"
-                onClick={() => setShowNewRoom(false)}
-              >
-                ✕
-              </button>
-            </div>
-            <form onSubmit={handleCreateRoom} className="space-y-3 text-xs">
-              <div>
-                <div className="mb-1 font-medium">Xona nomi</div>
-                <input
-                  value={newRoomName}
-                  onChange={(e) => setNewRoomName(e.target.value)}
-                  className="w-full rounded-xl border border-black/10 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-sky-400"
-                  placeholder="Masalan: Laboratoriya ichki"
-                  required
-                />
-              </div>
-              <div>
-                <div className="mb-1 font-medium">Izoh (ixtiyoriy)</div>
-                <textarea
-                  value={newRoomDesc}
-                  onChange={(e) => setNewRoomDesc(e.target.value)}
-                  className="w-full rounded-xl border border-black/10 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-sky-400"
-                  rows={2}
-                  placeholder="Masalan: EMC laboratoriya xodimlari uchun ichki muloqot"
-                />
-              </div>
-              <div className="flex items-center justify-end gap-2 pt-1">
-                <button
-                  type="button"
-                  onClick={() => setShowNewRoom(false)}
-                  className="rounded-xl border border-black/10 px-3 py-1.5 text-xs hover:bg-black/5"
-                >
-                  Bekor qilish
-                </button>
-                <button
-                  type="submit"
-                  className="rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-3 py-1.5 text-xs font-medium hover:opacity-90"
-                >
-                  Yaratish
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
