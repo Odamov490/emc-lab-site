@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ApplicationChat from "../components/ApplicationChat";
-//import IaChat from "../components/ia-chat";
+import AiChat from "../components/Ai-chat";
 
 // ...
 
@@ -11,9 +11,10 @@ import ApplicationChat from "../components/ApplicationChat";
     <Card>
       <ApplicationChat me={me} />
     </Card>
-    <IaChat me={me} />
+    <AiChat me={me} />
   </>
 )}
+
 
 import { db } from "../firebase";
 import {
@@ -52,7 +53,8 @@ const T = {
   uz: {
     title:"Kirish", username:"Login", password:"Parol", signIn:"Kirish", wrong:"Login yoki parol noto‘g‘ri",
     loading:"Yuklanmoqda...", dashboard:"Boshqaruv paneli", logout:"Chiqish", hello:"Salom", role:"Roli",
-    profile:"Profil", activity:"Faollik", employees:"Hodimlar", standards:"Standartlar",chat:"Chat",
+    profile:"Profil", activity:"Faollik", employees:"Hodimlar", standards:"Standartlar",chat:"Chat",aiAssistant: "AI Assistant",
+
     combo:"Arizalar & Harakat", stats:"Statistika", total:"Jami", inprog:"Jarayonda", done:"Sinov tugatildi",
     canceled:"Bekor qilindi", payyes:"To‘lov bor", payno:"To‘lov yo‘q",
     newApp:"Yangi ariza", appNum:"Ariza raqami", org:"Organ Sertifikatsiya", product:"Mahsulot",
@@ -72,7 +74,8 @@ const T = {
   ru: {
     title:"Вход", username:"Логин", password:"Пароль", signIn:"Войти", wrong:"Логин или пароль неверны",
     loading:"Загрузка...", dashboard:"Панель", logout:"Выйти", hello:"Здравствуйте", role:"Роль",
-    profile:"Профиль", activity:"Лента", employees:"Сотрудники", standards:"Стандарты",chat:"Чат",
+    profile:"Профиль", activity:"Лента", employees:"Сотрудники", standards:"Стандарты",chat:"Чат",aiAssistant: "AI Ассистент",
+
     combo:"Заявки & Движение", stats:"Статистика", total:"Всего", inprog:"В процессе", done:"Завершено",
     canceled:"Отменено", payyes:"Оплачено", payno:"Без оплаты",
     newApp:"Новая заявка", appNum:"№ заявки", org:"Орган сертиф.", product:"Изделие",
@@ -480,7 +483,7 @@ export default function Login(){
     </button>
 
 <button
-  onClick={() => setTab("ai")}
+  onClick={() => setTab("iAssistant")}
   className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${
     tab === "ai" ? "bg-black/5 font-semibold" : ""
   }`}
@@ -823,9 +826,9 @@ export default function Login(){
 )}
 
           {/* AI ASSISTENT */}  
-          {tab === "ai" && (
+          {tab === "iAssistant" && (
   <Card>
-    <IaChat me={me} />
+    <AiChat me={me} />
   </Card>
 )}
 

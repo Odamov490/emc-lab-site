@@ -1,4 +1,4 @@
-// src/components/ia-chat.jsx
+// src/components/Ai-chat.jsx
 import React, { useEffect, useRef, useState } from "react";
 
 function IaChat({ me }) {
