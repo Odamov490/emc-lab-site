@@ -2,6 +2,8 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ApplicationChat from "../components/ApplicationChat";
+import AIChat from "../components/AIChat";
+
 import { db } from "../firebase";
 import {
   collection, query, where, getDocs, addDoc, onSnapshot,
@@ -39,7 +41,8 @@ const T = {
   uz: {
     title:"Kirish", username:"Login", password:"Parol", signIn:"Kirish", wrong:"Login yoki parol noto‘g‘ri",
     loading:"Yuklanmoqda...", dashboard:"Boshqaruv paneli", logout:"Chiqish", hello:"Salom", role:"Roli",
-    profile:"Profil", activity:"Faollik", employees:"Hodimlar", standards:"Standartlar",chat:"Chat",
+    profile:"Profil", activity:"Faollik", employees:"Hodimlar", standards:"Standartlar",chat:"Chat",ai: "AI yordamchi",
+
     combo:"Arizalar & Harakat", stats:"Statistika", total:"Jami", inprog:"Jarayonda", done:"Sinov tugatildi",
     canceled:"Bekor qilindi", payyes:"To‘lov bor", payno:"To‘lov yo‘q",
     newApp:"Yangi ariza", appNum:"Ariza raqami", org:"Organ Sertifikatsiya", product:"Mahsulot",
@@ -59,7 +62,8 @@ const T = {
   ru: {
     title:"Вход", username:"Логин", password:"Пароль", signIn:"Войти", wrong:"Логин или пароль неверны",
     loading:"Загрузка...", dashboard:"Панель", logout:"Выйти", hello:"Здравствуйте", role:"Роль",
-    profile:"Профиль", activity:"Лента", employees:"Сотрудники", standards:"Стандарты",chat:"Чат",
+    profile:"Профиль", activity:"Лента", employees:"Сотрудники", standards:"Стандарты",chat:"Чат",ai: "AI assistant",
+
     combo:"Заявки & Движение", stats:"Статистика", total:"Всего", inprog:"В процессе", done:"Завершено",
     canceled:"Отменено", payyes:"Оплачено", payno:"Без оплаты",
     newApp:"Новая заявка", appNum:"№ заявки", org:"Орган сертиф.", product:"Изделие",
@@ -467,6 +471,16 @@ export default function Login(){
     >
       {t.standards}
     </button>
+
+      {/* ❗ AYNAN SHU YERGA QUYAMIZ */}
+  <button
+    onClick={() => setTab("ai")}
+    className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${
+      tab === "ai" ? "bg-black/5 font-semibold" : ""
+    }`}
+  >
+    {t.ai}
+  </button>
   </nav>
 </Card>
 
@@ -797,6 +811,12 @@ export default function Login(){
 {tab === "chat" && (
   <Card>
       <ApplicationChat me={me} />
+  </Card>
+)}
+
+{tab === "ai" && (
+  <Card>
+    <AIChat me={me} />
   </Card>
 )}
 
