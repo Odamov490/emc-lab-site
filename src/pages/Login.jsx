@@ -402,15 +402,6 @@ export default function Login(){
   </div>
 
   <nav className="p-2">
-    {/* ARIZALAR & HARAKAT */}
-    <button
-      onClick={() => setTab("combo")}
-      className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${
-        tab === "combo" ? "bg-black/5 font-semibold" : ""
-      }`}
-    >
-      {t.combo}
-    </button>
 
     {/* PROFILE */}
     <button
@@ -421,6 +412,19 @@ export default function Login(){
     >
       {t.profile}
     </button>
+
+
+
+    {/* ARIZALAR & HARAKAT */}
+    <button
+      onClick={() => setTab("combo")}
+      className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${
+        tab === "combo" ? "bg-black/5 font-semibold" : ""
+      }`}
+    >
+      {t.combo}
+    </button>
+
 
     {/* EMPLOYEES (Adminlarga) */}
     {me.role === "admin" && (
