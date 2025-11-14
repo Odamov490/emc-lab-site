@@ -371,6 +371,15 @@ export default function ApplicationChat({ me }) {
     }
   };
 
+
+  // Enter bosilganda yuborish, Shift+Enter yangi qatordan yozadi
+const handleKeyDown = (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault(); // yangi qatordan tushishini bloklaydi
+    handleSend();       // xabar yuboradi
+  }
+};
+
   /** ====== Fayl yuklash ====== */
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
@@ -1311,17 +1320,19 @@ export default function ApplicationChat({ me }) {
                   Dumaloq video yozilmoqda... {videoRecordTimer}s
                 </div>
               )}
-              <textarea
-                rows={1}
-                value={messageText}
-                onChange={(e) => setMessageText(e.target.value)}
-                placeholder={
-                  activeEmployee
-                    ? `${activeEmployee.fullname} bilan chat...`
-                    : "Umumiy chatga xabar yozing..."
-                }
-                className="w-full max-h-32 rounded-2xl border border-black/10 bg-white/80 px-3 py-2 text-xs resize-none focus:outline-none focus:ring-1 focus:ring-sky-400"
-              />
+          <textarea
+  rows={1}
+  value={messageText}
+  onChange={(e) => setMessageText(e.target.value)}
+  onKeyDown={handleKeyDown}   // 🔥 MUHIM joy
+  placeholder={
+    activeEmployee
+      ? `${activeEmployee.fullname} bilan chat...`
+      : "Umumiy chatga xabar yozing..."
+  }
+  className="w-full max-h-32 rounded-2xl border border-black/10 bg-white/80 px-3 py-2 text-xs resize-none focus:outline-none focus:ring-1 focus:ring-sky-400"
+/>
+
             </div>
             <button
               type="button"
