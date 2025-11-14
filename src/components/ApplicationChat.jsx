@@ -435,118 +435,122 @@ export default function ApplicationChat({ me }) {
   };
 
   /** ====== Voice message: audio blobni Firestore'ga yuborish ====== */
-  const uploadVoiceBlob = async (blob) => {
-    if (!me || !chatKey) return;
-    setUploading(true);
-    setUploadInfo("Ovozli xabar yuklanmoqda...");
+ const uploadVoiceBlob = async (blob) => {
+  if (!me || !chatKey) return;
+  setUploading(true);
+  setUploadInfo("Ovozli xabar yuklanmoqda...");
 
-    try {
-      const colRef = getMessagesCollectionRef();
-      const basePath =
-        chatKey === "global"
-          ? "voiceMessages/global"
-          : `voiceMessages/${chatKey}`;
-      const fileName = `voice_${Date.now()}.webm`;
-      const storageRef = ref(storage, `${basePath}/${fileName}`);
+  try {
+    const colRef = getMessagesCollectionRef();
+    const basePath =
+      chatKey === "global" ? "voices/global" : `voices/${chatKey}`;
+    const fileName = `voice_${Date.now()}.webm`;
+    const storageRef = ref(storage, `${basePath}/${fileName}`);
 
-      await uploadBytes(storageRef, blob);
-      const url = await getDownloadURL(storageRef);
+    await uploadBytes(storageRef, blob);
+    const url = await getDownloadURL(storageRef);
 
-      const msgBody = {
-        text: "",
-        kind: "audio",
-        fileUrl: url,
-        fileName,
-        senderId: me.id,
-        senderName: me.fullname,
-        senderPhoto: me.photoUrl || "",
-        createdAt: serverTimestamp(),
-        reactions: {},
-        seenBy: [me.id],
-      };
+    const msgBody = {
+      text: "",
+      kind: "voice",
+      fileUrl: url,
+      fileName,
+      senderId: me.id,
+      senderName: me.fullname,
+      senderPhoto: me.photoUrl || "",
+      createdAt: serverTimestamp(),
+      reactions: {},
+      seenBy: [me.id],
+    };
 
-      if (chatKey !== "global" && activeEmployee) {
-        msgBody.participants = [me.id, activeEmployee.id];
-      }
-
-      if (replyTo) {
-        msgBody.replyTo = {
-          id: replyTo.id,
-          senderName: replyTo.senderName,
-          preview:
-            (replyTo.text || replyTo.fileName || "").toString().slice(0, 120) ||
-            "Xabar",
-        };
-      }
-
-      await addDoc(colRef, msgBody);
-      setReplyTo(null);
-      setUploadInfo("Ovozli xabar yuborildi");
-      setTimeout(() => setUploadInfo(""), 1500);
-    } catch (err) {
-      console.error("voice upload error:", err);
-      alert("Ovozli xabarni yuklashda xato!");
-    } finally {
-      setUploading(false);
+    if (chatKey !== "global" && activeEmployee) {
+      msgBody.participants = [me.id, activeEmployee.id];
     }
-  };
+
+    if (replyTo) {
+      msgBody.replyTo = {
+        id: replyTo.id,
+        senderName: replyTo.senderName,
+        preview:
+          (replyTo.text || replyTo.fileName || "").toString().slice(0, 120) ||
+          "Xabar",
+      };
+    }
+
+    await addDoc(colRef, msgBody);
+
+    setReplyTo(null);
+    setUploadInfo("Ovozli xabar yuborildi");
+    setTimeout(() => setUploadInfo(""), 1500);   // ✅ muvaffaqiyatli bo‘lsa yo‘qoladi
+  } catch (err) {
+    console.error("voice upload error:", err);
+    alert("Ovozli xabarni yuklashda xato!");
+    setUploadInfo("");                            // ✅ xato bo‘lsa ham tozalaymiz
+  } finally {
+    setUploading(false);
+  }
+};
+
 
   /** ====== Dumaloq video blobini yuborish ====== */
-  const uploadCircleVideoBlob = async (blob) => {
-    if (!me || !chatKey) return;
-    setUploading(true);
-    setUploadInfo("Dumaloq video yuklanmoqda...");
+ const uploadCircleVideoBlob = async (blob) => {
+  if (!me || !chatKey) return;
+  setUploading(true);
+  setUploadInfo("Dumaloq video yuklanmoqda...");
 
-    try {
-      const colRef = getMessagesCollectionRef();
-      const basePath =
-        chatKey === "global"
-          ? "circleVideos/global"
-          : `circleVideos/${chatKey}`;
-      const fileName = `circle_${Date.now()}.webm`;
-      const storageRef = ref(storage, `${basePath}/${fileName}`);
+  try {
+    const colRef = getMessagesCollectionRef();
+    const basePath =
+      chatKey === "global"
+        ? "circleVideos/global"
+        : `circleVideos/${chatKey}`;
+    const fileName = `circle_${Date.now()}.webm`;
+    const storageRef = ref(storage, `${basePath}/${fileName}`);
 
-      await uploadBytes(storageRef, blob);
-      const url = await getDownloadURL(storageRef);
+    await uploadBytes(storageRef, blob);
+    const url = await getDownloadURL(storageRef);
 
-      const msgBody = {
-        text: "",
-        kind: "circleVideo",
-        fileUrl: url,
-        fileName,
-        senderId: me.id,
-        senderName: me.fullname,
-        senderPhoto: me.photoUrl || "",
-        createdAt: serverTimestamp(),
-        reactions: {},
-        seenBy: [me.id],
-      };
+    const msgBody = {
+      text: "",
+      kind: "circleVideo",
+      fileUrl: url,
+      fileName,
+      senderId: me.id,
+      senderName: me.fullname,
+      senderPhoto: me.photoUrl || "",
+      createdAt: serverTimestamp(),
+      reactions: {},
+      seenBy: [me.id],
+    };
 
-      if (chatKey !== "global" && activeEmployee) {
-        msgBody.participants = [me.id, activeEmployee.id];
-      }
-
-      if (replyTo) {
-        msgBody.replyTo = {
-          id: replyTo.id,
-          senderName: replyTo.senderName,
-          preview:
-            (replyTo.text || replyTo.fileName || "").toString().slice(0, 120) ||
-            "Xabar",
-        };
-      }
-
-      await addDoc(colRef, msgBody);
-      setReplyTo(null);
-      setUploadInfo("Dumaloq video yuborildi");
-      setTimeout(() => setUploadInfo(""), 1500);
-    } catch (err) {
-      console.error("circle video upload error:", err);
-      alert("Dumaloq videoni yuklashda xato!");
-    } finally {
-      setUploading(false);
+    if (chatKey !== "global" && activeEmployee) {
+      msgBody.participants = [me.id, activeEmployee.id];
     }
-  };
+
+    if (replyTo) {
+      msgBody.replyTo = {
+        id: replyTo.id,
+        senderName: replyTo.senderName,
+        preview:
+          (replyTo.text || replyTo.fileName || "").toString().slice(0, 120) ||
+          "Xabar",
+      };
+    }
+
+    await addDoc(colRef, msgBody);
+
+    setReplyTo(null);
+    setUploadInfo("Dumaloq video yuborildi");
+    setTimeout(() => setUploadInfo(""), 1500);   // ✅ muvaffaqiyatli bo‘lsa yo‘qoladi
+  } catch (err) {
+    console.error("circle video upload error:", err);
+    alert("Dumaloq videoni yuklashda xato!");
+    setUploadInfo("");                            // ✅ xato bo‘lsa ham tozalaymiz
+  } finally {
+    setUploading(false);
+  }
+};
+
 
   /** ====== Voice recording bosh/stop ====== */
   const startRecording = async () => {
