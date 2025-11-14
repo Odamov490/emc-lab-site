@@ -2,20 +2,6 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ApplicationChat from "../components/ApplicationChat";
-import AiChat from "../components/Ai-chat";
-
-// ...
-
-{tab === "chat" && (
-  <>
-    <Card>
-      <ApplicationChat me={me} />
-    </Card>
-    <AiChat me={me} />
-  </>
-)}
-
-
 import { db } from "../firebase";
 import {
   collection, query, where, getDocs, addDoc, onSnapshot,
@@ -53,8 +39,7 @@ const T = {
   uz: {
     title:"Kirish", username:"Login", password:"Parol", signIn:"Kirish", wrong:"Login yoki parol noto‘g‘ri",
     loading:"Yuklanmoqda...", dashboard:"Boshqaruv paneli", logout:"Chiqish", hello:"Salom", role:"Roli",
-    profile:"Profil", activity:"Faollik", employees:"Hodimlar", standards:"Standartlar",chat:"Chat",aiAssistant: "AI Assistant",
-
+    profile:"Profil", activity:"Faollik", employees:"Hodimlar", standards:"Standartlar",chat:"Chat",
     combo:"Arizalar & Harakat", stats:"Statistika", total:"Jami", inprog:"Jarayonda", done:"Sinov tugatildi",
     canceled:"Bekor qilindi", payyes:"To‘lov bor", payno:"To‘lov yo‘q",
     newApp:"Yangi ariza", appNum:"Ariza raqami", org:"Organ Sertifikatsiya", product:"Mahsulot",
@@ -74,8 +59,7 @@ const T = {
   ru: {
     title:"Вход", username:"Логин", password:"Пароль", signIn:"Войти", wrong:"Логин или пароль неверны",
     loading:"Загрузка...", dashboard:"Панель", logout:"Выйти", hello:"Здравствуйте", role:"Роль",
-    profile:"Профиль", activity:"Лента", employees:"Сотрудники", standards:"Стандарты",chat:"Чат",aiAssistant: "AI Ассистент",
-
+    profile:"Профиль", activity:"Лента", employees:"Сотрудники", standards:"Стандарты",chat:"Чат",
     combo:"Заявки & Движение", stats:"Статистика", total:"Всего", inprog:"В процессе", done:"Завершено",
     canceled:"Отменено", payyes:"Оплачено", payno:"Без оплаты",
     newApp:"Новая заявка", appNum:"№ заявки", org:"Орган сертиф.", product:"Изделие",
@@ -418,7 +402,15 @@ export default function Login(){
   </div>
 
   <nav className="p-2">
-  
+    {/* ARIZALAR & HARAKAT */}
+    <button
+      onClick={() => setTab("combo")}
+      className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${
+        tab === "combo" ? "bg-black/5 font-semibold" : ""
+      }`}
+    >
+      {t.combo}
+    </button>
 
     {/* PROFILE */}
     <button
@@ -428,16 +420,6 @@ export default function Login(){
       }`}
     >
       {t.profile}
-    </button>
-
-  {/* ARIZALAR & HARAKAT */}
-    <button
-      onClick={() => setTab("combo")}
-      className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${
-        tab === "combo" ? "bg-black/5 font-semibold" : ""
-      }`}
-    >
-      {t.combo}
     </button>
 
     {/* EMPLOYEES (Adminlarga) */}
@@ -478,20 +460,9 @@ export default function Login(){
       className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${
         tab === "standards" ? "bg-black/5 font-semibold" : ""
       }`}
-    > 
+    >
       {t.standards}
     </button>
-
-<button
-  onClick={() => setTab("iAssistant")}
-  className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${
-    tab === "ai" ? "bg-black/5 font-semibold" : ""
-  }`}
->
-  🤖 AI Assistent
-</button>
-
-
   </nav>
 </Card>
 
@@ -824,14 +795,6 @@ export default function Login(){
       <ApplicationChat me={me} />
   </Card>
 )}
-
-          {/* AI ASSISTENT */}  
-          {tab === "iAssistant" && (
-  <Card>
-    <AiChat me={me} />
-  </Card>
-)}
-
 
 
         </div>
