@@ -9,6 +9,11 @@ import {
   serverTimestamp,
   doc,
   updateDoc,
+  collectionGroup,
+  where,
+  getDocs,
+  deleteDoc,
+  arrayUnion,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../firebase";
@@ -65,8 +70,9 @@ function MessageContent({ msg }) {
     );
   }
 
-  if ((kind === "video" || kind === "audio") && fileUrl) {
+  if ((kind === "video" || kind === "circleVideo" || kind === "audio") && fileUrl) {
     const isAudio = kind === "audio";
+    const isCircle = kind === "circleVideo";
     return (
       <div className="space-y-1">
         {text && <div className="whitespace-pre-wrap text-sm">{text}</div>}
@@ -75,7 +81,14 @@ function MessageContent({ msg }) {
             <source src={fileUrl} />
           </audio>
         ) : (
-          <video controls className="rounded-xl max-h-64 w-full">
+          <video
+            controls
+            className={
+              isCircle
+                ? "rounded-full w-32 h-32 object-cover"
+                : "rounded-xl max-h-64 w-full"
+            }
+          >
             <source src={fileUrl} />
           </video>
         )}
@@ -143,8 +156,14 @@ export default function ApplicationChat({ me }) {
 
   const [pinnedHidden, setPinnedHidden] = useState(false);
 
+  const [dmUnreadMap, setDmUnreadMap] = useState({});
+
+  const [toast, setToast] = useState(null);
+
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
+  const lastMessageRef = useRef(null);
+  const toastTimeoutRef = useRef(null);
 
   // Voice recording
   const mediaRecorderRef = useRef(null);
@@ -152,6 +171,13 @@ export default function ApplicationChat({ me }) {
   const [recording, setRecording] = useState(false);
   const [recordTimer, setRecordTimer] = useState(0);
   const recordIntervalRef = useRef(null);
+
+  // Circle video recording
+  const videoRecorderRef = useRef(null);
+  const videoStreamRef = useRef(null);
+  const [videoRecording, setVideoRecording] = useState(false);
+  const [videoRecordTimer, setVideoRecordTimer] = useState(0);
+  const videoRecordIntervalRef = useRef(null);
 
   /** ====== Hodimlar ro‘yxatini olish (employees) ====== */
   useEffect(() => {
@@ -165,6 +191,15 @@ export default function ApplicationChat({ me }) {
       (err) => console.error("employees snapshot error:", err)
     );
     return () => unsub();
+  }, []);
+
+  /** ====== Notification permission so‘rash (bir marta) ====== */
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!("Notification" in window)) return;
+    if (Notification.permission === "default") {
+      Notification.requestPermission().catch(() => {});
+    }
   }, []);
 
   /** ====== Qaysi chat? umumiymi yoki DM? ====== */
@@ -213,10 +248,44 @@ export default function ApplicationChat({ me }) {
     return () => unsub();
   }, [chatKey]);
 
+  /** ====== DM unread map (barcha shaxsiy chatlar uchun) ====== */
+  useEffect(() => {
+    if (!me) return;
+    // directChats/*/messages collectionGroup
+    const qDm = query(
+      collectionGroup(db, "messages"),
+      where("participants", "array-contains", me.id)
+    );
+    const unsub = onSnapshot(
+      qDm,
+      (snap) => {
+        const map = {};
+        snap.forEach((docSnap) => {
+          const d = docSnap.data();
+          const participants = d.participants || [];
+          if (!Array.isArray(participants) || participants.length < 2) return;
+          const otherId = participants.find((id) => id !== me.id);
+          if (!otherId) return;
+          const seenBy = d.seenBy || [];
+          if (d.senderId === me.id) return;
+          if (seenBy.includes(me.id)) return;
+          map[otherId] = (map[otherId] || 0) + 1;
+        });
+        setDmUnreadMap(map);
+      },
+      (err) => console.error("dm unread snapshot error:", err)
+    );
+
+    return () => unsub();
+  }, [me]);
+
   /** ====== Scroll to bottom ====== */
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+      messagesEndRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
     }
   }, [messages, chatKey]);
 
@@ -274,7 +343,12 @@ export default function ApplicationChat({ me }) {
         senderPhoto: me.photoUrl || "",
         createdAt: serverTimestamp(),
         reactions: {},
+        seenBy: [me.id],
       };
+
+      if (chatKey !== "global" && activeEmployee) {
+        msgBody.participants = [me.id, activeEmployee.id];
+      }
 
       if (replyTo) {
         msgBody.replyTo = {
@@ -329,7 +403,12 @@ export default function ApplicationChat({ me }) {
         senderPhoto: me.photoUrl || "",
         createdAt: serverTimestamp(),
         reactions: {},
+        seenBy: [me.id],
       };
+
+      if (chatKey !== "global" && activeEmployee) {
+        msgBody.participants = [me.id, activeEmployee.id];
+      }
 
       if (replyTo) {
         msgBody.replyTo = {
@@ -383,7 +462,12 @@ export default function ApplicationChat({ me }) {
         senderPhoto: me.photoUrl || "",
         createdAt: serverTimestamp(),
         reactions: {},
+        seenBy: [me.id],
       };
+
+      if (chatKey !== "global" && activeEmployee) {
+        msgBody.participants = [me.id, activeEmployee.id];
+      }
 
       if (replyTo) {
         msgBody.replyTo = {
@@ -402,6 +486,63 @@ export default function ApplicationChat({ me }) {
     } catch (err) {
       console.error("voice upload error:", err);
       alert("Ovozli xabarni yuklashda xato!");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  /** ====== Dumaloq video blobini yuborish ====== */
+  const uploadCircleVideoBlob = async (blob) => {
+    if (!me || !chatKey) return;
+    setUploading(true);
+    setUploadInfo("Dumaloq video yuklanmoqda...");
+
+    try {
+      const colRef = getMessagesCollectionRef();
+      const basePath =
+        chatKey === "global"
+          ? "circleVideos/global"
+          : `circleVideos/${chatKey}`;
+      const fileName = `circle_${Date.now()}.webm`;
+      const storageRef = ref(storage, `${basePath}/${fileName}`);
+
+      await uploadBytes(storageRef, blob);
+      const url = await getDownloadURL(storageRef);
+
+      const msgBody = {
+        text: "",
+        kind: "circleVideo",
+        fileUrl: url,
+        fileName,
+        senderId: me.id,
+        senderName: me.fullname,
+        senderPhoto: me.photoUrl || "",
+        createdAt: serverTimestamp(),
+        reactions: {},
+        seenBy: [me.id],
+      };
+
+      if (chatKey !== "global" && activeEmployee) {
+        msgBody.participants = [me.id, activeEmployee.id];
+      }
+
+      if (replyTo) {
+        msgBody.replyTo = {
+          id: replyTo.id,
+          senderName: replyTo.senderName,
+          preview:
+            (replyTo.text || replyTo.fileName || "").toString().slice(0, 120) ||
+            "Xabar",
+        };
+      }
+
+      await addDoc(colRef, msgBody);
+      setReplyTo(null);
+      setUploadInfo("Dumaloq video yuborildi");
+      setTimeout(() => setUploadInfo(""), 1500);
+    } catch (err) {
+      console.error("circle video upload error:", err);
+      alert("Dumaloq videoni yuklashda xato!");
     } finally {
       setUploading(false);
     }
@@ -452,7 +593,10 @@ export default function ApplicationChat({ me }) {
   const stopRecording = () => {
     if (!recording) return;
     try {
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      if (
+        mediaRecorderRef.current &&
+        mediaRecorderRef.current.state !== "inactive"
+      ) {
         mediaRecorderRef.current.stop();
       }
     } catch (err) {
@@ -463,12 +607,91 @@ export default function ApplicationChat({ me }) {
     recordIntervalRef.current = null;
   };
 
+  /** ====== Dumaloq video yozuv bosh/stop ====== */
+  const startCircleVideoRecording = async () => {
+    if (videoRecording) return;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert("Kamera/mikrofon uchun ruxsat yo‘q yoki brauzer qo‘llab-quvvatlamaydi.");
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+      videoStreamRef.current = stream;
+      const recorder = new MediaRecorder(stream);
+      videoRecorderRef.current = recorder;
+      const chunks = [];
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      recorder.onstop = async () => {
+        try {
+          const blob = new Blob(chunks, { type: "video/webm" });
+          stream.getTracks().forEach((t) => t.stop());
+          if (blob.size > 0) {
+            await uploadCircleVideoBlob(blob);
+          }
+        } catch (err) {
+          console.error("circle record stop error:", err);
+        }
+      };
+
+      recorder.start();
+      setVideoRecording(true);
+      setVideoRecordTimer(0);
+      videoRecordIntervalRef.current = setInterval(() => {
+        setVideoRecordTimer((t) => t + 1);
+      }, 1000);
+    } catch (err) {
+      console.error("startCircleVideoRecording error:", err);
+      alert("Kamerani ishga tushirib bo‘lmadi.");
+    }
+  };
+
+  const stopCircleVideoRecording = () => {
+    if (!videoRecording) return;
+    try {
+      if (
+        videoRecorderRef.current &&
+        videoRecorderRef.current.state !== "inactive"
+      ) {
+        videoRecorderRef.current.stop();
+      }
+    } catch (err) {
+      console.error("stopCircleVideoRecording error:", err);
+    }
+    setVideoRecording(false);
+    if (videoRecordIntervalRef.current) {
+      clearInterval(videoRecordIntervalRef.current);
+      videoRecordIntervalRef.current = null;
+    }
+  };
+
   useEffect(() => {
     return () => {
       // cleanup
       if (recordIntervalRef.current) clearInterval(recordIntervalRef.current);
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      if (
+        mediaRecorderRef.current &&
+        mediaRecorderRef.current.state !== "inactive"
+      ) {
         mediaRecorderRef.current.stop();
+      }
+
+      if (videoRecordIntervalRef.current)
+        clearInterval(videoRecordIntervalRef.current);
+      if (
+        videoRecorderRef.current &&
+        videoRecorderRef.current.state !== "inactive"
+      ) {
+        videoRecorderRef.current.stop();
+      }
+      if (videoStreamRef.current) {
+        videoStreamRef.current.getTracks().forEach((t) => t.stop());
       }
     };
   }, []);
@@ -500,7 +723,6 @@ export default function ApplicationChat({ me }) {
     if (!chatKey) return;
     try {
       const currentPinned = messages.find((m) => m.pinned);
-      const colRef = getMessagesCollectionRef();
       // old pinnedni olib tashlaymiz
       if (currentPinned) {
         const oldRef =
@@ -532,6 +754,110 @@ export default function ApplicationChat({ me }) {
       await updateDoc(msgRef, { pinned: false });
     } catch (err) {
       console.error("unpin error:", err);
+    }
+  };
+
+  /** ====== Xabarlarni o‘qilgan deb belgilash (seenBy) ====== */
+  useEffect(() => {
+    if (!me || !chatKey || messages.length === 0) return;
+
+    const unread = messages.filter(
+      (m) =>
+        m.senderId !== me.id && !(m.seenBy || []).includes(me.id)
+    );
+    if (unread.length === 0) return;
+
+    const mark = async () => {
+      try {
+        for (const m of unread) {
+          const msgRef =
+            chatKey === "global"
+              ? doc(db, "chatGlobal", m.id)
+              : doc(db, "directChats", chatKey, "messages", m.id);
+          await updateDoc(msgRef, {
+            seenBy: arrayUnion(me.id),
+          });
+        }
+      } catch (err) {
+        console.error("mark read error:", err);
+      }
+    };
+
+    mark();
+  }, [me, chatKey, messages]);
+
+  /** ====== Toast + brauzer notification (yangi xabar) ====== */
+  useEffect(() => {
+    if (!me || !chatKey || messages.length === 0) return;
+    const last = messages[messages.length - 1];
+    const prev = lastMessageRef.current;
+
+    // birinchi load paytida bildirishnoma bermaslik
+    if (!prev) {
+      lastMessageRef.current = last;
+      return;
+    }
+
+    if (prev.id === last.id) return;
+    lastMessageRef.current = last;
+
+    // agar o‘zim yozgan bo‘lsam — bildirishnoma shart emas
+    if (last.senderId === me.id) return;
+
+    const preview = (last.text || last.fileName || "Yangi xabar")
+      .toString()
+      .slice(0, 80);
+
+    setToast({ id: last.id, text: preview });
+
+    if (
+      typeof window !== "undefined" &&
+      "Notification" in window &&
+      Notification.permission === "granted" &&
+      document.hidden
+    ) {
+      const title = activeEmployee
+        ? `${activeEmployee.fullname} dan yangi xabar`
+        : "Umumiy chatda yangi xabar";
+      try {
+        new Notification(title, { body: preview });
+      } catch {
+        // ignore
+      }
+    }
+  }, [messages, chatKey, me, activeEmployee]);
+
+  /** ====== Toast auto-hide ====== */
+  useEffect(() => {
+    if (!toast) return;
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    toastTimeoutRef.current = setTimeout(() => setToast(null), 5000);
+    return () => {
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    };
+  }, [toast]);
+
+  /** ====== Chat tarixini tozalash ====== */
+  const clearChatHistory = async () => {
+    if (!chatKey) return;
+    if (chatKey === "global" && me?.role !== "admin") {
+      alert("Umumiy chat tarixini faqat admin tozalashi mumkin.");
+      return;
+    }
+    const confirmText =
+      chatKey === "global"
+        ? "Umumiy chatdagi BARCHA xabarlar o‘chiriladi. Davom etasizmi?"
+        : "Ushbu shaxsiy chatdagi barcha xabarlar o‘chiriladi. Davom etasizmi?";
+    if (!window.confirm(confirmText)) return;
+
+    try {
+      const colRef = getMessagesCollectionRef();
+      const snap = await getDocs(colRef);
+      const tasks = snap.docs.map((d) => deleteDoc(d.ref));
+      await Promise.all(tasks);
+    } catch (err) {
+      console.error("clear chat error:", err);
+      alert("Tarixni o‘chirishda xato!");
     }
   };
 
@@ -591,6 +917,7 @@ export default function ApplicationChat({ me }) {
             .filter((e) => e.id !== me.id)
             .map((e) => {
               const active = activeEmployee?.id === e.id;
+              const unread = dmUnreadMap[e.id] || 0;
               return (
                 <button
                   key={e.id}
@@ -613,13 +940,20 @@ export default function ApplicationChat({ me }) {
                       </span>
                     )}
                   </div>
-                  <div className="min-w-0">
-                    <div className="text-xs font-semibold truncate">
-                      {e.fullname}
+                  <div className="flex items-center justify-between flex-1 min-w-0 gap-2">
+                    <div className="min-w-0">
+                      <div className="text-xs font-semibold truncate">
+                        {e.fullname}
+                      </div>
+                      <div className="text-[10px] text-gray-500 truncate">
+                        {e.role || "Hodim"}
+                      </div>
                     </div>
-                    <div className="text-[10px] text-gray-500 truncate">
-                      {e.role || "Hodim"}
-                    </div>
+                    {unread > 0 && (
+                      <span className="inline-flex min-w-[18px] justify-center rounded-full bg-sky-500 text-white text-[10px] px-1">
+                        {unread}
+                      </span>
+                    )}
                   </div>
                 </button>
               );
@@ -647,7 +981,7 @@ export default function ApplicationChat({ me }) {
       </div>
 
       {/* RIGHT: Chat oynasi */}
-      <div className="flex-1 flex flex-col bg-gradient-to-br from-sky-50/60 via-white to-indigo-50/60">
+      <div className="relative flex-1 flex flex-col bg-gradient-to-br from-sky-50/60 via-white to-indigo-50/60">
         {/* HEADER */}
         <div className="h-14 border-b border-black/10 px-4 flex items-center justify-between bg-white/80 backdrop-blur">
           <div className="flex items-center gap-3">
@@ -675,6 +1009,7 @@ export default function ApplicationChat({ me }) {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+            <TextButton onClick={clearChatHistory}>Tarixni tozalash</TextButton>
           </div>
         </div>
 
@@ -880,6 +1215,28 @@ export default function ApplicationChat({ me }) {
           </div>
         )}
 
+        {/* Toast (yangi xabar) */}
+        {toast && (
+          <div className="absolute bottom-16 right-4 max-w-xs">
+            <div className="rounded-2xl border border-sky-200 bg-white/90 shadow-lg px-3 py-2 text-[11px] text-gray-800 flex items-start gap-2">
+              <span className="mt-0.5">🔔</span>
+              <div className="flex-1">
+                <div className="font-semibold text-[11px] mb-0.5">
+                  Yangi xabar
+                </div>
+                <div className="line-clamp-3">{toast.text}</div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setToast(null)}
+                className="text-[11px] text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* INPUT AREA */}
         <div className="border-t border-black/10 bg-white/85 backdrop-blur px-4 py-2">
           {uploadInfo && (
@@ -919,11 +1276,35 @@ export default function ApplicationChat({ me }) {
               {recording ? "⏺" : "🎤"}
             </IconButton>
 
+            {/* Dumaloq video tugmasi */}
+            <IconButton
+              title="Dumaloq video"
+              onClick={
+                videoRecording
+                  ? stopCircleVideoRecording
+                  : startCircleVideoRecording
+              }
+              disabled={uploading}
+              className={
+                videoRecording
+                  ? "border-purple-400 bg-purple-50 text-purple-600"
+                  : "border-black/5"
+              }
+            >
+              {videoRecording ? "⏺" : "📹"}
+            </IconButton>
+
             <div className="flex-1">
               {recording && (
                 <div className="text-[11px] text-red-600 mb-0.5 flex items-center gap-1">
                   <span className="inline-block h-2 w-2 rounded-full bg-red-500 animate-ping" />
-                  Yozilmoqda... {recordTimer}s
+                  Ovoz yozilmoqda... {recordTimer}s
+                </div>
+              )}
+              {videoRecording && (
+                <div className="text-[11px] text-purple-600 mb-0.5 flex items-center gap-1">
+                  <span className="inline-block h-2 w-2 rounded-full bg-purple-500 animate-ping" />
+                  Dumaloq video yozilmoqda... {videoRecordTimer}s
                 </div>
               )}
               <textarea
