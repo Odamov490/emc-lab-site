@@ -70,8 +70,15 @@ function MessageContent({ msg }) {
     );
   }
 
-  if ((kind === "video" || kind === "circleVideo" || kind === "audio") && fileUrl) {
-    const isAudio = kind === "audio";
+  // video, dumaloq video va audio/voice
+  if (
+    (kind === "video" ||
+      kind === "circleVideo" ||
+      kind === "audio" ||
+      kind === "voice") &&
+    fileUrl
+  ) {
+    const isAudio = kind === "audio" || kind === "voice";
     const isCircle = kind === "circleVideo";
     return (
       <div className="space-y-1">
@@ -157,6 +164,7 @@ export default function ApplicationChat({ me }) {
   const [pinnedHidden, setPinnedHidden] = useState(false);
 
   const [dmUnreadMap, setDmUnreadMap] = useState({});
+  const [globalUnread, setGlobalUnread] = useState(0); // umumiy chat uchun badge
 
   const [toast, setToast] = useState(null);
 
@@ -178,6 +186,7 @@ export default function ApplicationChat({ me }) {
   const [videoRecording, setVideoRecording] = useState(false);
   const [videoRecordTimer, setVideoRecordTimer] = useState(0);
   const videoRecordIntervalRef = useRef(null);
+  const videoPreviewRef = useRef(null); // dumaloq preview uchun
 
   /** ====== Hodimlar ro‘yxatini olish (employees) ====== */
   useEffect(() => {
@@ -221,10 +230,7 @@ export default function ApplicationChat({ me }) {
 
     let qMsgs;
     if (chatKey === "global") {
-      qMsgs = query(
-        collection(db, "chatGlobal"),
-        orderBy("createdAt", "asc")
-      );
+      qMsgs = query(collection(db, "chatGlobal"), orderBy("createdAt", "asc"));
     } else {
       qMsgs = query(
         collection(db, "directChats", chatKey, "messages"),
@@ -251,7 +257,6 @@ export default function ApplicationChat({ me }) {
   /** ====== DM unread map (barcha shaxsiy chatlar uchun) ====== */
   useEffect(() => {
     if (!me) return;
-    // directChats/*/messages collectionGroup
     const qDm = query(
       collectionGroup(db, "messages"),
       where("participants", "array-contains", me.id)
@@ -276,6 +281,29 @@ export default function ApplicationChat({ me }) {
       (err) => console.error("dm unread snapshot error:", err)
     );
 
+    return () => unsub();
+  }, [me]);
+
+  /** ====== Umumiy chat uchun unread count ====== */
+  useEffect(() => {
+    if (!me) return;
+    const qGlobal = query(collection(db, "chatGlobal"));
+    const unsub = onSnapshot(
+      qGlobal,
+      (snap) => {
+        let cnt = 0;
+        snap.forEach((d) => {
+          const data = d.data();
+          if (data.senderId === me.id) return;
+          const seenBy = data.seenBy || [];
+          if (!Array.isArray(seenBy) || !seenBy.includes(me.id)) {
+            cnt += 1;
+          }
+        });
+        setGlobalUnread(cnt);
+      },
+      (err) => console.error("global unread snapshot error:", err)
+    );
     return () => unsub();
   }, [me]);
 
@@ -327,80 +355,76 @@ export default function ApplicationChat({ me }) {
   };
 
   /** ====== Xabar yuborish (matn) ====== */
- const handleSend = async () => {
-  const text = messageText.trim();
-  if (!me || !chatKey) return;
-  if (!text && !replyTo) return;
+  const handleSend = async () => {
+    const text = messageText.trim();
+    if (!me || !chatKey) return;
+    if (!text && !replyTo) return;
 
-  // 1) Darhol localga qo'shamiz (optimistik)
-  const tempId = "temp-" + Date.now();
-  const tempMsg = {
-    id: tempId,
-    text,
-    kind: "text",
-    senderId: me.id,
-    senderName: me.fullname,
-    senderPhoto: me.photoUrl || "",
-    createdAt: { seconds: Date.now() / 1000 }, // local vaqt
-    reactions: {},
-    seenBy: [me.id],
-    sending: true   // UI’da “yuborilmoqda...” sifatida
-  };
-
-  setMessages((prev) => [...prev, tempMsg]);
-  setMessageText("");
-  setReplyTo(null);
-
-  setSending(true);
-  try {
-    const colRef = getMessagesCollectionRef();
-
-    const msgBody = {
+    // 1) Darhol localga qo'shamiz (optimistik)
+    const tempId = "temp-" + Date.now();
+    const tempMsg = {
+      id: tempId,
       text,
       kind: "text",
       senderId: me.id,
       senderName: me.fullname,
       senderPhoto: me.photoUrl || "",
-      createdAt: serverTimestamp(),
+      createdAt: { seconds: Date.now() / 1000 },
       reactions: {},
       seenBy: [me.id],
+      sending: true,
     };
 
-    if (chatKey !== "global" && activeEmployee) {
-      msgBody.participants = [me.id, activeEmployee.id];
-    }
+    setMessages((prev) => [...prev, tempMsg]);
+    setMessageText("");
+    setReplyTo(null);
 
-    if (replyTo) {
-      msgBody.replyTo = {
-        id: replyTo.id,
-        senderName: replyTo.senderName,
-        preview:
-          (replyTo.text || replyTo.fileName || "").toString().slice(0, 120) ||
-          "Xabar",
+    setSending(true);
+    try {
+      const colRef = getMessagesCollectionRef();
+
+      const msgBody = {
+        text,
+        kind: "text",
+        senderId: me.id,
+        senderName: me.fullname,
+        senderPhoto: me.photoUrl || "",
+        createdAt: serverTimestamp(),
+        reactions: {},
+        seenBy: [me.id],
       };
+
+      if (chatKey !== "global" && activeEmployee) {
+        msgBody.participants = [me.id, activeEmployee.id];
+      }
+
+      if (replyTo) {
+        msgBody.replyTo = {
+          id: replyTo.id,
+          senderName: replyTo.senderName,
+          preview:
+            (replyTo.text || replyTo.fileName || "").toString().slice(0, 120) ||
+            "Xabar",
+        };
+      }
+
+      await addDoc(colRef, msgBody);
+    } catch (err) {
+      console.error("send message error:", err);
+      setMessages((prev) => prev.filter((m) => m.id !== tempId));
+      alert("Xabar yuborishda xato!");
+    } finally {
+      setSending(false);
     }
-
-    // 2) Firestore’ga haqiqiy xabarni yozamiz
-    await addDoc(colRef, msgBody);
-
-    // onSnapshot kelganda haqiqiy xabar temp ni o‘rnini bosadi
-  } catch (err) {
-    console.error("send message error:", err);
-    // Xato bo‘lsa local temp xabarni o‘chirib tashlaymiz
-    setMessages((prev) => prev.filter((m) => m.id !== tempId));
-    alert("Xabar yuborishda xato!");
-  } finally {
-    setSending(false);
-  }
-};
+  };
 
   // Enter bosilganda yuborish, Shift+Enter yangi qatordan yozadi
-const handleKeyDown = (e) => {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault(); // yangi qatordan tushishini bloklaydi
-    handleSend();       // xabar yuboradi
-  }
-};
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
 
   /** ====== Fayl yuklash ====== */
   const handleFileChange = async (e) => {
@@ -425,7 +449,7 @@ const handleKeyDown = (e) => {
       else if (file.type.startsWith("audio/")) kind = "audio";
 
       const msgBody = {
-        text: messageText.trim(), // caption bo‘lishi mumkin
+        text: messageText.trim(),
         kind,
         fileUrl: url,
         fileName: file.name,
@@ -466,122 +490,120 @@ const handleKeyDown = (e) => {
   };
 
   /** ====== Voice message: audio blobni Firestore'ga yuborish ====== */
- const uploadVoiceBlob = async (blob) => {
-  if (!me || !chatKey) return;
-  setUploading(true);
-  setUploadInfo("Ovozli xabar yuklanmoqda...");
+  const uploadVoiceBlob = async (blob) => {
+    if (!me || !chatKey) return;
+    setUploading(true);
+    setUploadInfo("Ovozli xabar yuklanmoqda...");
 
-  try {
-    const colRef = getMessagesCollectionRef();
-    const basePath =
-      chatKey === "global" ? "voices/global" : `voices/${chatKey}`;
-    const fileName = `voice_${Date.now()}.webm`;
-    const storageRef = ref(storage, `${basePath}/${fileName}`);
+    try {
+      const colRef = getMessagesCollectionRef();
+      const basePath =
+        chatKey === "global" ? "voices/global" : `voices/${chatKey}`;
+      const fileName = `voice_${Date.now()}.webm`;
+      const storageRef = ref(storage, `${basePath}/${fileName}`);
 
-    await uploadBytes(storageRef, blob);
-    const url = await getDownloadURL(storageRef);
+      await uploadBytes(storageRef, blob);
+      const url = await getDownloadURL(storageRef);
 
-    const msgBody = {
-      text: "",
-      kind: "voice",
-      fileUrl: url,
-      fileName,
-      senderId: me.id,
-      senderName: me.fullname,
-      senderPhoto: me.photoUrl || "",
-      createdAt: serverTimestamp(),
-      reactions: {},
-      seenBy: [me.id],
-    };
-
-    if (chatKey !== "global" && activeEmployee) {
-      msgBody.participants = [me.id, activeEmployee.id];
-    }
-
-    if (replyTo) {
-      msgBody.replyTo = {
-        id: replyTo.id,
-        senderName: replyTo.senderName,
-        preview:
-          (replyTo.text || replyTo.fileName || "").toString().slice(0, 120) ||
-          "Xabar",
+      const msgBody = {
+        text: "",
+        kind: "voice",
+        fileUrl: url,
+        fileName,
+        senderId: me.id,
+        senderName: me.fullname,
+        senderPhoto: me.photoUrl || "",
+        createdAt: serverTimestamp(),
+        reactions: {},
+        seenBy: [me.id],
       };
+
+      if (chatKey !== "global" && activeEmployee) {
+        msgBody.participants = [me.id, activeEmployee.id];
+      }
+
+      if (replyTo) {
+        msgBody.replyTo = {
+          id: replyTo.id,
+          senderName: replyTo.senderName,
+          preview:
+            (replyTo.text || replyTo.fileName || "").toString().slice(0, 120) ||
+            "Xabar",
+        };
+      }
+
+      await addDoc(colRef, msgBody);
+
+      setReplyTo(null);
+      setUploadInfo("Ovozli xabar yuborildi");
+      setTimeout(() => setUploadInfo(""), 1500);
+    } catch (err) {
+      console.error("voice upload error:", err);
+      alert("Ovozli xabarni yuklashda xato!");
+      setUploadInfo("");
+    } finally {
+      setUploading(false);
     }
-
-    await addDoc(colRef, msgBody);
-
-    setReplyTo(null);
-    setUploadInfo("Ovozli xabar yuborildi");
-    setTimeout(() => setUploadInfo(""), 1500);   // ✅ muvaffaqiyatli bo‘lsa yo‘qoladi
-  } catch (err) {
-    console.error("voice upload error:", err);
-    alert("Ovozli xabarni yuklashda xato!");
-    setUploadInfo("");                            // ✅ xato bo‘lsa ham tozalaymiz
-  } finally {
-    setUploading(false);
-  }
-};
-
+  };
 
   /** ====== Dumaloq video blobini yuborish ====== */
- const uploadCircleVideoBlob = async (blob) => {
-  if (!me || !chatKey) return;
-  setUploading(true);
-  setUploadInfo("Dumaloq video yuklanmoqda...");
+  const uploadCircleVideoBlob = async (blob) => {
+    if (!me || !chatKey) return;
+    setUploading(true);
+    setUploadInfo("Dumaloq video yuklanmoqda...");
 
-  try {
-    const colRef = getMessagesCollectionRef();
-    const basePath =
-      chatKey === "global"
-        ? "circleVideos/global"
-        : `circleVideos/${chatKey}`;
-    const fileName = `circle_${Date.now()}.webm`;
-    const storageRef = ref(storage, `${basePath}/${fileName}`);
+    try {
+      const colRef = getMessagesCollectionRef();
+      const basePath =
+        chatKey === "global"
+          ? "circleVideos/global"
+          : `circleVideos/${chatKey}`;
+      const fileName = `circle_${Date.now()}.webm`;
+      const storageRef = ref(storage, `${basePath}/${fileName}`);
 
-    await uploadBytes(storageRef, blob);
-    const url = await getDownloadURL(storageRef);
+      await uploadBytes(storageRef, blob);
+      const url = await getDownloadURL(storageRef);
 
-    const msgBody = {
-      text: "",
-      kind: "circleVideo",
-      fileUrl: url,
-      fileName,
-      senderId: me.id,
-      senderName: me.fullname,
-      senderPhoto: me.photoUrl || "",
-      createdAt: serverTimestamp(),
-      reactions: {},
-      seenBy: [me.id],
-    };
-
-    if (chatKey !== "global" && activeEmployee) {
-      msgBody.participants = [me.id, activeEmployee.id];
-    }
-
-    if (replyTo) {
-      msgBody.replyTo = {
-        id: replyTo.id,
-        senderName: replyTo.senderName,
-        preview:
-          (replyTo.text || replyTo.fileName || "").toString().slice(0, 120) ||
-          "Xabar",
+      const msgBody = {
+        text: "",
+        kind: "circleVideo",
+        fileUrl: url,
+        fileName,
+        senderId: me.id,
+        senderName: me.fullname,
+        senderPhoto: me.photoUrl || "",
+        createdAt: serverTimestamp(),
+        reactions: {},
+        seenBy: [me.id],
       };
+
+      if (chatKey !== "global" && activeEmployee) {
+        msgBody.participants = [me.id, activeEmployee.id];
+      }
+
+      if (replyTo) {
+        msgBody.replyTo = {
+          id: replyTo.id,
+          senderName: replyTo.senderName,
+          preview:
+            (replyTo.text || replyTo.fileName || "").toString().slice(0, 120) ||
+            "Xabar",
+        };
+      }
+
+      await addDoc(colRef, msgBody);
+
+      setReplyTo(null);
+      setUploadInfo("Dumaloq video yuborildi");
+      setTimeout(() => setUploadInfo(""), 1500);
+    } catch (err) {
+      console.error("circle video upload error:", err);
+      alert("Dumaloq videoni yuklashda xato!");
+      setUploadInfo("");
+    } finally {
+      setUploading(false);
     }
-
-    await addDoc(colRef, msgBody);
-
-    setReplyTo(null);
-    setUploadInfo("Dumaloq video yuborildi");
-    setTimeout(() => setUploadInfo(""), 1500);   // ✅ muvaffaqiyatli bo‘lsa yo‘qoladi
-  } catch (err) {
-    console.error("circle video upload error:", err);
-    alert("Dumaloq videoni yuklashda xato!");
-    setUploadInfo("");                            // ✅ xato bo‘lsa ham tozalaymiz
-  } finally {
-    setUploading(false);
-  }
-};
-
+  };
 
   /** ====== Voice recording bosh/stop ====== */
   const startRecording = async () => {
@@ -704,11 +726,23 @@ const handleKeyDown = (e) => {
       clearInterval(videoRecordIntervalRef.current);
       videoRecordIntervalRef.current = null;
     }
+    if (videoPreviewRef.current) {
+      videoPreviewRef.current.srcObject = null;
+    }
   };
+
+  // Dumaloq video yozilayotganda previewga stream ulash
+  useEffect(() => {
+    if (videoRecording && videoPreviewRef.current && videoStreamRef.current) {
+      videoPreviewRef.current.srcObject = videoStreamRef.current;
+    }
+    if (!videoRecording && videoPreviewRef.current) {
+      videoPreviewRef.current.srcObject = null;
+    }
+  }, [videoRecording]);
 
   useEffect(() => {
     return () => {
-      // cleanup
       if (recordIntervalRef.current) clearInterval(recordIntervalRef.current);
       if (
         mediaRecorderRef.current &&
@@ -758,7 +792,6 @@ const handleKeyDown = (e) => {
     if (!chatKey) return;
     try {
       const currentPinned = messages.find((m) => m.pinned);
-      // old pinnedni olib tashlaymiz
       if (currentPinned) {
         const oldRef =
           chatKey === "global"
@@ -797,8 +830,7 @@ const handleKeyDown = (e) => {
     if (!me || !chatKey || messages.length === 0) return;
 
     const unread = messages.filter(
-      (m) =>
-        m.senderId !== me.id && !(m.seenBy || []).includes(me.id)
+      (m) => m.senderId !== me.id && !(m.seenBy || []).includes(me.id)
     );
     if (unread.length === 0) return;
 
@@ -827,7 +859,6 @@ const handleKeyDown = (e) => {
     const last = messages[messages.length - 1];
     const prev = lastMessageRef.current;
 
-    // birinchi load paytida bildirishnoma bermaslik
     if (!prev) {
       lastMessageRef.current = last;
       return;
@@ -836,7 +867,6 @@ const handleKeyDown = (e) => {
     if (prev.id === last.id) return;
     lastMessageRef.current = last;
 
-    // agar o‘zim yozgan bo‘lsam — bildirishnoma shart emas
     if (last.senderId === me.id) return;
 
     const preview = (last.text || last.fileName || "Yangi xabar")
@@ -934,13 +964,20 @@ const handleKeyDown = (e) => {
             <div className="h-8 w-8 rounded-2xl bg-gradient-to-br from-sky-400 to-cyan-400 text-white text-xs font-semibold grid place-items-center shadow-sm">
               💬
             </div>
-            <div className="min-w-0">
-              <div className="text-xs font-semibold truncate">
-                Umumiy chat
+            <div className="flex items-center justify-between flex-1 min-w-0 gap-2">
+              <div className="min-w-0">
+                <div className="text-xs font-semibold truncate">
+                  Umumiy chat
+                </div>
+                <div className="text-[10px] text-gray-500 truncate">
+                  Barcha hodimlar uchun
+                </div>
               </div>
-              <div className="text-[10px] text-gray-500 truncate">
-                Barcha hodimlar uchun
-              </div>
+              {globalUnread > 0 && (
+                <span className="inline-flex min-w-[18px] justify-center rounded-full bg-sky-500 text-white text-[10px] px-1">
+                  {globalUnread > 99 ? "99+" : globalUnread}
+                </span>
+              )}
             </div>
           </button>
 
@@ -986,7 +1023,7 @@ const handleKeyDown = (e) => {
                     </div>
                     {unread > 0 && (
                       <span className="inline-flex min-w-[18px] justify-center rounded-full bg-sky-500 text-white text-[10px] px-1">
-                        {unread}
+                        {unread > 99 ? "99+" : unread}
                       </span>
                     )}
                   </div>
@@ -1103,7 +1140,6 @@ const handleKeyDown = (e) => {
                 key={msg.id}
                 className={`flex flex-col ${bubbleAlign} gap-1`}
               >
-                {/* Reply preview (bu xabar kimnidir javobi bo‘lsa) */}
                 {msg.replyTo && (
                   <div className="max-w-[70%] text-[10px] text-gray-500 border border-dashed border-gray-200 bg-white/60 rounded-xl px-2 py-1 mb-0.5">
                     <div className="font-semibold text-[10px]">
@@ -1115,7 +1151,6 @@ const handleKeyDown = (e) => {
                   </div>
                 )}
 
-                {/* Bubble */}
                 <div className="flex items-end gap-2 max-w-[80%]">
                   {!isMe && (
                     <div className="h-7 w-7 rounded-full bg-black/5 overflow-hidden grid place-items-center">
@@ -1150,7 +1185,6 @@ const handleKeyDown = (e) => {
                     </div>
                     <MessageContent msg={msg} />
 
-                    {/* Reaksiyalar */}
                     <div className="flex items-center gap-2 mt-1">
                       <div className="flex gap-1">
                         {REACTION_EMOJIS.map((emoji) => {
@@ -1186,7 +1220,6 @@ const handleKeyDown = (e) => {
                       </div>
                     </div>
 
-                    {/* Agar reaksiya bor bo‘lsa, kichkina banda ko‘rsatamiz (ixtiyoriy) */}
                     {hasReactions && (
                       <div className="mt-1 flex flex-wrap gap-1 text-[9px] opacity-75">
                         {Object.entries(reactions).map(([emoji, users]) => (
@@ -1252,7 +1285,7 @@ const handleKeyDown = (e) => {
 
         {/* Toast (yangi xabar) */}
         {toast && (
-          <div className="absolute bottom-16 right-4 max-w-xs">
+          <div className="absolute bottom-16 right-4 max-w-xs z-30">
             <div className="rounded-2xl border border-sky-200 bg-white/90 shadow-lg px-3 py-2 text-[11px] text-gray-800 flex items-start gap-2">
               <span className="mt-0.5">🔔</span>
               <div className="flex-1">
@@ -1272,6 +1305,25 @@ const handleKeyDown = (e) => {
           </div>
         )}
 
+        {/* Dumaloq video yozilayotganda LIVE preview (Telegram uslubi) */}
+        {videoRecording && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-sky-400 shadow-xl bg-black">
+                <video
+                  ref={videoPreviewRef}
+                  autoPlay
+                  muted
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="text-[11px] text-white/90 bg-black/50 rounded-full px-3 py-1">
+                Dumaloq video yozilmoqda... {videoRecordTimer}s
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* INPUT AREA */}
         <div className="border-t border-black/10 bg-white/85 backdrop-blur px-4 py-2">
           {uploadInfo && (
@@ -1281,7 +1333,6 @@ const handleKeyDown = (e) => {
             </div>
           )}
           <div className="flex items-end gap-2">
-            {/* Fayl tanlash */}
             <IconButton
               title="Fayl (rasm, video, audio, hujjat)"
               onClick={() => fileInputRef.current?.click()}
@@ -1297,7 +1348,6 @@ const handleKeyDown = (e) => {
               onChange={handleFileChange}
             />
 
-            {/* Ovozli xabar tugmasi */}
             <IconButton
               title="Ovozli xabar"
               onClick={recording ? stopRecording : startRecording}
@@ -1311,7 +1361,6 @@ const handleKeyDown = (e) => {
               {recording ? "⏺" : "🎤"}
             </IconButton>
 
-            {/* Dumaloq video tugmasi */}
             <IconButton
               title="Dumaloq video"
               onClick={
@@ -1342,19 +1391,18 @@ const handleKeyDown = (e) => {
                   Dumaloq video yozilmoqda... {videoRecordTimer}s
                 </div>
               )}
-          <textarea
-  rows={1}
-  value={messageText}
-  onChange={(e) => setMessageText(e.target.value)}
-  onKeyDown={handleKeyDown}   // 🔥 MUHIM joy
-  placeholder={
-    activeEmployee
-      ? `${activeEmployee.fullname} bilan chat...`
-      : "Umumiy chatga xabar yozing..."
-  }
-  className="w-full max-h-32 rounded-2xl border border-black/10 bg-white/80 px-3 py-2 text-xs resize-none focus:outline-none focus:ring-1 focus:ring-sky-400"
-/>
-
+              <textarea
+                rows={1}
+                value={messageText}
+                onChange={(e) => setMessageText(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={
+                  activeEmployee
+                    ? `${activeEmployee.fullname} bilan chat...`
+                    : "Umumiy chatga xabar yozing..."
+                }
+                className="w-full max-h-32 rounded-2xl border border-black/10 bg-white/80 px-3 py-2 text-xs resize-none focus:outline-none focus:ring-1 focus:ring-sky-400"
+              />
             </div>
             <button
               type="button"
