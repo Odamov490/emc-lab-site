@@ -2,6 +2,19 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ApplicationChat from "../components/ApplicationChat";
+import IaChat from "../components/ia-chat";
+
+// ...
+
+{tab === "chat" && (
+  <>
+    <Card>
+      <ApplicationChat me={me} />
+    </Card>
+    <IaChat me={me} />
+  </>
+)}
+
 import { db } from "../firebase";
 import {
   collection, query, where, getDocs, addDoc, onSnapshot,
@@ -402,15 +415,7 @@ export default function Login(){
   </div>
 
   <nav className="p-2">
-    {/* ARIZALAR & HARAKAT */}
-    <button
-      onClick={() => setTab("combo")}
-      className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${
-        tab === "combo" ? "bg-black/5 font-semibold" : ""
-      }`}
-    >
-      {t.combo}
-    </button>
+  
 
     {/* PROFILE */}
     <button
@@ -420,6 +425,16 @@ export default function Login(){
       }`}
     >
       {t.profile}
+    </button>
+
+  {/* ARIZALAR & HARAKAT */}
+    <button
+      onClick={() => setTab("combo")}
+      className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${
+        tab === "combo" ? "bg-black/5 font-semibold" : ""
+      }`}
+    >
+      {t.combo}
     </button>
 
     {/* EMPLOYEES (Adminlarga) */}
@@ -460,9 +475,20 @@ export default function Login(){
       className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${
         tab === "standards" ? "bg-black/5 font-semibold" : ""
       }`}
-    >
+    > 
       {t.standards}
     </button>
+
+<button
+  onClick={() => setTab("ai")}
+  className={`w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 ${
+    tab === "ai" ? "bg-black/5 font-semibold" : ""
+  }`}
+>
+  🤖 AI Assistent
+</button>
+
+
   </nav>
 </Card>
 
@@ -795,6 +821,14 @@ export default function Login(){
       <ApplicationChat me={me} />
   </Card>
 )}
+
+          {/* AI ASSISTENT */}  
+          {tab === "ai" && (
+  <Card>
+    <IaChat me={me} />
+  </Card>
+)}
+
 
 
         </div>
