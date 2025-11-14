@@ -327,50 +327,72 @@ export default function ApplicationChat({ me }) {
   };
 
   /** ====== Xabar yuborish (matn) ====== */
-  const handleSend = async () => {
-    const text = messageText.trim();
-    if (!me || !chatKey) return;
-    if (!text && !replyTo) return;
+ const handleSend = async () => {
+  const text = messageText.trim();
+  if (!me || !chatKey) return;
+  if (!text && !replyTo) return;
 
-    setSending(true);
-    try {
-      const colRef = getMessagesCollectionRef();
-      const msgBody = {
-        text,
-        kind: "text",
-        senderId: me.id,
-        senderName: me.fullname,
-        senderPhoto: me.photoUrl || "",
-        createdAt: serverTimestamp(),
-        reactions: {},
-        seenBy: [me.id],
-      };
-
-      if (chatKey !== "global" && activeEmployee) {
-        msgBody.participants = [me.id, activeEmployee.id];
-      }
-
-      if (replyTo) {
-        msgBody.replyTo = {
-          id: replyTo.id,
-          senderName: replyTo.senderName,
-          preview:
-            (replyTo.text || replyTo.fileName || "").toString().slice(0, 120) ||
-            "Xabar",
-        };
-      }
-
-      await addDoc(colRef, msgBody);
-      setMessageText("");
-      setReplyTo(null);
-    } catch (err) {
-      console.error("send message error:", err);
-      alert("Xabar yuborishda xato!");
-    } finally {
-      setSending(false);
-    }
+  // 1) Darhol localga qo'shamiz (optimistik)
+  const tempId = "temp-" + Date.now();
+  const tempMsg = {
+    id: tempId,
+    text,
+    kind: "text",
+    senderId: me.id,
+    senderName: me.fullname,
+    senderPhoto: me.photoUrl || "",
+    createdAt: { seconds: Date.now() / 1000 }, // local vaqt
+    reactions: {},
+    seenBy: [me.id],
+    sending: true   // UI’da “yuborilmoqda...” sifatida
   };
 
+  setMessages((prev) => [...prev, tempMsg]);
+  setMessageText("");
+  setReplyTo(null);
+
+  setSending(true);
+  try {
+    const colRef = getMessagesCollectionRef();
+
+    const msgBody = {
+      text,
+      kind: "text",
+      senderId: me.id,
+      senderName: me.fullname,
+      senderPhoto: me.photoUrl || "",
+      createdAt: serverTimestamp(),
+      reactions: {},
+      seenBy: [me.id],
+    };
+
+    if (chatKey !== "global" && activeEmployee) {
+      msgBody.participants = [me.id, activeEmployee.id];
+    }
+
+    if (replyTo) {
+      msgBody.replyTo = {
+        id: replyTo.id,
+        senderName: replyTo.senderName,
+        preview:
+          (replyTo.text || replyTo.fileName || "").toString().slice(0, 120) ||
+          "Xabar",
+      };
+    }
+
+    // 2) Firestore’ga haqiqiy xabarni yozamiz
+    await addDoc(colRef, msgBody);
+
+    // onSnapshot kelganda haqiqiy xabar temp ni o‘rnini bosadi
+  } catch (err) {
+    console.error("send message error:", err);
+    // Xato bo‘lsa local temp xabarni o‘chirib tashlaymiz
+    setMessages((prev) => prev.filter((m) => m.id !== tempId));
+    alert("Xabar yuborishda xato!");
+  } finally {
+    setSending(false);
+  }
+};
 
   // Enter bosilganda yuborish, Shift+Enter yangi qatordan yozadi
 const handleKeyDown = (e) => {
