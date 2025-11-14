@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ApplicationChat from "../components/ApplicationChat";
-import IaChat from "../components/ia-chat";
+//import IaChat from "../components/ia-chat";
 
 // ...
 
