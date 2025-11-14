@@ -15,12 +15,11 @@ export default async function handler(req, res) {
   try {
     const { messages } = req.body || {};
 
-    // Frontend'dan keladigan format: [{ role: "user"|"assistant", content: "..." }, ...]
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ error: "messages array required" });
     }
 
-    // 🔄 OpenAI Responses API uchun kerakli formatga o‘girib olamiz
+    // OpenAI Responses API uchun format
     const inputMessages = messages.map((m) => ({
       role: m.role || "user",
       content: [
@@ -36,14 +35,12 @@ export default async function handler(req, res) {
       input: inputMessages,
     });
 
-    // 🔎 Javob matnini xavfsiz olib tashlaymiz
     const firstOutput = response.output?.[0];
     const firstContent = firstOutput?.content?.[0];
 
     let replyText = "Javobni olishda xatolik bo‘ldi.";
 
     if (firstContent?.text) {
-      // text ba'zan string, ba'zan { value: "..." } bo‘lishi mumkin
       if (typeof firstContent.text === "string") {
         replyText = firstContent.text;
       } else if (typeof firstContent.text.value === "string") {
