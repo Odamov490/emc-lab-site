@@ -324,43 +324,97 @@ export default function Login(){
   }
 
   /** ======= LOGIN EKRANI ======= */
-  if(!me){
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-slate-50">
-        <div className="w-full max-w-md">
-          <div className="mb-4 flex items-center justify-between">
-            <h1 className="text-2xl font-semibold">{t.title}</h1>
-            <div className="flex items-center gap-2 text-sm">
-              <button onClick={()=>setLang("uz")} className={`px-2 py-1 rounded border ${lang==="uz"?"border-sky-500 text-sky-700":"border-black/10"}`}>UZ</button>
-              <button onClick={()=>setLang("ru")} className={`px-2 py-1 rounded border ${lang==="ru"?"border-sky-500 text-sky-700":"border-black/10"}`}>РУ</button>
-            </div>
+/** ======= LOGIN EKRANI ======= */
+if (!me) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-slate-50">
+      <div className="w-full max-w-md">
+        <div className="mb-4 flex items-center justify-between">
+          <h1 className="text-2xl font-semibold">{t.title}</h1>
+          <div className="flex items-center gap-2 text-sm">
+            <button
+              onClick={() => setLang("uz")}
+              className={`px-2 py-1 rounded border ${
+                lang === "uz" ? "border-sky-500 text-sky-700" : "border-black/10"
+              }`}
+            >
+              UZ
+            </button>
+            <button
+              onClick={() => setLang("ru")}
+              className={`px-2 py-1 rounded border ${
+                lang === "ru" ? "border-sky-500 text-sky-700" : "border-black/10"
+              }`}
+            >
+              РУ
+            </button>
           </div>
-          <Card>
-            <form onSubmit={doLogin} className="space-y-4">
-              <div><label className="text-sm font-medium">{t.username}</label><Input value={u} onChange={e=>setU(e.target.value)} placeholder="employee1" required/></div>
-              <div><label className="text-sm font-medium">{t.password}</label><Input type="password" value={p} onChange={e=>setP(e.target.value)} placeholder="••••••" required/></div>
-              {err && <div className="text-sm text-red-600">{err}</div>}
-              <button disabled={submitting} className="w-full rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-60">{submitting?t.loading:t.signIn}</button>
-            </form>
-          </Card>
         </div>
+        <Card>
+          <form onSubmit={doLogin} className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">{t.username}</label>
+              <Input
+                value={u}
+                onChange={(e) => setU(e.target.value)}
+                placeholder="employee1"
+                required
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">{t.password}</label>
+              <Input
+                type="password"
+                value={p}
+                onChange={(e) => setP(e.target.value)}
+                placeholder="••••••"
+                required
+              />
+            </div>
+            {err && <div className="text-sm text-red-600">{err}</div>}
+            <button
+              disabled={submitting}
+              className="w-full rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-60"
+            >
+              {submitting ? t.loading : t.signIn}
+            </button>
+          </form>
+        </Card>
       </div>
-    );
-  }
-
-  const SortBtn = ({col, label}) => (
-    <button
-      className="inline-flex items-center gap-1 hover:underline"
-      onClick={()=>{
-        if(sortKey===col){ setSortDir(d=>d==='asc'?'desc':'asc'); } else { setSortKey(col); setSortDir('asc'); }
-        setPage(1);
-      }}
-      title={`${t.sort}: ${label}`}
-    >
-      {label}
-      {sortKey===col && (<span>{sortDir==='asc'? '↑':'↓'}</span>)}
-    </button>
+    </div>
   );
+
+
+const SortBtn = ({ col, label }) => (
+  <button
+    className="inline-flex items-center gap-1 hover:underline"
+    onClick={() => {
+      if (sortKey === col) {
+        setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+      } else {
+        setSortKey(col);
+        setSortDir("asc");
+      }
+      setPage(1);
+    }}
+    title={`${t.sort}: ${label}`}
+  >
+    {label}
+    {sortKey === col && <span>{sortDir === "asc" ? "↑" : "↓"}</span>}
+  </button>
+);
+
+// 🔥 ASOSIY RETURN
+return (
+  <div className="min-h-screen bg-gradient-to-b from-white to-slate-50">
+    {/* 🔔 Globall qong‘iroq kuzatuvchi */}
+    <GlobalCallListener me={me} openChat={() => setTab("chat")} />
+
+    {/* ❗ shu yerdan boshlab eski dashboard kodingiz o‘sha-o‘sha qoladi */}
+    {/* Top bar, Sidebar, tablar, ApplicationChat, AIChat va h.k. */}
+  </div>
+);
+} // 👈 Login komponenti shu yerda tugaydi
 
   /** ======= DASHBOARD ======= */
   return (
