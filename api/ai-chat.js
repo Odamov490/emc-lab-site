@@ -1,9 +1,4 @@
-// api/ai-chat.js
-import OpenAI from "openai";
-
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -11,38 +6,44 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { prompt, history } = req.body || {};
+    const { prompt, history } = req.body;
 
-    if (!prompt || typeof prompt !== "string") {
-      return res.status(400).json({ error: "Prompt is required" });
+    if (!prompt) {
+      return res.status(400).json({ error: "Prompt required" });
     }
 
-    // Chat tarixini bitta matnga yig‘amiz
-    let conversation = "";
-    if (Array.isArray(history)) {
-      for (const m of history) {
-        const who = m.role === "user" ? "Foydalanuvchi" : "Yordamchi";
-        conversation += `${who}: ${m.text}\n`;
-      }
-    }
-    conversation += `Foydalanuvchi: ${prompt}\nYordamchi:`;
+    // Gemini ulanish
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-    // 💬 Asosiy OpenAI chaqiruvi (Responses API)
-    const response = await client.responses.create({
-      model: "gpt-4.1",        // ⬅️ shu yerda model nomi o‘zgartirildi
-      input: conversation,
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
     });
 
-    const reply =
-      response.output?.[0]?.content?.[0]?.text?.trim() ||
-      "Javobni olishda xatolik bo‘ldi.";
+    // Chat tarixi formatlash
+    const chatMessages = [
+      ...history.map(m => ({
+        role: m.sender === "user" ? "user" : "model",
+        parts: [{ text: m.text }],
+      })),
+      {
+        role: "user",
+        parts: [{ text: prompt }],
+      },
+    ];
+
+    const result = await model.generateContent({
+      contents: chatMessages,
+    });
+
+    const reply = result.response.text();
 
     return res.status(200).json({ reply });
+
   } catch (err) {
-    console.error("AI error:", err);
+    console.error("Gemini API error:", err);
     return res.status(500).json({
-      error: "AI error",
-      detail: err.error?.message || err.message || "Unknown error",
+      error: "server_error",
+      message: "Gemini bilan bog‘lanishda xatolik.",
     });
   }
 }
