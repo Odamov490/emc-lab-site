@@ -29,7 +29,7 @@ export default async function handler(req, res) {
 
     // 💬 Asosiy OpenAI chaqiruvi (Responses API)
     const response = await client.responses.create({
-      model: "gpt-4.1-mini",        // ⬅️ shu yerda model nomi o‘zgartirildi
+      model: "gpt-4.1",        // ⬅️ shu yerda model nomi o‘zgartirildi
       input: conversation,
     });
 
