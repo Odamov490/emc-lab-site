@@ -418,7 +418,7 @@ export default function Login() {
       localStorage.setItem("emc_auth", JSON.stringify(auth));
       setMe(auth);
       setSubmitting(false);
-      setTab("profile");
+      setTab("combo");
     } catch (e2) {
       console.error(e2);
       setErr("Xatolik. Keyinroq urinib ko‘ring.");
@@ -428,7 +428,7 @@ export default function Login() {
   const logout = () => {
     localStorage.removeItem("emc_auth");
     setMe(null);
-    setTab("profile");
+    setTab("combo");
   };
 
   /** ======= HELPERS ======= */
