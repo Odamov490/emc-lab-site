@@ -382,54 +382,55 @@ export default function Login() {
     };
   }, [me]);
 
-  /** ======= LOGIN ======= */
-  const doLogin = async (e) => {
-    e.preventDefault();
-    setErr("");
-    setSubmitting(true);
-    try {
-      const qy = query(
-        collection(db, "employees"),
-        where("username", "==", u.trim()),
-        where("password", "==", p)
-      );
-      const qs = await getDocs(qy);
-      if (qs.empty) {
-        setErr(t.wrong);
-        setSubmitting(false);
-        return;
-      }
-      const d = qs.docs[0].data();
-      const photo = d.photoUrl || STAFF_PHOTOS[d.fullname] || "";
-      if (!d.photoUrl && STAFF_PHOTOS[d.fullname]) {
-        try {
-          await updateDoc(doc(db, "employees", qs.docs[0].id), {
-            photoUrl: STAFF_PHOTOS[d.fullname],
-          });
-        } catch {}
-      }
-      const auth = {
-        id: qs.docs[0].id,
-        username: d.username,
-        fullname: d.fullname || d.username,
-        role: d.role || "employee",
-        photoUrl: photo,
-      };
-      localStorage.setItem("emc_auth", JSON.stringify(auth));
-      setMe(auth);
+ const doLogin = async (e) => {
+  e.preventDefault();
+  setErr("");
+  setSubmitting(true);
+
+  try {
+    const qy = query(
+      collection(db, "employees"),
+      where("username", "==", u.trim()),
+      where("password", "==", p)
+    );
+
+    const qs = await getDocs(qy);
+    if (qs.empty) {
+      setErr(t.wrong);
       setSubmitting(false);
-      setTab("profile");
-    } catch (e2) {
-      console.error(e2);
-      setErr("Xatolik. Keyinroq urinib ko‘ring.");
-      setSubmitting(false);
+      return;
     }
-  };
-  const logout = () => {
-    localStorage.removeItem("emc_auth");
-    setMe(null);
-    setTab("combo");
-  };
+
+    const d = qs.docs[0].data();
+    const photo = d.photoUrl || STAFF_PHOTOS[d.fullname] || "";
+
+    if (!d.photoUrl && STAFF_PHOTOS[d.fullname]) {
+      try {
+        await updateDoc(doc(db, "employees", qs.docs[0].id), {
+          photoUrl: STAFF_PHOTOS[d.fullname],
+        });
+      } catch {}
+    }
+
+    const auth = {
+      id: qs.docs[0].id,
+      username: d.username,
+      fullname: d.fullname || d.username,
+      role: d.role || "employee",
+      photoUrl: photo,
+    };
+
+    localStorage.setItem("emc_auth", JSON.stringify(auth));
+    setMe(auth);
+    setSubmitting(false);
+    setTab("profile");  // ← ENDIIII PROFILGA O‘TADI
+  } catch (e2) {
+    console.error(e2);
+    setErr("Xatolik. Keyinroq urinib ko‘ring.");
+    setSubmitting(false);
+  }
+};
+
 
   /** ======= HELPERS ======= */
   const formatDT = (ts) => {
