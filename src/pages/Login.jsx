@@ -292,7 +292,7 @@ export default function Login() {
   const [submitting, setSubmitting] = useState(false);
 
   // tabs
-  const [tab, setTab] = useState("combo"); // profile | combo | employees | activity | standards | chat | ai
+  const [tab, setTab] = useState("profile"); // profile | combo | employees | activity | standards | chat | ai
 
   // data
   const [apps, setApps] = useState([]);
