@@ -1,13 +1,11 @@
-// api/ai-chat.js  (Vercel Serverless Function)
+// api/ai-chat.js
 import OpenAI from "openai";
 
 const client = new OpenAI({
-  // ⚠️ Kalitni Vercel environment'ida OPENAI_API_KEY nomi bilan saqlaganmiz
   apiKey: process.env.OPENAI_API_KEY,
 });
 
 export default async function handler(req, res) {
-  // Faqat POST ruxsat
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -15,33 +13,32 @@ export default async function handler(req, res) {
   try {
     const { prompt, history } = req.body || {};
 
-    if (!prompt || typeof prompt !== "string") {
-      return res.status(400).json({ error: "prompt required" });
+    if (!prompt) {
+      return res.status(400).json({ error: "Prompt is required" });
     }
 
-    // Chat tarixini bitta matnga yig‘amiz (oddiy, ammo ishlaydigan usul)
+    // Tarixni matnga aylantirish
     let conversation = "";
     if (Array.isArray(history)) {
-      for (const msg of history) {
-        const speaker = msg.role === "user" ? "Foydalanuvchi" : "Yordamchi";
-        conversation += `${speaker}: ${msg.text}\n`;
+      for (const m of history) {
+        const who = m.role === "user" ? "Foydalanuvchi" : "Yordamchi";
+        conversation += `${who}: ${m.text}\n`;
       }
     }
     conversation += `Foydalanuvchi: ${prompt}\nYordamchi:`;
 
+    // Yangi Responses API
     const response = await client.responses.create({
       model: "gpt-5.1-mini",
-      // ❗ Yangi API: faqat `input`, `messages` yo‘q
       input: conversation,
-      instructions:
-        "Siz EMC Lab saytining AI yordamchisisiz. Savollarga qisqa, aniq va asosan o‘zbek tilida javob bering. Juda rasmiy bo‘lmasin.",
     });
 
-    const outputText =
+    // To‘g‘ri o‘qish
+    const reply =
       response.output?.[0]?.content?.[0]?.text ||
-      "Javobni olishda xatolik bo‘ldi.";
+      "Xatolik: javobni o‘qib bo‘lmadi";
 
-    return res.status(200).json({ reply: outputText });
+    return res.status(200).json({ reply });
   } catch (err) {
     console.error("AI error:", err);
     return res.status(500).json({ error: "AI error" });
