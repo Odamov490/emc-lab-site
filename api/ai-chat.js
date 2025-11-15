@@ -13,11 +13,11 @@ export default async function handler(req, res) {
   try {
     const { prompt, history } = req.body || {};
 
-    if (!prompt) {
+    if (!prompt || typeof prompt !== "string") {
       return res.status(400).json({ error: "Prompt is required" });
     }
 
-    // Tarixni matnga aylantirish
+    // Chat tarixini bitta matnga yig‘amiz
     let conversation = "";
     if (Array.isArray(history)) {
       for (const m of history) {
@@ -27,20 +27,22 @@ export default async function handler(req, res) {
     }
     conversation += `Foydalanuvchi: ${prompt}\nYordamchi:`;
 
-    // Yangi Responses API
+    // 💬 Asosiy OpenAI chaqiruvi (Responses API)
     const response = await client.responses.create({
-      model: "gpt-5.1-mini",
+      model: "gpt-4.1-mini",        // ⬅️ shu yerda model nomi o‘zgartirildi
       input: conversation,
     });
 
-    // To‘g‘ri o‘qish
     const reply =
-      response.output?.[0]?.content?.[0]?.text ||
-      "Xatolik: javobni o‘qib bo‘lmadi";
+      response.output?.[0]?.content?.[0]?.text?.trim() ||
+      "Javobni olishda xatolik bo‘ldi.";
 
     return res.status(200).json({ reply });
   } catch (err) {
     console.error("AI error:", err);
-    return res.status(500).json({ error: "AI error" });
+    return res.status(500).json({
+      error: "AI error",
+      detail: err.error?.message || err.message || "Unknown error",
+    });
   }
 }
