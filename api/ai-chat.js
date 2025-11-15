@@ -1,49 +1,58 @@
+// api/ai-chat.js  (Vercel serverless function, Gemini bilan)
+
+// 1) npm orqali o‘rnatilgan bo‘lishi kerak:
+//    npm install @google/generative-ai
 import { GoogleGenerativeAI } from "@google/generative-ai";
+
+// 2) Vercel’da Environment Variables ichida:
+//    GEMINI_API_KEY = ... (sening Gemini API kaliting)
+//    qilib qo‘yilgan bo‘lishi kerak.
+const client = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    return res
+      .status(405)
+      .json({ error: "Only POST method allowed for this endpoint" });
   }
 
   try {
-    const { prompt, history } = req.body;
+    const { messages } = req.body || {};
 
-    if (!prompt) {
-      return res.status(400).json({ error: "Prompt required" });
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({ error: "messages array required" });
     }
 
-    // Gemini ulanish
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    // Frontdan kelgan {role, content} massivini bitta promptga aylantiramiz
+    const prompt = messages
+      .map((m) => {
+        const role = m.role === "assistant" ? "AI" : "User";
+        return `${role}: ${m.content}`;
+      })
+      .join("\n");
 
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
+    // 🔹 MUHIM: model nomi — gemini-pro
+    const model = client.getGenerativeModel({
+      model: "gemini-pro",
     });
-
-    // Chat tarixi formatlash
-    const chatMessages = [
-      ...history.map(m => ({
-        role: m.sender === "user" ? "user" : "model",
-        parts: [{ text: m.text }],
-      })),
-      {
-        role: "user",
-        parts: [{ text: prompt }],
-      },
-    ];
 
     const result = await model.generateContent({
-      contents: chatMessages,
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: prompt }],
+        },
+      ],
     });
 
-    const reply = result.response.text();
+    const text = result.response?.text?.() || "Javob topilmadi.";
 
-    return res.status(200).json({ reply });
-
+    return res.status(200).json({ reply: text });
   } catch (err) {
     console.error("Gemini API error:", err);
     return res.status(500).json({
-      error: "server_error",
-      message: "Gemini bilan bog‘lanishda xatolik.",
+      error: "Gemini API error",
+      details: err?.message || String(err),
     });
   }
 }
