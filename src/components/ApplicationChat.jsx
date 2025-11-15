@@ -17,6 +17,8 @@ import {
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../firebase";
+import AudioCall from "./AudioCall";
+
 
 /**
  * KICHIK UI KOMPONENTLAR
@@ -1055,35 +1057,39 @@ export default function ApplicationChat({ me }) {
       {/* RIGHT: Chat oynasi */}
       <div className="relative flex-1 flex flex-col bg-gradient-to-br from-sky-50/60 via-white to-indigo-50/60">
         {/* HEADER */}
-        <div className="h-14 border-b border-black/10 px-4 flex items-center justify-between bg-white/80 backdrop-blur">
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-500 text-white text-xs font-semibold grid place-items-center shadow">
-              {activeEmployee ? activeEmployee.fullname?.[0] || "👤" : "💬"}
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <div className="text-sm font-semibold">{headerTitle}</div>
-                {activeEmployee && (
-                  <span className="text-[10px] rounded-full bg-sky-100 text-sky-700 px-2 py-0.5">
-                    DM
-                  </span>
-                )}
-              </div>
-              <div className="text-[11px] text-gray-500 truncate max-w-[260px]">
-                {headerSubtitle}
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <input
-              className="rounded-2xl border border-black/10 bg-white/70 px-3 py-1.5 text-[11px] w-40 focus:outline-none focus:ring-1 focus:ring-sky-400"
-              placeholder="Chat ichida qidirish"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <TextButton onClick={clearChatHistory}>Tarixni tozalash</TextButton>
-          </div>
-        </div>
+<div className="h-14 border-b border-black/10 px-4 flex items-center justify-between bg-white/80 backdrop-blur">
+  <div className="flex items-center gap-3">
+    <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-500 text-white text-xs font-semibold grid place-items-center shadow">
+      {activeEmployee ? activeEmployee.fullname?.[0] || "👤" : "💬"}
+    </div>
+    <div>
+      <div className="flex items-center gap-2">
+        <div className="text-sm font-semibold">{headerTitle}</div>
+        {activeEmployee && (
+          <span className="text-[10px] rounded-full bg-sky-100 text-sky-700 px-2 py-0.5">
+            DM
+          </span>
+        )}
+      </div>
+      <div className="text-[11px] text-gray-500 truncate max-w-[260px]">
+        {headerSubtitle}
+      </div>
+    </div>
+  </div>
+
+  <div className="flex items-center gap-3">
+    {/* 🔊 Audio qo‘ng‘iroq faqat DM da ko‘rinadi */}
+    {activeEmployee && <AudioCall me={me} peer={activeEmployee} />}
+
+    <input
+      className="rounded-2xl border border-black/10 bg-white/70 px-3 py-1.5 text-[11px] w-40 focus:outline-none focus:ring-1 focus:ring-sky-400"
+      placeholder="Chat ichida qidirish"
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+    />
+    <TextButton onClick={clearChatHistory}>Tarixni tozalash</TextButton>
+  </div>
+</div>
 
         {/* PINNED BANNER */}
         {pinnedMessage && !pinnedHidden && (
