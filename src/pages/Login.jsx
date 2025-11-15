@@ -418,7 +418,7 @@ export default function Login() {
       localStorage.setItem("emc_auth", JSON.stringify(auth));
       setMe(auth);
       setSubmitting(false);
-      setTab("combo");
+      setTab("profile");
     } catch (e2) {
       console.error(e2);
       setErr("Xatolik. Keyinroq urinib ko‘ring.");
