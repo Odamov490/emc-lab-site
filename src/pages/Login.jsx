@@ -3,6 +3,8 @@ import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ApplicationChat from "../components/ApplicationChat";
 import AIChat from "../components/AIChat";
+import GlobalCallListener from "../components/GlobalCallListener";
+
 
 import { db } from "../firebase";
 import {
@@ -323,7 +325,7 @@ export default function Login(){
     return <div className="min-h-screen grid place-items-center"><div className="text-sm text-gray-600">{t.loading}</div></div>;
   }
 
-  /** ======= LOGIN EKRANI ======= */
+    /** ======= LOGIN EKRANI ======= */
   if(!me){
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-slate-50">
@@ -331,16 +333,48 @@ export default function Login(){
           <div className="mb-4 flex items-center justify-between">
             <h1 className="text-2xl font-semibold">{t.title}</h1>
             <div className="flex items-center gap-2 text-sm">
-              <button onClick={()=>setLang("uz")} className={`px-2 py-1 rounded border ${lang==="uz"?"border-sky-500 text-sky-700":"border-black/10"}`}>UZ</button>
-              <button onClick={()=>setLang("ru")} className={`px-2 py-1 rounded border ${lang==="ru"?"border-sky-500 text-sky-700":"border-black/10"}`}>РУ</button>
+              <button
+                onClick={()=>setLang("uz")}
+                className={`px-2 py-1 rounded border ${lang==="uz"?"border-sky-500 text-sky-700":"border-black/10"}`}
+              >
+                UZ
+              </button>
+              <button
+                onClick={()=>setLang("ru")}
+                className={`px-2 py-1 rounded border ${lang==="ru"?"border-sky-500 text-sky-700":"border-black/10"}`}
+              >
+                РУ
+              </button>
             </div>
           </div>
           <Card>
             <form onSubmit={doLogin} className="space-y-4">
-              <div><label className="text-sm font-medium">{t.username}</label><Input value={u} onChange={e=>setU(e.target.value)} placeholder="employee1" required/></div>
-              <div><label className="text-sm font-medium">{t.password}</label><Input type="password" value={p} onChange={e=>setP(e.target.value)} placeholder="••••••" required/></div>
+              <div>
+                <label className="text-sm font-medium">{t.username}</label>
+                <Input
+                  value={u}
+                  onChange={e=>setU(e.target.value)}
+                  placeholder="employee1"
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">{t.password}</label>
+                <Input
+                  type="password"
+                  value={p}
+                  onChange={e=>setP(e.target.value)}
+                  placeholder="••••••"
+                  required
+                />
+              </div>
               {err && <div className="text-sm text-red-600">{err}</div>}
-              <button disabled={submitting} className="w-full rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-60">{submitting?t.loading:t.signIn}</button>
+              <button
+                disabled={submitting}
+                className="w-full rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-60"
+              >
+                {submitting ? t.loading : t.signIn}
+              </button>
             </form>
           </Card>
         </div>
@@ -352,15 +386,48 @@ export default function Login(){
     <button
       className="inline-flex items-center gap-1 hover:underline"
       onClick={()=>{
-        if(sortKey===col){ setSortDir(d=>d==='asc'?'desc':'asc'); } else { setSortKey(col); setSortDir('asc'); }
+        if (sortKey===col) {
+          setSortDir(d=>d==='asc'?'desc':'asc');
+        } else {
+          setSortKey(col);
+          setSortDir('asc');
+        }
         setPage(1);
       }}
       title={`${t.sort}: ${label}`}
     >
       {label}
-      {sortKey===col && (<span>{sortDir==='asc'? '↑':'↓'}</span>)}
+      {sortKey===col && (<span>{sortDir==='asc' ? '↑' : '↓'}</span>)}
     </button>
   );
+
+  // 🚀 ASOSIY DASHBOARD RETURN – SHU YERGA LISTENERNI QO'YAMIZ
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-white to-slate-50">
+
+      {/* 🔔 Global qo‘ng‘iroq listener — HAR QANDAY SAHIFADA ISHLAYDI */}
+      <GlobalCallListener
+        me={me}
+        openChat={() => setTab("chat")}   // qo‘ng‘iroq kelganda chat tab’ga o‘tadi
+      />
+
+      {/* Pastdagi hamma eski kodingiz o‘z holicha davom etadi */}
+      {/* Top bar */}
+      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-black/10">
+        <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
+          {/* ... sizning bor kodlaringiz ... */}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 py-6 grid md:grid-cols-[230px_1fr] gap-6">
+        {/* Sidebar, tablar, boshqalar */}
+        {/* ... hammasi oldingidek qoladi ... */}
+      </div>
+    </div>
+  );
+}
+
 
   /** ======= DASHBOARD ======= */
   return (
