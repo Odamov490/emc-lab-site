@@ -1965,9 +1965,7 @@ const logout = () => {
                 </div>
               </div>
 
-              <div className="text-xs text-gray-500 mb-3">
-                {t.stdHint}
-              </div>
+         
 
               <div className="flex items-center gap-2 mb-3">
                 <input
