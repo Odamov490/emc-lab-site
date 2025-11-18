@@ -1948,14 +1948,7 @@ const logout = () => {
                   {t.stdTitle}
                 </div>
                 <div className="flex items-center gap-2">
-                  <a
-                    href="/standards/"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="rounded-xl border px-3 py-1.5 text-sm hover:bg-black/5"
-                  >
-                    {t.stdOpenFolder}
-                  </a>
+             
                   <button
                     onClick={loadStandards}
                     className="rounded-xl border px-3 py-1.5 text-sm hover:bg-black/5"
