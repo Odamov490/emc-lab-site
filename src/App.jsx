@@ -849,8 +849,8 @@ const navigate = useNavigate();
                 </h1>
                 <p className="mt-4 text-gray-700 dark:text-gray-300 text-base sm:text-lg max-w-xl">
                   {lang==="uz"
-                    ? "ESD, EFT/B, Surge, RF immunitet, Flicker, Garmonik va emissiya o‘lchovlari. ISO/IEC 17025 akkreditatsiya doirasida."
-                    : "ESD, EFT/B, Surge, RF иммунитет, мерцание, гармоники и измерения помех. В рамках аккредитации ISO/IEC 17025."}
+                    ? "ESD, EFT/B, Surge, RF immunitet, Flicker, Garmonik va emissiya o‘lchovlari. Oʼz DSt ISO/IEC 17025:2019 akkreditatsiya doirasida."
+                    : "ESD, EFT/B, Surge, RF иммунитет, мерцание, гармоники и измерения помех. В рамках аккредитации Oʼz DSt ISO/IEC 17025:2019."}
                 </p>
                 <div className="mt-6 flex flex-col xs:flex-row sm:flex-row items-start sm:items-center gap-3">
                   <a href="#services" className="rounded-xl border border-black/10 bg-white/70 px-4 py-2 text-sm font-medium hover:opacity-90 backdrop-blur">
@@ -893,8 +893,8 @@ const navigate = useNavigate();
           id="about"
           title={lang==="uz" ? "Biz haqimizda" : "О нас"}
           subtitle={lang==="uz"
-            ? "ISO/IEC 17025 doirasida akkreditatsiyadan o‘tgan EMC laboratoriyasi (O’ZAK.SL.0309). 2021-yildan buyon elektromagnit moslashuvchanlik sinovlarini o‘tkazamiz."
-            : "EMC-лаборатория, аккредитованная по ISO/IEC 17025 (О’ЗАК.SL.0309). С 2021 года проводим испытания на электромагнитную совместимость."
+            ? "Oʼz DSt ISO/IEC 17025:2019 doirasida akkreditatsiyadan o‘tgan EMC laboratoriyasi (O’ZAK.SL.0309). 2021-yildan buyon elektromagnit moslashuvchanlik sinovlarini o‘tkazamiz."
+            : "EMC-лаборатория, аккредитованная по Oʼz DSt ISO/IEC 17025:2019 (О’ЗАК.SL.0309). С 2021 года проводим испытания на электромагнитную совместимость."
           }
         >
           <div className="rounded-3xl bg-gradient-to-r from-sky-700 to-cyan-600 text-white shadow-lg p-6 sm:p-8 space-y-6">
@@ -1042,7 +1042,7 @@ const navigate = useNavigate();
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <div className="text-sm/5 opacity-90">{lang==="uz" ? "Akkreditatsiya va doira" : "Аккредитация и область"}</div>
-                <div className="text-xl font-semibold">O’ZAK.SL.0309 • ISO/IEC 17025</div>
+                <div className="text-xl font-semibold">O’ZAK.SL.0309 • Oʼz DSt ISO/IEC 17025:2019 </div>
               </div>
               <a href="#contact" className="rounded-xl bg-white/15 px-4 py-2 text-sm font-medium hover:bg_white/20">
                 {lang==="uz" ? "Hujjatlarni ko‘rish" : "Просмотреть документы"}
