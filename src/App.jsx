@@ -879,7 +879,7 @@ const navigate = useNavigate();
                 </Card>
                 <div className="absolute -bottom-6 -right-6 hidden sm:block">
                   <div className="rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-400 text-white px-5 py-3 shadow-lg">
-                    <div className="text-xs">ISO/IEC 17025</div>
+                    <div className="text-xs">Oʼz DSt ISO/IEC 17025:2019</div>
                     <div className="text-sm font-semibold">{lang==="uz" ? "Akkreditatsiya" : "Аккредитация"}</div>
                   </div>
                 </div>
