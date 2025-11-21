@@ -4,18 +4,26 @@ const programs = [
   {
     id: "maishiy",
     standard: "O‘z MST IEC 61000-6-1/3",
-    uzTitle: "Maishiy elektr jihozlari uchun EMC sinov dasturi",
-    ruTitle: "Программа EMC-испытаний для бытовой электротехники",
+    uzTitle: "Maishiy elektr jihozlari uchun EMC sinov dasturi*",
+    ruTitle: "Программа EMC-испытаний для бытовой электротехники*",
     uzType: "Kompleks EMC sinovi",
     ruType: "Комплексные EMC-испытания",
-    file: "/sinov-dasturlari/maishiy-texnika-emc-sinov-dasturi.docx"
+    file: "/sinov-dasturlari/maishiy-texnika-emc-sinov-dasturi.docx",
+
+    // 🔥 ISTISNOLAR
+    noteUz:
+      "*Ushbu dasturga quyidagi mahsulotlar kirmaydi: Avtotransport vositalari uchun mo‘ljallangan elektr jihozlari, traktorlar va qishloq xo‘jaligi texnikasi, elektr pogruzchiklar, dizel pogruzchiklar, stasionar holatda sinovdan o‘tadigan maxsus qurilmalar.",
+
+    noteRu:
+      "*В данную программу не входят: электрооборудование автотранспортных средств, тракторов и сельхозтехники, электропогрузчики, дизельные погрузчики, специализированное стационарное оборудование."
   },
 
   {
     id: "it-equipment",
     standard: "O‘z MST IEC 61000-6-1/3",
     uzTitle: "Axborot-texnik qurilmalar (IT/office) uchun EMC sinov dasturi",
-    ruTitle: "Программа EMC-испытаний для информационно-технического (IT/офисного) оборудования",
+    ruTitle:
+      "Программа EMC-испытаний для информационно-технического (IT/офисного) оборудования",
     uzType: "Kompleks EMC sinovi",
     ruType: "Комплексные EMC-испытания",
     file: "/sinov-dasturlari/axborot-texnik-qurilmalar-emc-sinov-dasturi.docx"
@@ -51,7 +59,6 @@ const programs = [
     file: "/sinov-dasturlari/lampalar-emc-sinov-dasturi.docx"
   }
 ];
-
 
 const text = {
   section: {
@@ -109,10 +116,8 @@ export default function SinovDasturlari() {
         <img src="/img/bird.png" alt="" className="bird-img bird-img-2" />
       </div>
 
-      {/* Kontent */}
       <div className="relative z-[2]">
         <div className="max-w-6xl mx-auto px-4 pb-16 pt-10 md:pt-14">
-          
           {/* Yuqori blok */}
           <section className="mb-10 md:mb-12">
             <div className="flex items-center justify-between mb-3 gap-4">
@@ -125,7 +130,9 @@ export default function SinovDasturlari() {
                   onClick={() => setLang("uz")}
                   className={
                     "px-3 py-1.5 font-bold " +
-                    (isUz ? "bg-sky-600 text-white" : "text-slate-700 hover:bg-slate-100")
+                    (isUz
+                      ? "bg-sky-600 text-white"
+                      : "text-slate-700 hover:bg-slate-100")
                   }
                 >
                   UZ
@@ -148,8 +155,6 @@ export default function SinovDasturlari() {
               {isUz ? t.header.uz : t.header.ru}
             </h1>
 
-         
-
             <p className="text-sm md:text-[15px] text-slate-100 max-w-2xl drop-shadow">
               {isUz ? t.desc.uz : t.desc.ru}
             </p>
@@ -165,14 +170,12 @@ export default function SinovDasturlari() {
                 <div className="h-[3px] bg-gradient-to-r from-sky-500 via-cyan-400 to-sky-500" />
 
                 <div className="p-6 flex flex-col gap-4">
-                  
+                  {/* Sarlavha */}
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <h2 className="text-base md:text-lg font-semibold text-slate-900 leading-snug">
                         {isUz ? p.uzTitle : p.ruTitle}
                       </h2>
-
-                   
                     </div>
 
                     <span className="inline-flex items-center justify-center rounded-full bg-sky-50 px-3 py-1 text-[11px] font-semibold text-sky-700">
@@ -180,11 +183,16 @@ export default function SinovDasturlari() {
                     </span>
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex flex-col text-[12px] text-slate-600">
-                    
-                   
+                  {/* 🔥 Faqat MAISHIY uchun istisno chiqarish */}
+                  {p.noteUz && (
+                    <div className="text-[11px] bg-slate-100 text-slate-600 border border-slate-200 rounded-lg p-2">
+                      {isUz ? p.noteUz : p.noteRu}
                     </div>
+                  )}
+
+                  {/* Tugmalar */}
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div />
 
                     <div className="flex flex-wrap gap-2">
                       <a
@@ -205,12 +213,10 @@ export default function SinovDasturlari() {
                       </a>
                     </div>
                   </div>
-
                 </div>
               </article>
             ))}
           </section>
-
         </div>
       </div>
     </div>
