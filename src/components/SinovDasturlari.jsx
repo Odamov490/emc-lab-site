@@ -5,25 +5,25 @@ const programs = [
     id: "esd",
     uzTitle: "ESD (elektrostatik razryad) sinov dasturi",
     ruTitle: "Программа испытаний ESD (электростатический разряд)",
-    file: "/files/sinov-dasturlari/esd-test-program.docx"
+    file: "/public/sinov-dasturlari/esd-test-program.docx"
   },
   {
     id: "surge",
     uzTitle: "Surge (kuchlanish sakrashi) sinov dasturi",
     ruTitle: "Программа испытаний Surge",
-    file: "/files/sinov-dasturlari/surge-test-program.docx"
+    file: "/public/sinov-dasturlari/surge-test-program.docx"
   },
   {
     id: "rf-immunity",
     uzTitle: "RF immunitet sinov dasturi",
     ruTitle: "Программа испытаний на радиочастотную помехоустойчивость",
-    file: "/files/sinov-dasturlari/rf-immunity-program.docx"
+    file: "/public/sinov-dasturlari/rf-immunity-program.docx"
   },
   {
     id: "flicker",
     uzTitle: "Flicker sinov dasturi",
     ruTitle: "Программа испытаний Flicker",
-    file: "/files/sinov-dasturlari/flicker-test-program.docx"
+    file: "/public/sinov-dasturlari/flicker-test-program.docx"
   }
   // xohlasangiz bu yerga yana qo‘shimcha dasturlar qo‘sha olasiz
 ];
