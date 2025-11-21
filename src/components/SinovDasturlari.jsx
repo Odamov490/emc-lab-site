@@ -87,7 +87,9 @@ export default function SinovDasturlari() {
   const isUz = lang === "uz";
   const t = text;
 
+  // DOCX’ni Office Online orqali ochish
   const getViewerUrl = (relativePath) => {
+    if (typeof window === "undefined") return relativePath;
     const absolute = `${window.location.origin}${relativePath}`;
     return `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(
       absolute
@@ -96,103 +98,122 @@ export default function SinovDasturlari() {
 
   return (
     <div className="nature-bg min-h-screen relative overflow-hidden">
-      <div className="birds-layer">
-        <div className="bird bird--1" />
-        <div className="bird bird--2" />
-        <div className="bird bird--3" />
+      {/* Real qush rasmlari – fon ustida uchadi */}
+      <div className="birds-layer" aria-hidden="true">
+        {/* bitta yoki ikkita qush yetarli, hozir ikkitasi */}
+        <img src="/img/bird.png" alt="" className="bird-img bird-img-1" />
+        <img src="/img/bird.png" alt="" className="bird-img bird-img-2" />
       </div>
 
+      {/* Kontent */}
       <div className="relative z-[2]">
         <div className="max-w-6xl mx-auto px-4 pb-16 pt-10 md:pt-14">
-
-          {/* UZ / RU */}
+          {/* Yuqori blok */}
           <section className="mb-10 md:mb-12">
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-3 gap-4">
               <p className="text-sm font-medium text-white drop-shadow">
                 {isUz ? t.section.uz : t.section.ru}
               </p>
 
+              {/* UZ / RU tugmalari */}
               <div className="inline-flex bg-white/80 shadow border border-slate-200 rounded-full text-xs overflow-hidden">
                 <button
+                  type="button"
                   onClick={() => setLang("uz")}
-                  className={`px-3 py-1.5 font-bold ${
-                    isUz ? "bg-sky-600 text-white" : "text-slate-700"
-                  }`}
+                  className={
+                    "px-3 py-1.5 font-bold transition " +
+                    (isUz ? "bg-sky-600 text-white" : "text-slate-700 hover:bg-slate-100")
+                  }
                 >
                   UZ
                 </button>
                 <button
+                  type="button"
                   onClick={() => setLang("ru")}
-                  className={`px-3 py-1.5 font-bold ${
-                    !isUz ? "bg-sky-600 text-white" : "text-slate-700"
-                  }`}
+                  className={
+                    "px-3 py-1.5 font-bold transition " +
+                    (!isUz
+                      ? "bg-sky-600 text-white"
+                      : "text-slate-700 hover:bg-slate-100")
+                  }
                 >
                   RU
                 </button>
               </div>
             </div>
 
-            <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow mb-2">
+            <h1 className="text-3xl md:text-4xl font-semibold text-white drop-shadow mb-2">
               {isUz ? t.header.uz : t.header.ru}
             </h1>
 
-            <p className="text-sky-100 md:text-base drop-shadow mb-2">
+            <p className="text-sm md:text-base text-sky-100 drop-shadow mb-2">
               {isUz ? t.subtitle.uz : t.subtitle.ru}
             </p>
 
-            <p className="text-slate-100 max-w-2xl drop-shadow">
+            <p className="text-sm md:text-[15px] text-slate-100 max-w-2xl drop-shadow">
               {isUz ? t.desc.uz : t.desc.ru}
             </p>
           </section>
 
-          {/* Cards */}
+          {/* Kartalar */}
           <section className="grid gap-6 md:grid-cols-2">
             {programs.map((p) => (
               <article
                 key={p.id}
-                className="bg-white/90 backdrop-blur-xl border border-white/60 shadow-2xl rounded-2xl overflow-hidden"
+                className="relative overflow-hidden rounded-[26px] bg-white/92 backdrop-blur-xl shadow-[0_16px_40px_rgba(15,23,42,0.4)] border border-slate-100"
               >
                 <div className="h-[3px] bg-gradient-to-r from-sky-500 via-cyan-400 to-sky-500" />
 
-                <div className="p-6">
-                  <h2 className="text-lg font-semibold text-slate-900">
-                    {isUz ? p.uzTitle : p.ruTitle}
-                  </h2>
-
-                  <p className="mt-2 text-xs uppercase text-slate-500 tracking-wide">
-                    {isUz ? t.standard.uz : t.standard.ru}{" "}
-                    <span className="font-bold text-slate-700">{p.standard}</span>
-                  </p>
-
-                  <div className="mt-4 flex justify-between items-center">
-                    <div className="text-xs text-slate-700">
-                      {isUz ? t.testType.uz : t.testType.ru}{" "}
-                      <span className="font-semibold text-slate-900">
-                        {isUz ? p.uzType : p.ruType}
-                      </span>
+                <div className="p-6 flex flex-col gap-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h2 className="text-base md:text-lg font-semibold text-slate-900 leading-snug">
+                        {isUz ? p.uzTitle : p.ruTitle}
+                      </h2>
+                      <p className="mt-2 text-[11px] uppercase tracking-wide text-slate-500">
+                        {isUz ? t.standard.uz : t.standard.ru}{" "}
+                        <span className="font-semibold text-slate-700">
+                          {p.standard}
+                        </span>
+                      </p>
                     </div>
 
-                    <span className="bg-sky-50 text-sky-700 px-3 py-1 rounded-full text-[11px] font-semibold">
+                    <span className="inline-flex items-center justify-center rounded-full bg-sky-50 px-3 py-1 text-[11px] font-semibold text-sky-700">
                       EMC
                     </span>
                   </div>
 
-                  <div className="flex gap-2 mt-5">
-                    <a
-                      href={getViewerUrl(p.file)}
-                      target="_blank"
-                      className="bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold px-4 py-1.5 rounded-full transition"
-                    >
-                      {isUz ? t.viewOnline.uz : t.viewOnline.ru}
-                    </a>
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex flex-col text-[12px] text-slate-600">
+                      <span>
+                        {isUz ? t.testType.uz : t.testType.ru}{" "}
+                        <span className="font-medium text-slate-800">
+                          {isUz ? p.uzType : p.ruType}
+                        </span>
+                      </span>
+                      <span>
+                        DOCX · {isUz ? "Rus / ingliz tili" : "Русский / английский"}
+                      </span>
+                    </div>
 
-                    <a
-                      href={p.file}
-                      download
-                      className="border border-slate-300 hover:border-sky-400 text-slate-800 text-xs font-semibold px-4 py-1.5 rounded-full transition"
-                    >
-                      {isUz ? t.download.uz : t.download.ru}
-                    </a>
+                    <div className="flex flex-wrap gap-2">
+                      <a
+                        href={getViewerUrl(p.file)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center justify-center rounded-full bg-sky-600 text-white text-xs md:text-sm font-semibold px-3.5 py-1.5 hover:bg-sky-500 hover:-translate-y-0.5 active:translate-y-0 transition transform"
+                      >
+                        {isUz ? t.viewOnline.uz : t.viewOnline.ru}
+                      </a>
+
+                      <a
+                        href={p.file}
+                        download
+                        className="inline-flex items-center justify-center rounded-full border border-slate-300 text-xs md:text-sm font-semibold px-3.5 py-1.5 text-slate-800 bg-slate-50 hover:bg-white hover:border-sky-400 hover:text-sky-700 hover:-translate-y-0.5 active:translate-y-0 transition transform"
+                      >
+                        {isUz ? t.download.uz : t.download.ru}
+                      </a>
+                    </div>
                   </div>
                 </div>
               </article>
