@@ -57,6 +57,108 @@ const programs = [
     uzType: "Emissiya sinovi",
     ruType: "Испытание по эмиссии",
     file: "/sinov-dasturlari/lampalar-emc-sinov-dasturi.docx"
+  },
+   {
+    id: "maishiy",
+    standard: "O‘z MST IEC 61000-6-1/3",
+    uzTitle: "Maishiy elektr jihozlari uchun EMC sinov dasturi",
+    ruTitle: "Программа EMC-испытаний для бытовой электротехники",
+    uzType: "Kompleks EMC sinovi",
+    ruType: "Комплексные EMC-испытания",
+    file: "/sinov-dasturlari/maishiy-texnika-emc-sinov-dasturi.docx"
+  },
+
+  {
+    id: "it-equipment",
+    standard: "O‘z MST IEC 61000-6-1/3",
+    uzTitle: "Axborot-texnik qurilmalar (IT/office) uchun EMC sinov dasturi",
+    ruTitle: "Программа EMC-испытаний для информационно-технического (IT/офисного) оборудования",
+    uzType: "Kompleks EMC sinovi",
+    ruType: "Комплексные EMC-испытания",
+    file: "/sinov-dasturlari/axborot-texnik-qurilmalar-emc-sinov-dasturi.docx"
+  },
+
+  {
+    id: "microwave",
+    standard: "O‘z MST IEC 60335-2-25",
+    uzTitle: "Mikroto‘lqinli pechlar uchun EMC sinov dasturi",
+    ruTitle: "Программа EMC-испытаний для микроволновых печей",
+    uzType: "Kompleks EMC sinovi",
+    ruType: "Комплексные EMC-испытания",
+    file: "/sinov-dasturlari/mikrotolqinli-pech-emc-sinov-dasturi.docx"
+  },
+
+  {
+    id: "svarka",
+    standard: "O‘z MST IEC 60974-10",
+    uzTitle: "Payvandlash uskunalari (svarkalar) uchun EMC sinov dasturi",
+    ruTitle: "Программа EMC-испытаний для сварочного оборудования",
+    uzType: "Kompleks EMC sinovi",
+    ruType: "Комплексные EMC-испытания",
+    file: "/sinov-dasturlari/svarka-emc-sinov-dasturi.docx"
+  },
+
+  {
+    id: "lamps",
+    standard: "O‘z MST IEC 55015",
+    uzTitle: "Yoritish moslamalari (lampalar) uchun EMC sinov dasturi",
+    ruTitle: "Программа EMC-испытаний для осветительных устройств (ламп)",
+    uzType: "Emissiya sinovi",
+    ruType: "Испытание по эмиссии",
+    file: "/sinov-dasturlari/lampalar-emc-sinov-dasturi.docx"
+  },
+
+  // --------------------------
+  // 2. Maxsus texnika va transport
+  // --------------------------
+  {
+    id: "transport",
+    standard: "O‘z DST ISO 7637-2",
+    uzTitle: "Avtotransport vositalari uchun elektr jihozlarining EMC sinov dasturi",
+    ruTitle: "Программа EMC-испытаний электрооборудования автотранспортных средств",
+    uzType: "Avtomobil EMC sinovi",
+    ruType: "Автомобильные EMC-испытания",
+    file: "/sinov-dasturlari/avtotransport-elektr-jihozlari-emc.docx"
+  },
+
+  {
+    id: "tractor",
+    standard: "O‘z DST ISO 14982",
+    uzTitle: "Traktorlar va qishloq xo‘jaligi texnikasi uchun EMC sinov dasturi",
+    ruTitle: "Программа EMC-испытаний электрооборудования тракторов и сельхозтехники",
+    uzType: "Qishloq xo‘jaligi texnikasi EMC sinovi",
+    ruType: "EMC-испытания сельхозтехники",
+    file: "/sinov-dasturlari/traktor-qx-texnika-emc.docx"
+  },
+
+  {
+    id: "forklift-electric",
+    standard: "IEC 61000-6-2 / 6-4",
+    uzTitle: "Pogruzchiklar (elektrda ishlaydigan) uchun EMC sinov dasturi",
+    ruTitle: "Программа EMC-испытаний электропогрузчиков",
+    uzType: "Sanoat EMC sinovi",
+    ruType: "Промышленные EMC-испытания",
+    file: "/sinov-dasturlari/elektr-pogruzchik-emc.docx"
+  },
+
+  {
+    id: "forklift-diesel",
+    standard: "IEC 61000-6-2 / 6-4",
+    uzTitle: "Pogruzchiklar (dizel yoqilg‘isida ishlaydigan) uchun EMC sinov dasturi",
+    ruTitle: "Программа EMC-испытаний дизельных погрузчиков",
+    uzType: "Sanoat EMC sinovi",
+    ruType: "Промышленные EMC-испытания",
+    file: "/sinov-dasturlari/dizel-pogruzchik-emc.docx"
+  },
+
+  {
+    id: "stationary",
+    standard: "IEC 61000-6-2 / 6-4",
+    uzTitle: "O‘rnatilgan (stasionar) holatda sinovdan o‘tadigan maxsus qurilmalar uchun EMC sinov dasturi",
+    ruTitle: "Программа EMC-испытаний стационарного специализированного оборудования",
+    uzType: "Stasionar EMC sinovi",
+    ruType: "Стационарные EMC-испытания",
+    file: "/sinov-dasturlari/stasionar-qurilma-emc.docx"
   }
 ];
 
