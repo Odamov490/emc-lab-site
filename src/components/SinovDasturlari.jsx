@@ -41,8 +41,8 @@ const programs = [
 
 const text = {
   section: {
-    uz: "Xizmatlar va sinovlar",
-    ru: "Услуги и испытания"
+    uz: "Sinov dasturlari",
+    ru: "Программы испытаний"
   },
   header: {
     uz: "Sinov dasturlari",
@@ -71,14 +71,6 @@ const text = {
   download: {
     uz: "Yuklab olish",
     ru: "Скачать"
-  },
-  testType: {
-    uz: "Sinov turi:",
-    ru: "Тип испытаний:"
-  },
-  standard: {
-    uz: "Standart:",
-    ru: "Стандарт:"
   }
 };
 
