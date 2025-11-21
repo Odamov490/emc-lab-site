@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 const programs = [
   {
@@ -83,9 +83,11 @@ const text = {
   }
 };
 
-export default function SinovDasturlari({ lang = "uz" }) {
-  const t = text; // qisqa yozish uchun
+export default function SinovDasturlari() {
+  // 🔥 Tilni sahifa ichida boshqaramiz
+  const [lang, setLang] = useState("uz");
   const isUz = lang === "uz";
+  const t = text;
 
   // DOCX’ni Office Online orqali ochish
   const getViewerUrl = (relativePath) => {
@@ -100,11 +102,41 @@ export default function SinovDasturlari({ lang = "uz" }) {
       <div className="max-w-6xl mx-auto px-4 pb-16 pt-10 md:pt-14">
         {/* Yuqori blok – bosh sahifadagi uslubga yaqin */}
         <section className="mb-10 md:mb-12">
-          <p className="text-sm font-medium text-sky-600 mb-1">
-            {isUz ? t.section.uz : t.section.ru}
-          </p>
+          <div className="flex items-center justify-between gap-4 mb-2">
+            <p className="text-sm font-medium text-sky-600">
+              {isUz ? t.section.uz : t.section.ru}
+            </p>
 
-          <div className="flex flex-wrap items-end justify-between gap-4">
+            {/* 📴 UZ / RU til tanlash tugmalari */}
+            <div className="inline-flex items-center rounded-full bg-white shadow border border-slate-200 overflow-hidden text-xs">
+              <button
+                type="button"
+                onClick={() => setLang("uz")}
+                className={
+                  "px-3 py-1.5 font-semibold transition " +
+                  (isUz
+                    ? "bg-sky-600 text-white"
+                    : "bg-transparent text-slate-600 hover:bg-slate-100")
+                }
+              >
+                UZ
+              </button>
+              <button
+                type="button"
+                onClick={() => setLang("ru")}
+                className={
+                  "px-3 py-1.5 font-semibold transition " +
+                  (!isUz
+                    ? "bg-sky-600 text-white"
+                    : "bg-transparent text-slate-600 hover:bg-slate-100")
+                }
+              >
+                RU
+              </button>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-end justify-between gap-4 mt-1">
             <div>
               <h1 className="text-3xl md:text-4xl font-semibold text-slate-900 mb-1">
                 {isUz ? t.header.uz : t.header.ru}
