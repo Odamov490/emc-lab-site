@@ -1390,8 +1390,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<EMCLabUltra />} />
       <Route path="/login" element={<Login />} />
-<Route path="/sinov-dasturlari" element={<SinovDasturlari lang={lang} />} />
-
+<Route path="/sinov-dasturlari" element={<SinovDasturlari />} />
 
     </Routes>
     
