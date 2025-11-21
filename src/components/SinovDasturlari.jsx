@@ -176,16 +176,6 @@ export default function SinovDasturlari() {
                     </span>
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex flex-col text-[12px] text-slate-600">
-                      <span>
-                        {isUz ? t.testType.uz : t.testType.ru}{" "}
-                        <span className="font-medium text-slate-800">
-                          {isUz ? p.uzType : p.ruType}
-                        </span>
-                      </span>
-                      <span>DOCX · {isUz ? "Rus / ingliz tili" : "Русский / английский"}</span>
-                    </div>
 
                     <div className="flex flex-wrap gap-2">
                       <a
