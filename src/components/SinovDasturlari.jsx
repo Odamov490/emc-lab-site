@@ -101,8 +101,8 @@ export default function SinovDasturlari() {
       {/* Real qush rasmlari – fon ustida uchadi */}
       <div className="birds-layer" aria-hidden="true">
         {/* bitta yoki ikkita qush yetarli, hozir ikkitasi */}
-        <img src="/img/bird.png" alt="" className="bird-img bird-img-1" />
-        <img src="/img/bird.png" alt="" className="bird-img bird-img-2" />
+        <img src="/img/bird.jpg" alt="" className="bird-img bird-img-1" />
+        <img src="/img/bird.jpg" alt="" className="bird-img bird-img-2" />
       </div>
 
       {/* Kontent */}
