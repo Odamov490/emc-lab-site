@@ -18,47 +18,11 @@ const programs = [
       "*В данную программу не входят: электрооборудование автотранспортных средств, тракторов и сельхозтехники, электропогрузчики, дизельные погрузчики, специализированное стационарное оборудование."
   },
 
+  const programs = [
+  // --------------------------
+  // 1. Maishiy va umumiy texnika
+  // --------------------------
   {
-    id: "it-equipment",
-    standard: "O‘z MST IEC 61000-6-1/3",
-    uzTitle: "Axborot-texnik qurilmalar (IT/office) uchun EMC sinov dasturi",
-    ruTitle:
-      "Программа EMC-испытаний для информационно-технического (IT/офисного) оборудования",
-    uzType: "Kompleks EMC sinovi",
-    ruType: "Комплексные EMC-испытания",
-    file: "/sinov-dasturlari/axborot-texnik-qurilmalar-emc-sinov-dasturi.docx"
-  },
-
-  {
-    id: "microwave",
-    standard: "O‘z MST IEC 60335-2-25",
-    uzTitle: "Mikroto‘lqinli pechlar uchun EMC sinov dasturi",
-    ruTitle: "Программа EMC-испытаний для микроволновых печей",
-    uzType: "Kompleks EMC sinovi",
-    ruType: "Комплексные EMC-испытания",
-    file: "/sinov-dasturlari/mikrotolqinli-pech-emc-sinov-dasturi.docx"
-  },
-
-  {
-    id: "svarka",
-    standard: "O‘z MST IEC 60974-10",
-    uzTitle: "Payvandlash uskunalari (svarkalar) uchun EMC sinov dasturi",
-    ruTitle: "Программа EMC-испытаний для сварочного оборудования",
-    uzType: "Kompleks EMC sinovi",
-    ruType: "Комплексные EMC-испытания",
-    file: "/sinov-dasturlari/svarka-emc-sinov-dasturi.docx"
-  },
-
-  {
-    id: "lamps",
-    standard: "O‘z MST IEC 55015",
-    uzTitle: "Yoritish moslamalari (lampalar) uchun EMC sinov dasturi",
-    ruTitle: "Программа EMC-испытаний для осветительных устройств (ламп)",
-    uzType: "Emissiya sinovi",
-    ruType: "Испытание по эмиссии",
-    file: "/sinov-dasturlari/lampalar-emc-sinov-dasturi.docx"
-  },
-   {
     id: "maishiy",
     standard: "O‘z MST IEC 61000-6-1/3",
     uzTitle: "Maishiy elektr jihozlari uchun EMC sinov dasturi",
@@ -161,6 +125,7 @@ const programs = [
     file: "/sinov-dasturlari/stasionar-qurilma-emc.docx"
   }
 ];
+
 
 const text = {
   section: {
