@@ -2,52 +2,77 @@
 @tailwind components;
 @tailwind utilities;
 
-.video-bg-container {
-  position: relative;
-  min-height: 100vh;
-  overflow: hidden;
+html {
+  scroll-behavior: smooth;
 }
 
-/* 🎥 Video butun sahifa bo‘ylab */
-.video-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+/* 🌄 Tabiat fon rasmi (Unsplash) */
+.nature-bg {
+  position: relative;
+  background-image: url("https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1950&q=80");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* yuqoridan yengil qoraytirish */
+.nature-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
   z-index: 0;
-  filter: brightness(0.6); /* ozgina qoraytirish */
 }
 
-/* Kontent video ustiga chiqadi */
-.content {
-  position: relative;
-  z-index: 2;
-  padding: 60px 20px;
-  color: white;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.7);
+/* 🕊 Real qush rasmlari uchun qatlam */
+.birds-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* Til almashtirish */
-.lang-switch {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+/* Qush rasmi (real PNG) */
+.bird-img {
+  position: absolute;
+  width: 140px;      /* kerak bo‘lsa o‘zgartirasiz */
+  height: auto;
+  opacity: 0.85;
 }
 
-.lang-switch button {
-  padding: 6px 16px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.3);
-  font-weight: bold;
-  color: white;
-  border: 1px solid rgba(255,255,255,0.4);
-  backdrop-filter: blur(4px);
+/* 1-qush yo‘li */
+@keyframes birdFly1 {
+  0% {
+    transform: translateX(-20vw) translateY(8vh) scale(0.9);
+  }
+  50% {
+    transform: translateX(45vw) translateY(3vh) scale(1);
+  }
+  100% {
+    transform: translateX(120vw) translateY(-2vh) scale(1.05);
+  }
 }
 
-.lang-switch button.active {
-  background: #0ea5e9;
-  border-color: #0ea5e9;
-  color: white;
+/* 2-qush yo‘li */
+@keyframes birdFly2 {
+  0% {
+    transform: translateX(110vw) translateY(30vh) scale(0.85);
+  }
+  50% {
+    transform: translateX(40vw) translateY(24vh) scale(0.95);
+  }
+  100% {
+    transform: translateX(-20vw) translateY(18vh) scale(1.05);
+  }
+}
+
+/* Qushlarni animatsiyaga ulash */
+.bird-img-1 {
+  top: 12%;
+  animation: birdFly1 40s linear infinite;
+}
+
+.bird-img-2 {
+  top: 28%;
+  animation: birdFly2 55s linear infinite;
 }
