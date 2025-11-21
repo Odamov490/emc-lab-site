@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
 import ScrollToTopButton from "./ScrollToTopButton";
-
+import SinovDasturlari from "./components/SinovDasturlari";
 import Login from "./pages/Login"; // login sahifang
  // asosiy sahifa
  import { Routes, Route, useNavigate } from "react-router-dom";
@@ -811,12 +811,13 @@ const navigate = useNavigate();
                 </a>
               ))}
             </nav>
-            <a
-              href="#contact"
-              className="rounded-2xl border border-black/10 bg-gray-900 text-white px-3 py-1.5 text-sm hover:-translate-y-0.5 transition will-change-transform"
-            >
-              {lang==="uz" ? "Sinovga buyurtma" : "Заявка на испытания"}
-            </a>
+           <a
+  href="/sinov-dasturlari"
+  className="rounded-2xl border border-black/10 bg-gray-900 text-white px-3 py-1.5 text-sm hover:-translate-y-0.5 transition will-change-transform"
+>
+  {lang==="uz" ? "Sinov dasturlari" : "Программы испытаний"}
+</a>
+
 
   <button
     onClick={() => navigate("/login")}
@@ -1389,7 +1390,9 @@ export default function App() {
     <Routes>
       <Route path="/" element={<EMCLabUltra />} />
       <Route path="/login" element={<Login />} />
+<Route path="/sinov-dasturlari" element={<SinovDasturlari />} />
 
     </Routes>
+    
   );
 }
