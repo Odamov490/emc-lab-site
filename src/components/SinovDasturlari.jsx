@@ -176,6 +176,11 @@ export default function SinovDasturlari() {
                     </span>
                   </div>
 
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex flex-col text-[12px] text-slate-600">
+                    
+                   
+                    </div>
 
                     <div className="flex flex-wrap gap-2">
                       <a
