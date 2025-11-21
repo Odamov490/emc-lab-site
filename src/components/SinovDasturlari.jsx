@@ -87,7 +87,6 @@ export default function SinovDasturlari() {
   const isUz = lang === "uz";
   const t = text;
 
-  // DOCX’ni Office Online orqali ochish
   const getViewerUrl = (relativePath) => {
     if (typeof window === "undefined") return relativePath;
     const absolute = `${window.location.origin}${relativePath}`;
@@ -98,9 +97,8 @@ export default function SinovDasturlari() {
 
   return (
     <div className="nature-bg min-h-screen relative overflow-hidden">
-      {/* Real qush rasmlari – fon ustida uchadi */}
+      {/* Qushlar */}
       <div className="birds-layer" aria-hidden="true">
-        {/* bitta yoki ikkita qush yetarli, hozir ikkitasi */}
         <img src="/img/bird.png" alt="" className="bird-img bird-img-1" />
         <img src="/img/bird.png" alt="" className="bird-img bird-img-2" />
       </div>
@@ -108,6 +106,7 @@ export default function SinovDasturlari() {
       {/* Kontent */}
       <div className="relative z-[2]">
         <div className="max-w-6xl mx-auto px-4 pb-16 pt-10 md:pt-14">
+          
           {/* Yuqori blok */}
           <section className="mb-10 md:mb-12">
             <div className="flex items-center justify-between mb-3 gap-4">
@@ -115,23 +114,20 @@ export default function SinovDasturlari() {
                 {isUz ? t.section.uz : t.section.ru}
               </p>
 
-              {/* UZ / RU tugmalari */}
               <div className="inline-flex bg-white/80 shadow border border-slate-200 rounded-full text-xs overflow-hidden">
                 <button
-                  type="button"
                   onClick={() => setLang("uz")}
                   className={
-                    "px-3 py-1.5 font-bold transition " +
+                    "px-3 py-1.5 font-bold " +
                     (isUz ? "bg-sky-600 text-white" : "text-slate-700 hover:bg-slate-100")
                   }
                 >
                   UZ
                 </button>
                 <button
-                  type="button"
                   onClick={() => setLang("ru")}
                   className={
-                    "px-3 py-1.5 font-bold transition " +
+                    "px-3 py-1.5 font-bold " +
                     (!isUz
                       ? "bg-sky-600 text-white"
                       : "text-slate-700 hover:bg-slate-100")
@@ -160,21 +156,21 @@ export default function SinovDasturlari() {
             {programs.map((p) => (
               <article
                 key={p.id}
-                className="relative overflow-hidden rounded-[26px] bg-white/92 backdrop-blur-xl shadow-[0_16px_40px_rgba(15,23,42,0.4)] border border-slate-100"
+                className="relative overflow-hidden rounded-[26px] bg-white shadow-[0_16px_40px_rgba(15,23,42,0.4)] border border-slate-100"
               >
                 <div className="h-[3px] bg-gradient-to-r from-sky-500 via-cyan-400 to-sky-500" />
 
                 <div className="p-6 flex flex-col gap-4">
+                  
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <h2 className="text-base md:text-lg font-semibold text-slate-900 leading-snug">
                         {isUz ? p.uzTitle : p.ruTitle}
                       </h2>
+
                       <p className="mt-2 text-[11px] uppercase tracking-wide text-slate-500">
                         {isUz ? t.standard.uz : t.standard.ru}{" "}
-                        <span className="font-semibold text-slate-700">
-                          {p.standard}
-                        </span>
+                        <span className="font-semibold text-slate-700">{p.standard}</span>
                       </p>
                     </div>
 
@@ -191,9 +187,7 @@ export default function SinovDasturlari() {
                           {isUz ? p.uzType : p.ruType}
                         </span>
                       </span>
-                      <span>
-                        DOCX · {isUz ? "Rus / ingliz tili" : "Русский / английский"}
-                      </span>
+                      <span>DOCX · {isUz ? "Rus / ingliz tili" : "Русский / английский"}</span>
                     </div>
 
                     <div className="flex flex-wrap gap-2">
@@ -201,7 +195,7 @@ export default function SinovDasturlari() {
                         href={getViewerUrl(p.file)}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center justify-center rounded-full bg-sky-600 text-white text-xs md:text-sm font-semibold px-3.5 py-1.5 hover:bg-sky-500 hover:-translate-y-0.5 active:translate-y-0 transition transform"
+                        className="inline-flex items-center justify-center rounded-full bg-sky-600 text-white text-xs md:text-sm font-semibold px-3.5 py-1.5 hover:bg-sky-500 transition"
                       >
                         {isUz ? t.viewOnline.uz : t.viewOnline.ru}
                       </a>
@@ -209,16 +203,18 @@ export default function SinovDasturlari() {
                       <a
                         href={p.file}
                         download
-                        className="inline-flex items-center justify-center rounded-full border border-slate-300 text-xs md:text-sm font-semibold px-3.5 py-1.5 text-slate-800 bg-slate-50 hover:bg-white hover:border-sky-400 hover:text-sky-700 hover:-translate-y-0.5 active:translate-y-0 transition transform"
+                        className="inline-flex items-center justify-center rounded-full border border-slate-300 text-xs md:text-sm font-semibold px-3.5 py-1.5 text-slate-800 bg-slate-50 hover:bg-white hover:border-sky-400 hover:text-sky-700 transition"
                       >
                         {isUz ? t.download.uz : t.download.ru}
                       </a>
                     </div>
                   </div>
+
                 </div>
               </article>
             ))}
           </section>
+
         </div>
       </div>
     </div>
