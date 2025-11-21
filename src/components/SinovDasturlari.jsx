@@ -71,14 +71,6 @@ const text = {
   download: {
     uz: "Yuklab olish",
     ru: "Скачать"
-  },
-  testType: {
-    uz: "Sinov turi:",
-    ru: "Тип испытаний:"
-  },
-  standard: {
-    uz: "Standart:",
-    ru: "Стандарт:"
   }
 };
 
@@ -142,9 +134,7 @@ export default function SinovDasturlari() {
               {isUz ? t.header.uz : t.header.ru}
             </h1>
 
-            <p className="text-sm md:text-base text-sky-100 drop-shadow mb-2">
-              {isUz ? t.subtitle.uz : t.subtitle.ru}
-            </p>
+         
 
             <p className="text-sm md:text-[15px] text-slate-100 max-w-2xl drop-shadow">
               {isUz ? t.desc.uz : t.desc.ru}
