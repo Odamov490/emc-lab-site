@@ -18,25 +18,12 @@ const programs = [
       "*В данную программу не входят: электрооборудование автотранспортных средств, тракторов и сельхозтехники, электропогрузчики, дизельные погрузчики, специализированное стационарное оборудование."
   },
 
-  const programs = [
-  // --------------------------
-  // 1. Maishiy va umumiy texnika
-  // --------------------------
-  {
-    id: "maishiy",
-    standard: "O‘z MST IEC 61000-6-1/3",
-    uzTitle: "Maishiy elektr jihozlari uchun EMC sinov dasturi",
-    ruTitle: "Программа EMC-испытаний для бытовой электротехники",
-    uzType: "Kompleks EMC sinovi",
-    ruType: "Комплексные EMC-испытания",
-    file: "/sinov-dasturlari/maishiy-texnika-emc-sinov-dasturi.docx"
-  },
-
   {
     id: "it-equipment",
     standard: "O‘z MST IEC 61000-6-1/3",
     uzTitle: "Axborot-texnik qurilmalar (IT/office) uchun EMC sinov dasturi",
-    ruTitle: "Программа EMC-испытаний для информационно-технического (IT/офисного) оборудования",
+    ruTitle:
+      "Программа EMC-испытаний для информационно-технического (IT/офисного) оборудования",
     uzType: "Kompleks EMC sinovi",
     ruType: "Комплексные EMC-испытания",
     file: "/sinov-dasturlari/axborot-texnik-qurilmalar-emc-sinov-dasturi.docx"
@@ -71,10 +58,6 @@ const programs = [
     ruType: "Испытание по эмиссии",
     file: "/sinov-dasturlari/lampalar-emc-sinov-dasturi.docx"
   },
-
-  // --------------------------
-  // 2. Maxsus texnika va transport
-  // --------------------------
   {
     id: "transport",
     standard: "O‘z DST ISO 7637-2",
@@ -124,8 +107,8 @@ const programs = [
     ruType: "Стационарные EMC-испытания",
     file: "/sinov-dasturlari/stasionar-qurilma-emc.docx"
   }
+  
 ];
-
 
 const text = {
   section: {
