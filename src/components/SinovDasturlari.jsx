@@ -71,6 +71,14 @@ const text = {
   download: {
     uz: "Yuklab olish",
     ru: "Скачать"
+  },
+  testType: {
+    uz: "Sinov turi:",
+    ru: "Тип испытаний:"
+  },
+  standard: {
+    uz: "Standart:",
+    ru: "Стандарт:"
   }
 };
 
@@ -154,17 +162,7 @@ export default function SinovDasturlari() {
 
                 <div className="p-6 flex flex-col gap-4">
                   
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h2 className="text-base md:text-lg font-semibold text-slate-900 leading-snug">
-                        {isUz ? p.uzTitle : p.ruTitle}
-                      </h2>
-
-                      <p className="mt-2 text-[11px] uppercase tracking-wide text-slate-500">
-                        {isUz ? t.standard.uz : t.standard.ru}{" "}
-                        <span className="font-semibold text-slate-700">{p.standard}</span>
-                      </p>
-                    </div>
+           
 
                     <span className="inline-flex items-center justify-center rounded-full bg-sky-50 px-3 py-1 text-[11px] font-semibold text-sky-700">
                       EMC
@@ -173,13 +171,7 @@ export default function SinovDasturlari() {
 
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex flex-col text-[12px] text-slate-600">
-                      <span>
-                        {isUz ? t.testType.uz : t.testType.ru}{" "}
-                        <span className="font-medium text-slate-800">
-                          {isUz ? p.uzType : p.ruType}
-                        </span>
-                      </span>
-                      <span>DOCX · {isUz ? "Rus / ingliz tili" : "Русский / английский"}</span>
+                    
                     </div>
 
                     <div className="flex flex-wrap gap-2">
