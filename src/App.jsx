@@ -4,6 +4,7 @@ import SinovDasturlari from "./components/SinovDasturlari";
 import Login from "./pages/Login"; // login sahifang
  // asosiy sahifa
  import { Routes, Route, useNavigate } from "react-router-dom";
+ import QrTizimi from "./components/QrTizimi";
 
 /********************* CONFIG *********************/
 const NAV = [
@@ -773,15 +774,36 @@ const navigate = useNavigate();
               {/*  <Badge>ISO/IEC 17025</Badge>
               <Badge>ILAC – G8</Badge> */}
             </div>
-            <div className="flex items-center gap-3">
-              <button onClick={() => setLang("uz")} className={`hover:underline ${lang === "uz" ? "font-semibold" : ""}`}>UZ</button>
-              <span className="text-gray-400">|</span>
-              <button onClick={() => setLang("ru")} className={`hover:underline ${lang === "ru" ? "font-semibold" : ""}`}>РУ</button>
-              <span className="mx-1" />
-              <button onClick={() => setDark((d) => !d)} className="rounded-lg border px-2 py-1 text_[11px] hover:opacity-80">
-                {dark ? (lang==="uz" ? "Yorug‘" : "Светлая") : (lang==="uz" ? "Qorong‘i" : "Тёмная")}
-              </button>
-            </div>
+            
+         <div className="flex items-center gap-3">
+  <button
+    onClick={() => setLang("uz")}
+    className={`hover:underline ${lang === "uz" ? "font-semibold" : ""}`}
+  >
+    UZ
+  </button>
+
+  <span className="text-gray-400">|</span>
+
+  <button
+    onClick={() => setLang("ru")}
+    className={`hover:underline ${lang === "ru" ? "font-semibold" : ""}`}
+  >
+    РУ
+  </button>
+
+  <span className="mx-1" />
+
+  <Link
+    to="/qr-tizimi"
+    className="rounded-lg border px-2 py-1 text-[11px] hover:opacity-80"
+  >
+    {lang === "uz" ? "QR tizimi" : "QR система"}
+  </Link>
+</div>
+
+
+
           </div>
         </div>
 
@@ -807,6 +829,7 @@ const navigate = useNavigate();
                   }`}
                   aria-current={active === n.href.replace('#','') ? 'page' : undefined}
                 >
+                
                   {lang==="uz" ? n.label.uz : n.label.ru}
                 </a>
               ))}
@@ -1391,6 +1414,7 @@ export default function App() {
       <Route path="/" element={<EMCLabUltra />} />
       <Route path="/login" element={<Login />} />
 <Route path="/sinov-dasturlari" element={<SinovDasturlari />} />
+<Route path="/qr-tizimi" element={<QrTizimi lang={lang} />} />
 
     </Routes>
     
