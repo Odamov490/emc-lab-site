@@ -775,33 +775,21 @@ const navigate = useNavigate();
               <Badge>ILAC – G8</Badge> */}
             </div>
             
-         <div className="flex items-center gap-3">
-  <button
-    onClick={() => setLang("uz")}
-    className={`hover:underline ${lang === "uz" ? "font-semibold" : ""}`}
-  >
-    UZ
-  </button>
+            <div className="flex items-center gap-3">
+              <button onClick={() => setLang("uz")} className={`hover:underline ${lang === "uz" ? "font-semibold" : ""}`}>UZ</button>
+              <span className="text-gray-400">|</span>
+              <button onClick={() => setLang("ru")} className={`hover:underline ${lang === "ru" ? "font-semibold" : ""}`}>РУ</button>
+              <span className="mx-1" />
+             <a
+  href="/qr-tizimi"
+  className="rounded-2xl border border-black/10 bg-gray-900 text-white px-3 py-1.5 text-sm hover:-translate-y-0.5 transition will-change-transform"
+>
+  {lang === "uz" ? "QR tizimi" : "QR система"}
+</a>
 
-  <span className="text-gray-400">|</span>
 
-  <button
-    onClick={() => setLang("ru")}
-    className={`hover:underline ${lang === "ru" ? "font-semibold" : ""}`}
-  >
-    РУ
-  </button>
 
-  <span className="mx-1" />
-
-  <Link
-    to="/qr-tizimi"
-    className="rounded-lg border px-2 py-1 text-[11px] hover:opacity-80"
-  >
-    {lang === "uz" ? "QR tizimi" : "QR система"}
-  </Link>
-</div>
-
+            </div>
 
 
           </div>
