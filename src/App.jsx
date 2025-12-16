@@ -780,11 +780,32 @@ const navigate = useNavigate();
               <span className="text-gray-400">|</span>
               <button onClick={() => setLang("ru")} className={`hover:underline ${lang === "ru" ? "font-semibold" : ""}`}>РУ</button>
               <span className="mx-1" />
-             <a
+      
+                  <a
   href="/qr-tizimi"
-  className="rounded-2xl border border-black/10 bg-gray-900 text-white px-3 py-1.5 text-sm hover:-translate-y-0.5 transition will-change-transform"
+  className="
+    group relative inline-flex items-center gap-2
+    rounded-2xl border border-white/20
+    bg-gradient-to-r from-slate-900 via-gray-900 to-slate-900
+    text-white px-4 py-2 text-sm font-medium
+    shadow-md shadow-black/30
+    transition-all duration-300
+    hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/40
+    will-change-transform
+  "
 >
-  {lang === "uz" ? "QR tizimi" : "QR система"}
+  {/* Icon (QR) */}
+  <svg
+    className="h-4 w-4 opacity-80 group-hover:opacity-100 transition"
+    fill="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm10-2h2v2h-2v-2zm-2 2h2v2h-2v-2zm2 2h2v2h-2v-2zm2-4h2v6h-2v-6z" />
+  </svg>
+
+  <span>
+    {lang === "uz" ? "QR tizimi" : "QR система"}
+  </span>
 </a>
 
 
