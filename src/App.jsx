@@ -775,15 +775,33 @@ const navigate = useNavigate();
               <Badge>ILAC – G8</Badge> */}
             </div>
             
-            <div className="flex items-center gap-3">
-              <button onClick={() => setLang("uz")} className={`hover:underline ${lang === "uz" ? "font-semibold" : ""}`}>UZ</button>
-              <span className="text-gray-400">|</span>
-              <button onClick={() => setLang("ru")} className={`hover:underline ${lang === "ru" ? "font-semibold" : ""}`}>РУ</button>
-              <span className="mx-1" />
-              <button onClick={() => setDark((d) => !d)} className="rounded-lg border px-2 py-1 text_[11px] hover:opacity-80">
-                {dark ? (lang==="uz" ? "Yorug‘" : "Светлая") : (lang==="uz" ? "Qorong‘i" : "Тёмная")}
-              </button>
-            </div>
+         <div className="flex items-center gap-3">
+  <button
+    onClick={() => setLang("uz")}
+    className={`hover:underline ${lang === "uz" ? "font-semibold" : ""}`}
+  >
+    UZ
+  </button>
+
+  <span className="text-gray-400">|</span>
+
+  <button
+    onClick={() => setLang("ru")}
+    className={`hover:underline ${lang === "ru" ? "font-semibold" : ""}`}
+  >
+    РУ
+  </button>
+
+  <span className="mx-1" />
+
+  <Link
+    to="/qr-tizimi"
+    className="rounded-lg border px-2 py-1 text-[11px] hover:opacity-80"
+  >
+    {lang === "uz" ? "QR tizimi" : "QR система"}
+  </Link>
+</div>
+
 
 
           </div>
