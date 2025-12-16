@@ -781,22 +781,22 @@ const navigate = useNavigate();
               <button onClick={() => setLang("ru")} className={`hover:underline ${lang === "ru" ? "font-semibold" : ""}`}>РУ</button>
               <span className="mx-1" />
       
-                  <a
+                 <a
   href="/qr-tizimi"
   className="
     group relative inline-flex items-center gap-2
-    rounded-2xl border border-white/20
-    bg-gradient-to-r from-slate-900 via-gray-900 to-slate-900
-    text-white px-4 py-2 text-sm font-medium
-    shadow-md shadow-black/30
+    rounded-2xl
+    bg-gradient-to-r from-sky-600 via-sky-700 to-blue-700
+    text-white px-4 py-2 text-sm font-semibold
+    shadow-md shadow-sky-900/30
     transition-all duration-300
-    hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/40
+    hover:-translate-y-0.5 hover:shadow-lg hover:shadow-sky-900/40
     will-change-transform
   "
 >
-  {/* Icon (QR) */}
+  {/* QR icon */}
   <svg
-    className="h-4 w-4 opacity-80 group-hover:opacity-100 transition"
+    className="h-4 w-4 opacity-90 group-hover:opacity-100 transition"
     fill="currentColor"
     viewBox="0 0 24 24"
   >
