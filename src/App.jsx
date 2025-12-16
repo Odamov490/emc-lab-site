@@ -1396,7 +1396,7 @@ export default function App() {
       <Route path="/" element={<EMCLabUltra />} />
       <Route path="/login" element={<Login />} />
 <Route path="/sinov-dasturlari" element={<SinovDasturlari />} />
-<Route path="/qr-tizimi" element={<QrTizimi lang={lang} />} />
+<Route path="/qr-tizimi" element={<QrTizimi/>} />
 
     </Routes>
     
