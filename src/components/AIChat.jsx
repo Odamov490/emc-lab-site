@@ -1,205 +1,747 @@
 // src/components/AIChat.jsx
-// Live TV — tayyor kanallar bilan (foydalanuvchi link kiritmaydi)
-// Vercel-safe: hls.js CDN orqali yuklanadi
+// Live TV PRO (10k+ kanalga mos)
+// ✅ Categories / Countries
+// ✅ Fast search
+// ✅ Favorites + Recents (localStorage)
+// ✅ M3U import (FILE) — link kiritish shart emas
+// ✅ HLS (m3u8) Chrome/Edge uchun hls.js CDN orqali (Vercel-safe)
+// ✅ Virtual list (10k+ kanal lag qilmaydi)
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-/* =======================
-   TAYYOR KANALLAR
-   ======================= */
+/* =========================
+   CONFIG
+========================= */
 
-const CHANNELS = [
+const LS_FAV_KEY = "emclab_tv_fav_v2";
+const LS_RECENT_KEY = "emclab_tv_recent_v2";
+const LS_LAST_SOURCE = "emclab_tv_last_source_v2";
+const LS_LAST_SELECTED = "emclab_tv_last_selected_v2";
+
+const HLS_CDN = "https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js";
+
+/** Demo-only (litsenziyasiz real TV linklar bermayman).
+ *  Siz M3U fayl import qilib haqiqiy kanallarni kiritasiz. */
+const DEMO_CHANNELS = [
   {
-    id: "uz-1",
-    name: "Oʻzbekiston 24",
-    country: "O‘zbekiston",
-    category: "Yangiliklar",
-    lang: "UZ",
+    id: "demo-1",
+    name: "Demo HLS Stream (Mux Test)",
+    country: "Boshqa",
+    category: "Demo",
+    lang: "EN",
     type: "hls",
     url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    logo: "",
   },
   {
-    id: "uz-2",
-    name: "Madaniyat TV",
-    country: "O‘zbekiston",
-    category: "Ko‘ngilochar",
-    lang: "UZ",
-    type: "hls",
-    url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-  },
-  {
-    id: "ru-1",
-    name: "Россия 24",
-    country: "Rossiya",
-    category: "Yangiliklar",
-    lang: "RU",
-    type: "hls",
-    url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-  },
-  {
-    id: "tr-1",
-    name: "TRT Haber",
-    country: "Turkiya",
-    category: "Yangiliklar",
-    lang: "TR",
-    type: "hls",
-    url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-  },
-  {
-    id: "us-1",
-    name: "NASA Live",
+    id: "demo-2",
+    name: "NASA Live (YouTube)",
     country: "AQSh",
     category: "Ilm-Fan",
     lang: "EN",
     type: "iframe",
     url: "https://www.youtube.com/embed/21X5lGlDOfg",
+    logo: "",
   },
 ];
 
-const CATEGORIES = ["Hammasi", "Yangiliklar", "Ko‘ngilochar", "Ilm-Fan"];
-const COUNTRIES = ["Hammasi", "O‘zbekiston", "Rossiya", "Turkiya", "AQSh"];
+/* =========================
+   UTILS
+========================= */
 
-/* =======================
-   HLS CDN LOADER
-   ======================= */
-
-const HLS_CDN = "https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js";
-
-function loadHls() {
-  if (window.Hls) return Promise.resolve(window.Hls);
-
-  return new Promise((resolve, reject) => {
-    const s = document.createElement("script");
-    s.src = HLS_CDN;
-    s.onload = () => resolve(window.Hls);
-    s.onerror = reject;
-    document.head.appendChild(s);
-  });
+function safeGetJSON(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw);
+  } catch {
+    return fallback;
+  }
 }
 
-/* =======================
-   PLAYER
-   ======================= */
+function safeSetJSON(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // ignore
+  }
+}
 
-function HLSPlayer({ src }) {
-  const ref = useRef(null);
+function norm(s = "") {
+  return String(s).toLowerCase().trim();
+}
 
-  useEffect(() => {
-    const video = ref.current;
-    if (!video) return;
+function makeId(prefix = "ch") {
+  return `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now().toString(16)}`;
+}
 
-    if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = src;
+function guessType(url = "") {
+  const u = url.toLowerCase();
+  if (u.includes("youtube.com/embed") || u.includes("player.twitch.tv") || u.includes("<iframe")) return "iframe";
+  if (u.endsWith(".mp4") || u.includes(".mp4?")) return "mp4";
+  if (u.endsWith(".m3u8") || u.includes(".m3u8?")) return "hls";
+  return "hls";
+}
+
+/* =========================
+   HLS LOADER (CDN, Vercel-safe)
+========================= */
+
+function loadHlsFromCdn() {
+  if (typeof window === "undefined") return Promise.reject(new Error("no window"));
+  if (window.Hls) return Promise.resolve(window.Hls);
+  if (window.__HLS_PROMISE__) return window.__HLS_PROMISE__;
+
+  window.__HLS_PROMISE__ = new Promise((resolve, reject) => {
+    const existing = document.querySelector('script[data-hlsjs="1"]');
+    if (existing) {
+      existing.addEventListener("load", () => resolve(window.Hls));
+      existing.addEventListener("error", () => reject(new Error("hls.js load error")));
       return;
     }
+    const s = document.createElement("script");
+    s.src = HLS_CDN;
+    s.async = true;
+    s.defer = true;
+    s.dataset.hlsjs = "1";
+    s.onload = () => resolve(window.Hls);
+    s.onerror = () => reject(new Error("hls.js load error"));
+    document.head.appendChild(s);
+  });
 
-    let hls;
-    loadHls().then((Hls) => {
-      if (Hls.isSupported()) {
-        hls = new Hls();
+  return window.__HLS_PROMISE__;
+}
+
+/* =========================
+   M3U PARSER (EXTINF)
+   Minimal, but works for big lists
+========================= */
+
+function parseExtinfAttrs(line) {
+  // line example: #EXTINF:-1 tvg-id="..." tvg-name="..." group-title="News",Channel Name
+  const attrs = {};
+  const beforeComma = line.split(",")[0] || "";
+  const afterComma = line.includes(",") ? line.slice(line.indexOf(",") + 1) : "";
+  attrs.displayName = afterComma.trim();
+
+  const re = /([a-zA-Z0-9_-]+)="([^"]*)"/g;
+  let m;
+  while ((m = re.exec(beforeComma))) {
+    attrs[m[1]] = m[2];
+  }
+  return attrs;
+}
+
+function parseM3U(text) {
+  const lines = text.split(/\r?\n/).map((l) => l.trim());
+  const out = [];
+  let current = null;
+
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i];
+    if (!l) continue;
+
+    if (l.startsWith("#EXTINF:")) {
+      const attrs = parseExtinfAttrs(l);
+      current = {
+        id: makeId("m3u"),
+        name: attrs["tvg-name"] || attrs.displayName || "Unknown",
+        country: attrs["tvg-country"] || "Boshqa",
+        category: attrs["group-title"] || "Boshqa",
+        lang: attrs["tvg-language"] || "—",
+        logo: attrs["tvg-logo"] || "",
+        type: "hls",
+        url: "",
+        tvgId: attrs["tvg-id"] || "",
+        raw: attrs,
+      };
+      continue;
+    }
+
+    // URL line (after EXTINF)
+    if (current && !l.startsWith("#")) {
+      current.url = l;
+      current.type = guessType(l);
+      out.push(current);
+      current = null;
+    }
+  }
+
+  return out;
+}
+
+/* =========================
+   UI SMALL COMPONENTS
+========================= */
+
+function Badge({ children }) {
+  return (
+    <span className="text-[11px] px-2 py-1 rounded-full bg-black/5 border border-black/10">
+      {children}
+    </span>
+  );
+}
+
+function IconBtn({ title, onClick, children }) {
+  return (
+    <button
+      type="button"
+      title={title}
+      onClick={onClick}
+      className="h-9 w-9 rounded-xl border border-black/10 bg-white/70 hover:bg-white shadow-sm inline-flex items-center justify-center"
+    >
+      {children}
+    </button>
+  );
+}
+
+function Modal({ open, title, onClose, children }) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/30" onClick={onClose} role="button" tabIndex={-1} />
+      <div className="relative w-full max-w-2xl rounded-2xl bg-white shadow-xl border border-black/10 overflow-hidden">
+        <div className="p-4 border-b border-black/10 flex items-center justify-between">
+          <div className="font-semibold">{title}</div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="h-9 w-9 rounded-xl border border-black/10 hover:bg-black/5"
+            aria-label="Close"
+          >
+            ✕
+          </button>
+        </div>
+        <div className="p-4">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+/* =========================
+   PLAYER
+========================= */
+
+function HLSPlayer({ src, poster }) {
+  const videoRef = useRef(null);
+  const [hint, setHint] = useState("");
+
+  useEffect(() => {
+    let hls = null;
+    let cancelled = false;
+
+    async function run() {
+      setHint("");
+      const video = videoRef.current;
+      if (!video || !src) return;
+
+      // Native HLS (Safari)
+      const canNative = video.canPlayType("application/vnd.apple.mpegurl");
+      if (canNative) {
+        video.src = src;
+        return;
+      }
+
+      try {
+        const Hls = await loadHlsFromCdn();
+        if (cancelled) return;
+
+        if (!Hls || !Hls.isSupported()) {
+          setHint("Brauzer HLS’ni qo‘llamaydi. MP4 yoki iframe ishlating.");
+          return;
+        }
+
+        hls = new Hls({ enableWorker: true, lowLatencyMode: true });
         hls.loadSource(src);
         hls.attachMedia(video);
+      } catch {
+        setHint("HLS yuklanmadi (CDN blok bo‘lishi mumkin). MP4/iframe sinab ko‘ring.");
       }
-    });
+    }
 
-    return () => hls && hls.destroy();
+    run();
+
+    return () => {
+      cancelled = true;
+      try {
+        if (hls) hls.destroy();
+      } catch {
+        // ignore
+      }
+    };
   }, [src]);
 
   return (
-    <video
-      ref={ref}
-      controls
-      className="w-full rounded-xl bg-black"
-      style={{ aspectRatio: "16 / 9" }}
-    />
+    <div className="w-full">
+      <video
+        ref={videoRef}
+        className="w-full rounded-2xl border border-black/10 bg-black/5"
+        controls
+        playsInline
+        poster={poster || undefined}
+      />
+      {hint ? <div className="mt-2 text-xs text-gray-600">{hint}</div> : null}
+    </div>
   );
 }
 
 function Player({ channel }) {
-  if (!channel)
+  if (!channel) {
     return (
-      <div className="h-64 flex items-center justify-center text-gray-500">
-        Kanal tanlang
+      <div className="h-[320px] rounded-2xl border border-black/10 bg-white/60 flex items-center justify-center">
+        <div className="text-center px-6">
+          <div className="text-3xl mb-2">📺</div>
+          <div className="font-semibold">Kanal tanlang</div>
+          <div className="text-sm text-gray-600 mt-1">Chap tomondan kanalni tanlang.</div>
+        </div>
       </div>
     );
+  }
 
   if (channel.type === "iframe") {
     return (
-      <iframe
+      <div className="w-full">
+        <div className="aspect-video w-full overflow-hidden rounded-2xl border border-black/10 bg-black/5">
+          <iframe
+            title={channel.name}
+            src={channel.url}
+            className="w-full h-full"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (channel.type === "mp4") {
+    return (
+      <video
+        className="w-full rounded-2xl border border-black/10 bg-black/5"
+        controls
+        playsInline
         src={channel.url}
-        className="w-full rounded-xl"
-        style={{ aspectRatio: "16 / 9" }}
-        allowFullScreen
       />
     );
   }
 
-  return <HLSPlayer src={channel.url} />;
+  return <HLSPlayer src={channel.url} poster={channel.logo} />;
 }
 
-/* =======================
-   MAIN COMPONENT
-   ======================= */
+/* =========================
+   VIRTUAL LIST (NO DEPENDENCY)
+   Fixed row height
+========================= */
 
-export default function AIChat() {
-  const [category, setCategory] = useState("Hammasi");
-  const [country, setCountry] = useState("Hammasi");
-  const [selected, setSelected] = useState(CHANNELS[0]);
+function VirtualList({ items, rowHeight = 76, height = 520, renderRow }) {
+  const ref = useRef(null);
+  const [scrollTop, setScrollTop] = useState(0);
 
-  const filtered = useMemo(() => {
-    return CHANNELS.filter((c) => {
-      if (category !== "Hammasi" && c.category !== category) return false;
-      if (country !== "Hammasi" && c.country !== country) return false;
-      return true;
-    });
-  }, [category, country]);
+  const total = items.length;
+  const totalHeight = total * rowHeight;
+  const overscan = 6;
 
-  useEffect(() => {
-    if (!filtered.includes(selected)) setSelected(filtered[0] || null);
-  }, [filtered, selected]);
+  const startIndex = Math.max(0, Math.floor(scrollTop / rowHeight) - overscan);
+  const endIndex = Math.min(total - 1, Math.floor((scrollTop + height) / rowHeight) + overscan);
+
+  const visible = [];
+  for (let i = startIndex; i <= endIndex; i++) visible.push(i);
 
   return (
-    <div className="p-4 max-w-7xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">📺 Live TV</h2>
-
-      {/* Filters */}
-      <div className="flex gap-2 mb-4">
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          {CATEGORIES.map((c) => (
-            <option key={c}>{c}</option>
-          ))}
-        </select>
-
-        <select value={country} onChange={(e) => setCountry(e.target.value)}>
-          {COUNTRIES.map((c) => (
-            <option key={c}>{c}</option>
-          ))}
-        </select>
+    <div
+      ref={ref}
+      style={{ height, overflow: "auto" }}
+      className="pr-1"
+      onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}
+    >
+      <div style={{ height: totalHeight, position: "relative" }}>
+        {visible.map((i) => (
+          <div
+            key={items[i]?.id || i}
+            style={{ position: "absolute", top: i * rowHeight, left: 0, right: 0, height: rowHeight }}
+          >
+            {renderRow(items[i], i)}
+          </div>
+        ))}
       </div>
+    </div>
+  );
+}
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        {/* Channel list */}
-        <div className="space-y-2">
-          {filtered.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => setSelected(c)}
-              className={`w-full text-left p-2 rounded-lg border ${
-                selected?.id === c.id ? "bg-black text-white" : "bg-white"
-              }`}
+/* =========================
+   MAIN
+========================= */
+
+export default function AIChat() {
+  // Sources: demo + imported M3U (in-memory; user doesn’t type links)
+  const [sourceName, setSourceName] = useState(() => safeGetJSON(LS_LAST_SOURCE, "Demo"));
+  const [imported, setImported] = useState([]);
+  const [importOpen, setImportOpen] = useState(false);
+
+  // filters
+  const [category, setCategory] = useState("Hammasi");
+  const [country, setCountry] = useState("Hammasi");
+  const [query, setQuery] = useState("");
+
+  // favorites, recents
+  const [favorites, setFavorites] = useState(() => new Set(safeGetJSON(LS_FAV_KEY, [])));
+  const [recents, setRecents] = useState(() => safeGetJSON(LS_RECENT_KEY, []));
+
+  // selection
+  const [selectedId, setSelectedId] = useState(() => safeGetJSON(LS_LAST_SELECTED, null));
+
+  const allChannels = useMemo(() => {
+    if (sourceName === "Demo") return DEMO_CHANNELS;
+    return imported.length ? imported : DEMO_CHANNELS;
+  }, [sourceName, imported]);
+
+  const categories = useMemo(() => {
+    const set = new Set(["Hammasi"]);
+    for (const c of allChannels) set.add(c.category || "Boshqa");
+    return Array.from(set);
+  }, [allChannels]);
+
+  const countries = useMemo(() => {
+    const set = new Set(["Hammasi"]);
+    for (const c of allChannels) set.add(c.country || "Boshqa");
+    return Array.from(set);
+  }, [allChannels]);
+
+  const filtered = useMemo(() => {
+    const q = norm(query);
+    let list = allChannels.slice();
+
+    if (category !== "Hammasi") list = list.filter((c) => (c.category || "Boshqa") === category);
+    if (country !== "Hammasi") list = list.filter((c) => (c.country || "Boshqa") === country);
+
+    if (q) {
+      list = list.filter((c) => {
+        const hay = norm(`${c.name} ${c.country} ${c.category} ${c.lang}`);
+        return hay.includes(q);
+      });
+    }
+
+    // favorite first
+    list.sort((a, b) => {
+      const af = favorites.has(a.id) ? 1 : 0;
+      const bf = favorites.has(b.id) ? 1 : 0;
+      if (af !== bf) return bf - af;
+      return (a.name || "").localeCompare(b.name || "");
+    });
+
+    return list;
+  }, [allChannels, category, country, query, favorites]);
+
+  const selectedChannel = useMemo(() => {
+    const found = allChannels.find((c) => c.id === selectedId);
+    return found || null;
+  }, [allChannels, selectedId]);
+
+  // persist
+  useEffect(() => safeSetJSON(LS_FAV_KEY, Array.from(favorites)), [favorites]);
+  useEffect(() => safeSetJSON(LS_RECENT_KEY, recents), [recents]);
+  useEffect(() => safeSetJSON(LS_LAST_SOURCE, sourceName), [sourceName]);
+  useEffect(() => safeSetJSON(LS_LAST_SELECTED, selectedId), [selectedId]);
+
+  // default select
+  useEffect(() => {
+    if (!selectedId && filtered.length) setSelectedId(filtered[0].id);
+  }, [filtered, selectedId]);
+
+  // add recent
+  const selectChannel = (ch) => {
+    setSelectedId(ch.id);
+    setRecents((prev) => {
+      const next = [ch.id, ...prev.filter((x) => x !== ch.id)].slice(0, 30);
+      return next;
+    });
+  };
+
+  const toggleFav = (id) => {
+    setFavorites((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const recentChannels = useMemo(() => {
+    const map = new Map(allChannels.map((c) => [c.id, c]));
+    return recents.map((id) => map.get(id)).filter(Boolean);
+  }, [allChannels, recents]);
+
+  // import M3U from file (no URL typing)
+  const onPickM3U = async (file) => {
+    if (!file) return;
+    const text = await file.text();
+    const parsed = parseM3U(text);
+
+    // normalize missing fields
+    const cleaned = parsed.map((c) => ({
+      ...c,
+      category: c.category || "Boshqa",
+      country: c.country || "Boshqa",
+      lang: c.lang || "—",
+      logo: c.logo || "",
+      type: c.type || guessType(c.url),
+    }));
+
+    setImported(cleaned);
+    setSourceName("M3U");
+    setImportOpen(false);
+    setCategory("Hammasi");
+    setCountry("Hammasi");
+    setQuery("");
+    setSelectedId(cleaned[0]?.id || null);
+  };
+
+  return (
+    <div className="h-full w-full p-4 md:p-6">
+      <div className="max-w-7xl mx-auto h-full">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+          <div>
+            <div className="text-2xl font-bold">📺 Live TV (PRO)</div>
+            <div className="text-sm text-gray-600">
+              10k+ kanal uchun optimizatsiya qilingan panel. (Real kanallarni M3U fayl orqali import qiling)
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-2">
+              <Badge>{sourceName === "Demo" ? "Demo" : "M3U"}</Badge>
+              <Badge>Search</Badge>
+              <Badge>Favorites</Badge>
+              <Badge>Recents</Badge>
+            </div>
+
+            <IconBtn title="M3U import" onClick={() => setImportOpen(true)}>
+              📥
+            </IconBtn>
+            <IconBtn
+              title="Demo/M3U almashtirish"
+              onClick={() => setSourceName((p) => (p === "Demo" ? "M3U" : "Demo"))}
             >
-              {c.name}
-              <div className="text-xs opacity-70">
-                {c.country} • {c.lang}
-              </div>
-            </button>
-          ))}
+              🔁
+            </IconBtn>
+          </div>
         </div>
 
-        {/* Player */}
-        <div className="lg:col-span-3">
-          <Player channel={selected} />
+        {/* Filters */}
+        <div className="rounded-2xl bg-white/70 backdrop-blur border border-black/10 shadow-sm p-3 md:p-4 mb-4">
+          <div className="flex flex-col md:flex-row gap-3 md:items-center">
+            <div className="flex-1">
+              <div className="text-xs text-gray-600 mb-1">Qidiruv</div>
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Kanal nomi, davlat, turkum..."
+                className="w-full h-10 px-3 rounded-xl border border-black/10 bg-white/80 focus:outline-none focus:ring-2 focus:ring-black/10"
+              />
+            </div>
+
+            <div className="md:w-64">
+              <div className="text-xs text-gray-600 mb-1">Davlat</div>
+              <select
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                className="w-full h-10 px-3 rounded-xl border border-black/10 bg-white/80 focus:outline-none focus:ring-2 focus:ring-black/10"
+              >
+                {countries.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="md:w-64">
+              <div className="text-xs text-gray-600 mb-1">Turkum</div>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full h-10 px-3 rounded-xl border border-black/10 bg-white/80 focus:outline-none focus:ring-2 focus:ring-black/10"
+              >
+                {categories.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Quick: Recents */}
+          {recentChannels.length ? (
+            <div className="mt-3 flex flex-wrap gap-2">
+              <div className="text-xs text-gray-600 w-full">Oxirgi ko‘rilganlar:</div>
+              {recentChannels.slice(0, 10).map((ch) => (
+                <button
+                  key={ch.id}
+                  type="button"
+                  onClick={() => selectChannel(ch)}
+                  className="px-3 py-2 rounded-xl border border-black/10 bg-white/60 hover:bg-white text-sm"
+                >
+                  {ch.name}
+                </button>
+              ))}
+            </div>
+          ) : null}
         </div>
+
+        {/* Main */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 h-[calc(100%-180px)]">
+          {/* Channel list */}
+          <div className="lg:col-span-2 rounded-2xl bg-white/70 backdrop-blur border border-black/10 shadow-sm p-3 md:p-4 overflow-hidden">
+            <div className="flex items-center justify-between mb-3">
+              <div className="font-semibold">Kanallar</div>
+              <div className="text-xs text-gray-600">
+                {filtered.length} ta • Fav: {favorites.size} ta
+              </div>
+            </div>
+
+            {filtered.length === 0 ? (
+              <div className="text-sm text-gray-600 p-4 rounded-xl bg-black/5 border border-black/10">
+                Hech narsa topilmadi. Filtrlarni o‘zgartiring yoki M3U import qiling.
+              </div>
+            ) : (
+              <VirtualList
+                items={filtered}
+                rowHeight={76}
+                height={560}
+                renderRow={(ch) => {
+                  const isFav = favorites.has(ch.id);
+                  const active = selectedId === ch.id;
+
+                  return (
+                    <div
+                      className={[
+                        "group rounded-2xl border shadow-sm cursor-pointer transition mx-0",
+                        active ? "border-black/30 bg-white" : "border-black/10 bg-white/70 hover:bg-white",
+                      ].join(" ")}
+                      onClick={() => selectChannel(ch)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") selectChannel(ch);
+                      }}
+                    >
+                      <div className="p-3 flex gap-3 items-center">
+                        <div className="h-10 w-10 rounded-xl bg-black/5 border border-black/10 flex items-center justify-center overflow-hidden">
+                          {ch.logo ? (
+                            <img src={ch.logo} alt={ch.name} className="h-full w-full object-cover" />
+                          ) : (
+                            <span className="text-lg">📡</span>
+                          )}
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                          <div className="font-semibold truncate">{ch.name}</div>
+                          <div className="text-xs text-gray-600 truncate">
+                            {(ch.country || "Boshqa")} • {(ch.category || "Boshqa")} • {(ch.lang || "—")}
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleFav(ch.id);
+                          }}
+                          className={[
+                            "h-9 w-9 rounded-xl border border-black/10 bg-white/70 hover:bg-white shadow-sm",
+                            "opacity-100 md:opacity-0 md:group-hover:opacity-100 transition",
+                          ].join(" ")}
+                          title={isFav ? "Favoritdan olib tashlash" : "Favoritga qo‘shish"}
+                        >
+                          {isFav ? "★" : "☆"}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                }}
+              />
+            )}
+          </div>
+
+          {/* Player */}
+          <div className="lg:col-span-3 rounded-2xl bg-white/70 backdrop-blur border border-black/10 shadow-sm p-3 md:p-4">
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="min-w-0">
+                <div className="font-semibold truncate">
+                  {selectedChannel ? selectedChannel.name : "Kanal tanlanmagan"}
+                </div>
+                <div className="text-xs text-gray-600">
+                  {selectedChannel
+                    ? `${selectedChannel.country || "Boshqa"} • ${selectedChannel.category || "Boshqa"} • ${
+                        selectedChannel.lang || "—"
+                      }`
+                    : "—"}
+                </div>
+              </div>
+
+              {selectedChannel ? (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => toggleFav(selectedChannel.id)}
+                    className="px-3 h-9 rounded-xl border border-black/10 bg-white/70 hover:bg-white shadow-sm"
+                    title="Favorit"
+                  >
+                    {favorites.has(selectedChannel.id) ? "★ Favorit" : "☆ Favorit"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => window?.navigator?.clipboard?.writeText(selectedChannel.url || "")}
+                    className="px-3 h-9 rounded-xl border border-black/10 bg-white/70 hover:bg-white shadow-sm"
+                    title="Linkni nusxalash"
+                  >
+                    🔗 Copy
+                  </button>
+                </div>
+              ) : null}
+            </div>
+
+            <Player channel={selectedChannel} />
+
+            <div className="mt-3 text-xs text-gray-600">
+              <span className="font-semibold">Eslatma:</span> HLS (.m3u8) ishlashi uchun hls.js CDN’dan yuklanadi.
+              Agar stream CORS bilan bloklansa, MP4 yoki iframe ishlaydi.
+            </div>
+          </div>
+        </div>
+
+        {/* Import Modal */}
+        <Modal open={importOpen} title="📥 M3U import (fayldan)" onClose={() => setImportOpen(false)}>
+          <div className="text-sm text-gray-700">
+            Bu panel 10 ming+ kanalni ko‘tara oladi. Real kanallar uchun odatda IPTV provayderingiz **M3U fayl** beradi.
+            Siz faqat shu faylni tanlaysiz — link qo‘lda kiritish shart emas.
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-black/10 bg-black/5 p-4">
+            <div className="text-xs text-gray-600 mb-2">M3U faylni tanlang:</div>
+            <input
+              type="file"
+              accept=".m3u,.m3u8,text/plain"
+              onChange={(e) => onPickM3U(e.target.files?.[0])}
+              className="block w-full"
+            />
+            <div className="text-[11px] text-gray-500 mt-2">
+              Importdan keyin “M3U” source avtomatik tanlanadi.
+            </div>
+          </div>
+
+          <div className="mt-4 flex items-center justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setImportOpen(false)}
+              className="px-4 h-10 rounded-xl border border-black/10 bg-white/70 hover:bg-white shadow-sm"
+            >
+              Yopish
+            </button>
+          </div>
+        </Modal>
       </div>
     </div>
   );
