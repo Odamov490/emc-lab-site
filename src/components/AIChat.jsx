@@ -204,29 +204,26 @@ function HLSPlayer({ src, poster }) {
       }
 
       // Agar hls.js bo‘lsa, ishlatamiz (dynamic import)
-  try {
-  const mod = await import(/* @vite-ignore */ "hls.js");
-  if (cancelled) return;
+      try {
+        const mod = await import(/* @vite-ignore */ "hls.js");
+        if (cancelled) return;
 
-  const Hls = mod.default;
-  if (!Hls || !Hls.isSupported()) {
-    setHint("Brauzer HLS’ni qo‘llamaydi. MP4 yoki iframe ishlating.");
-    return;
-  }
+        const Hls = mod.default;
+        if (!Hls || !Hls.isSupported()) {
+          setHint("Brauzer HLS’ni qo‘llamaydi. MP4 yoki iframe ishlating.");
+          return;
+        }
 
-  hlsInstance = new Hls({
-    enableWorker: true,
-    lowLatencyMode: true,
-  });
+        hlsInstance = new Hls({
+          enableWorker: true,
+          lowLatencyMode: true,
+        });
 
-  hlsInstance.loadSource(src);
-  hlsInstance.attachMedia(video);
-} catch (e) {
-  setHint(
-    "HLS oqimni yuklab bo‘lmadi. npm i hls.js qilinganini tekshiring."
-  );
-}
-
+        hlsInstance.loadSource(src);
+        hlsInstance.attachMedia(video);
+      } catch (e) {
+        setHint("HLS oqimni yuklab bo‘lmadi. npm i hls.js qilinganini tekshiring.");
+      }
     }
 
     setup();
@@ -628,7 +625,9 @@ export default function AIChat() {
                 </div>
                 <div className="text-xs text-gray-600">
                   {selectedChannel
-                    ? `${selectedChannel.country} • ${selectedChannel.category} • ${selectedChannel.lang || "—"}`
+                    ? `${selectedChannel.country} • ${selectedChannel.category} • ${
+                        selectedChannel.lang || "—"
+                      }`
                     : "—"}
                 </div>
               </div>
@@ -732,9 +731,7 @@ export default function AIChat() {
             </div>
 
             <div className="md:col-span-2">
-              <div className="text-xs text-gray-600 mb-1">
-                URL (m3u8 / mp4 / embed link)
-              </div>
+              <div className="text-xs text-gray-600 mb-1">URL (m3u8 / mp4 / embed link)</div>
               <input
                 value={addForm.url}
                 onChange={(e) => setAddForm((p) => ({ ...p, url: e.target.value }))}
