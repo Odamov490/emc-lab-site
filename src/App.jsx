@@ -452,18 +452,226 @@ ESD-испытание отвечает на главный вопрос:
   },
   "O‘z MSt IEC 61000-4-4:2023": {
     uz: `
-Tez o‘tuvchi o‘tish jarayonlari (EFT/Burst) – tarmoq hamda signal liniyalaridagi kalitlash jarayonlaridan paydo bo‘ladigan impulslar ta'siriga barqarorlik.
+🔹 Bu sinov nima?
 
-• Impuls paketi: 5/50 ns, takrorlanish 5 kHz – 100 kHz
-• Kiritish: quvvat liniyasi, signal/muloqot portlari (CDN orqali)
-• Maqsad: nazorat tizimlari, invertorlar, boshqaruv modullari
+Tez o‘tuvchi o‘tish jarayonlari (EFT/Burst) — bu elektr tarmoqlarida yoki signal liniyalarida kalitlash jarayonlari vaqtida paydo bo‘ladigan juda qisqa, lekin tez-tez takrorlanadigan impulslardir.
+
+Oddiy misollar:
+
+rele yoqilib-o‘chishi
+
+dvigatel, invertor ishga tushishi
+
+kontaktorlar almashishi
+
+sanoat uskunalarining kalitlash jarayonlari
+
+Bu impulslar ko‘zga ko‘rinmaydi, lekin elektron qurilmalar uchun juda xavfli bo‘lishi mumkin.
+
+🔹 Nima uchun EFT/Burst sinovi kerak?
+
+Real sharoitda qurilmalar:
+
+sanoat tarmoqlariga ulanadi
+
+uzun kabellar orqali ishlaydi
+
+rele, dvigatel, invertorlar bilan yonma-yon joylashadi
+
+Agar qurilma EFT ga chidamsiz bo‘lsa:
+
+noto‘g‘ri buyruqlar paydo bo‘ladi
+
+sensor va nazorat tizimlari adashadi
+
+aloqa uziladi
+
+qurilma qayta yuklanadi yoki osilib qoladi
+
+👉 Shu sababli EFT sinovi ishonchlilik va funksional barqarorlikni tekshiradi.
+
+🔹 Sinov qanday o‘tkaziladi?
+
+Sinov maxsus EFT/Burst generatori yordamida o‘tkaziladi.
+
+Impulslar:
+
+5/50 ns davomiylikda
+
+5 kHz – 100 kHz chastotada
+
+impuls paketlari (burst) ko‘rinishida yuboriladi
+
+Zarba to‘g‘ridan-to‘g‘ri emas, balki:
+
+quvvat liniyasiga
+
+signal va aloqa portlariga
+
+CDN (Coupling/Decoupling Network) orqali uzatiladi.
+
+🔹 Qaysi joylarga ta’sir qilinadi?
+
+Sinov quyidagi liniyalarga beriladi:
+
+AC / DC quvvat liniyalari
+
+signal kabellari
+
+boshqaruv va aloqa portlari (RS, CAN, Ethernet va boshqalar)
+
+Bu real ekspluatatsiyadagi sharoitni takrorlaydi.
+
+🔹 Sinov darajalari nimani anglatadi?
+
+Sinov darajasi qurilmaning qaysi muhitga mo‘ljallanganini ko‘rsatadi:
+
+past darajalar — ofis va maishiy qurilmalar
+
+yuqori darajalar — sanoat va avtomatika tizimlari
+
+Qurilma impulslar ta’sirida ham to‘g‘ri ishlashi yoki tez tiklanishi kerak.
+
+🔹 Natijalar qanday baholanadi?
+
+Baholash mezonlari ESD dagi kabi:
+
+A — normal ishlash
+
+B — vaqtinchalik buzilish, avtomatik tiklanish
+
+C — operator aralashuvi kerak
+
+D — ishdan chiqish (qabul qilinmaydi)
+
+🔹 Qayerlarda ayniqsa muhim?
+
+EFT/Burst sinovi ayniqsa muhim:
+
+nazorat va avtomatika tizimlari
+
+invertorlar
+
+PLC va boshqaruv modullari
+
+sanoat elektronikalari
+
+🔹 Xulosa (oddiy qilib)
+
+EFT/Burst sinovi shuni tekshiradi:
+
+“Bu qurilma elektr tarmog‘idagi tezkor shovqinlarga qaramay, barqaror ishlay oladimi?”
     `,
     ru: `
-EFT/Burst – устойчивость к быстропеременным переходным процессам от коммутаций в сетях.
+🔹 Что такое EFT / Burst?
 
-• Пакет: 5/50 нс, повторение 5–100 кГц
-• Ввод: питание, сигнальные/коммуникационные порты (через CDN)
-• Цель: контроллеры, инверторы, управляющие модули
+Электрические быстрые переходные процессы (EFT/Burst) — это короткие, но часто повторяющиеся импульсы, возникающие в силовых и сигнальных линиях при коммутационных процессах.
+
+Примеры:
+
+включение и отключение реле
+
+запуск электродвигателей и инверторов
+
+работа контакторов
+
+коммутация промышленного оборудования
+
+Импульсы очень короткие, но способны серьезно повлиять на электронные устройства.
+
+🔹 Зачем нужно испытание EFT/Burst?
+
+В реальных условиях устройства:
+
+подключены к промышленным электросетям
+
+работают с длинными кабелями
+
+находятся рядом с источниками коммутационных помех
+
+Если устройство неустойчиво к EFT:
+
+возникают ложные сигналы
+
+сбои в системах управления
+
+нарушения связи
+
+перезагрузки или зависания
+
+👉 Испытание EFT/Burst подтверждает надежность и функциональную устойчивость оборудования.
+
+🔹 Как проводится испытание?
+
+Испытание выполняется с помощью генератора EFT/Burst.
+
+Характеристики импульсов:
+
+длительность 5/50 нс
+
+частота повторения 5 кГц – 100 кГц
+
+подача в виде импульсных пакетов
+
+Импульсы вводятся через:
+
+линии питания
+
+сигнальные и коммуникационные порты
+
+с использованием CDN (Coupling/Decoupling Network).
+
+🔹 На какие линии подается воздействие?
+
+Испытание проводится на:
+
+силовые линии AC / DC
+
+сигнальные кабели
+
+порты управления и связи (RS, CAN, Ethernet и др.)
+
+Это имитирует реальные условия эксплуатации.
+
+🔹 Что означают уровни испытаний?
+
+Уровень испытаний показывает, для какой среды предназначено устройство:
+
+низкие уровни — офисная и бытовая среда
+
+высокие уровни — промышленная среда
+
+Устройство должно сохранять работоспособность или быстро восстанавливаться.
+
+🔹 Оценка результатов
+
+Критерии оценки:
+
+A — нормальная работа
+
+B — временное нарушение с самовосстановлением
+
+C — требуется вмешательство оператора
+
+D — отказ оборудования (недопустимо)
+
+🔹 Где особенно важно?
+
+Испытание EFT/Burst критически важно для:
+
+систем управления и автоматизации
+
+инверторов
+
+ПЛК и управляющих модулей
+
+промышленной электроники
+
+🔹 Итог
+
+Испытание EFT/Burst отвечает на вопрос:
+
+«Сможет ли устройство стабильно работать при наличии быстрых электрических помех в сети?»
     `,
   },
   default: {
