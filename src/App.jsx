@@ -674,6 +674,101 @@ D — отказ оборудования (недопустимо)
 «Сможет ли устройство стабильно работать при наличии быстрых электрических помех в сети?»
     `,
   },
+
+ "Oʻz MSt IEC 61000-4-5:2023": {
+    uz: `
+🔹 Bu sinov nima?
+
+    `,
+    ru: `
+🔹 Что такое электростатический разряд (ESD)?
+
+    `,
+  },
+
+ "ʻz MSt IEC 61000.4.11-2013": {
+    uz: `
+🔹 Bu sinov nima?
+
+    `,
+    ru: `
+🔹 Что такое электростатический разряд (ESD)?
+
+    `,
+  },
+
+   "O'z MSt IEC 61000-4-6:2023": {
+    uz: `
+🔹 Bu sinov nima?
+
+    `,
+    ru: `
+🔹 Что такое электростатический разряд (ESD)?
+
+    `,
+  },
+
+
+   "O‘zMSt IEC 61000-4-3:2023": {
+    uz: `
+🔹 Bu sinov nima?
+
+    `,
+    ru: `
+🔹 Что такое электростатический разряд (ESD)?
+
+    `,
+  },
+
+
+   "ГОСТ CISPR 14-1-2022": {
+    uz: `
+🔹 Bu sinov nima?
+
+    `,
+    ru: `
+🔹 Что такое электростатический разряд (ESD)?
+
+    `,
+  },
+
+
+   "O‘zMSt IEC 61000-3-3:2023": {
+    uz: `
+🔹 Bu sinov nima?
+
+    `,
+    ru: `
+🔹 Что такое электростатический разряд (ESD)?
+
+    `,
+  },
+
+
+   "O‘zMSt IEC 61000-3-2:2023": {
+    uz: `
+🔹 Bu sinov nima?
+
+    `,
+    ru: `
+🔹 Что такое электростатический разряд (ESD)?
+
+    `,
+  },
+
+
+   "ГОСТ CISPR 14-1-2022": {
+    uz: `
+🔹 Bu sinov nima?
+
+    `,
+    ru: `
+🔹 Что такое электростатический разряд (ESD)?
+
+    `,
+  },
+
+
   default: {
     uz: `
 Ushbu sinov bo‘yicha batafsil texnik ma’lumotlar: sinov darajalari, joylashtirish, portlar, mezonlar va protokol misollari. Zarur bo‘lsa,
@@ -684,6 +779,8 @@ mijozga mos individual dastur tuziladi. Qo‘shimcha ma’lumot uchun "Bog‘lan
 формируем индивидуальную программу под изделие. Для уточнения оставьте заявку в разделе «Контакты».
     `,
   },
+
+
 };
 
 
