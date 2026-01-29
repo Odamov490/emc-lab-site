@@ -1,12 +1,13 @@
 // src/components/AIChat.jsx
 // Live TV PRO — Auto Open Playlists (iptv-org)
 // ✅ Auto load (no user input)
-// ✅ Categories / Countries
+// ✅ Categories / Countries (countries dropdown ALWAYS shows list; includes "O‘zbekiston")
 // ✅ Fast search
 // ✅ Favorites + Recents (localStorage)
 // ✅ HLS (.m3u8) via CDN (Vercel-safe)
 // ✅ Virtual list (10k+ kanal lag qilmaydi)
 // ✅ Cache (6 hours) to speed up
+// ✅ Autoplay on channel select (no extra Play click)
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
@@ -186,9 +187,13 @@ function parseM3U(text) {
    UI SMALL COMPONENTS
 ========================= */
 
-function Badge({ children }) {
+function Badge({ children, tone = "default" }) {
+  const toneCls =
+    tone === "neon"
+      ? "border-white/15 bg-white/10 text-white"
+      : "border-black/10 bg-black/5 text-black/80";
   return (
-    <span className="text-[11px] px-2 py-1 rounded-full bg-black/5 border border-black/10">
+    <span className={`text-[11px] px-2 py-1 rounded-full border ${toneCls}`}>
       {children}
     </span>
   );
@@ -200,7 +205,12 @@ function IconBtn({ title, onClick, children }) {
       type="button"
       title={title}
       onClick={onClick}
-      className="h-9 w-9 rounded-xl border border-black/10 bg-white/70 hover:bg-white shadow-sm inline-flex items-center justify-center"
+      className={[
+        "h-10 w-10 rounded-2xl border border-white/15",
+        "bg-white/10 hover:bg-white/15 text-white",
+        "shadow-[0_10px_30px_rgba(0,0,0,0.35)]",
+        "inline-flex items-center justify-center transition active:scale-95",
+      ].join(" ")}
     >
       {children}
     </button>
@@ -211,7 +221,7 @@ function IconBtn({ title, onClick, children }) {
    PLAYER
 ========================= */
 
-function HLSPlayer({ src, poster }) {
+function HLSPlayer({ src, poster, autoPlayToken }) {
   const videoRef = useRef(null);
   const [hint, setHint] = useState("");
 
@@ -227,6 +237,14 @@ function HLSPlayer({ src, poster }) {
       const canNative = video.canPlayType("application/vnd.apple.mpegurl");
       if (canNative) {
         video.src = src;
+        // autoplay attempt
+        try {
+          video.muted = true;
+          await video.play();
+          video.muted = false;
+        } catch {
+          // if blocked, user can press play
+        }
         return;
       }
 
@@ -242,6 +260,17 @@ function HLSPlayer({ src, poster }) {
         hls = new Hls({ enableWorker: true, lowLatencyMode: true });
         hls.loadSource(src);
         hls.attachMedia(video);
+
+        // autoplay when manifest is parsed
+        hls.on(Hls.Events.MANIFEST_PARSED, async () => {
+          try {
+            video.muted = true;
+            await video.play();
+            video.muted = false;
+          } catch {
+            // autoplay blocked
+          }
+        });
       } catch {
         setHint("HLS yuklanmadi (CDN blok bo‘lishi mumkin). MP4/iframe sinab ko‘ring.");
       }
@@ -257,30 +286,30 @@ function HLSPlayer({ src, poster }) {
         // ignore
       }
     };
-  }, [src]);
+  }, [src, autoPlayToken]);
 
   return (
     <div className="w-full">
       <video
         ref={videoRef}
-        className="w-full rounded-2xl border border-black/10 bg-black/5"
+        className="w-full rounded-3xl border border-white/10 bg-black/40 shadow-[0_20px_60px_rgba(0,0,0,0.55)]"
         controls
         playsInline
         poster={poster || undefined}
       />
-      {hint ? <div className="mt-2 text-xs text-gray-600">{hint}</div> : null}
+      {hint ? <div className="mt-2 text-xs text-white/70">{hint}</div> : null}
     </div>
   );
 }
 
-function Player({ channel }) {
+function Player({ channel, autoPlayToken }) {
   if (!channel) {
     return (
-      <div className="h-[320px] rounded-2xl border border-black/10 bg-white/60 flex items-center justify-center">
-        <div className="text-center px-6">
+      <div className="h-[320px] rounded-3xl border border-white/10 bg-white/5 flex items-center justify-center">
+        <div className="text-center px-6 text-white">
           <div className="text-3xl mb-2">📺</div>
           <div className="font-semibold">Kanal tanlang</div>
-          <div className="text-sm text-gray-600 mt-1">Chap tomondan kanalni tanlang.</div>
+          <div className="text-sm text-white/70 mt-1">Chap tomondan kanalni tanlang.</div>
         </div>
       </div>
     );
@@ -289,7 +318,7 @@ function Player({ channel }) {
   if (channel.type === "iframe") {
     return (
       <div className="w-full">
-        <div className="aspect-video w-full overflow-hidden rounded-2xl border border-black/10 bg-black/5">
+        <div className="aspect-video w-full overflow-hidden rounded-3xl border border-white/10 bg-black/30 shadow-[0_20px_60px_rgba(0,0,0,0.55)]">
           <iframe
             title={channel.name}
             src={channel.url}
@@ -304,11 +333,17 @@ function Player({ channel }) {
 
   if (channel.type === "mp4") {
     return (
-      <video className="w-full rounded-2xl border border-black/10 bg-black/5" controls playsInline src={channel.url} />
+      <video
+        className="w-full rounded-3xl border border-white/10 bg-black/30 shadow-[0_20px_60px_rgba(0,0,0,0.55)]"
+        controls
+        playsInline
+        src={channel.url}
+        autoPlay
+      />
     );
   }
 
-  return <HLSPlayer src={channel.url} poster={channel.logo} />;
+  return <HLSPlayer src={channel.url} poster={channel.logo} autoPlayToken={autoPlayToken} />;
 }
 
 /* =========================
@@ -386,7 +421,6 @@ function dedupeAndNormalize(channels) {
 }
 
 async function loadOpenPlaylists(setProgress) {
-  // Parallel fetch
   const urls = OPEN_SOURCES.map((s) => s.url);
   const results = await Promise.allSettled(urls.map(fetchText));
 
@@ -412,7 +446,7 @@ async function loadOpenPlaylists(setProgress) {
 
 export default function AIChat() {
   // sources: Open (auto) + Demo fallback
-  const [sourceName, setSourceName] = useState("Open"); // default: auto open playlists
+  const [sourceName, setSourceName] = useState("Open");
   const [channels, setChannels] = useState(() => {
     const cached = safeGetJSON(LS_CACHE_KEY, null);
     const cachedAt = Number(localStorage.getItem(LS_CACHE_TIME) || 0);
@@ -436,6 +470,9 @@ export default function AIChat() {
   // selection
   const [selectedId, setSelectedId] = useState(() => safeGetJSON(LS_LAST_SELECTED, null));
 
+  // token to re-trigger autoplay effect reliably
+  const [autoPlayToken, setAutoPlayToken] = useState(0);
+
   const allChannels = useMemo(() => {
     return sourceName === "Demo" ? DEMO_CHANNELS : channels;
   }, [sourceName, channels]);
@@ -446,10 +483,26 @@ export default function AIChat() {
     return Array.from(set);
   }, [allChannels]);
 
+  // ✅ FIX: countries list sometimes empty/strange — force include O‘zbekiston + common
   const countries = useMemo(() => {
-    const set = new Set(["Hammasi"]);
-    for (const c of allChannels) set.add(c.country || "Boshqa");
-    return Array.from(set);
+    const set = new Set(["Hammasi", "O‘zbekiston", "UZ", "UZB"]);
+    for (const c of allChannels) {
+      if (c.country) set.add(c.country);
+    }
+    // remove empty
+    const arr = Array.from(set).filter(Boolean);
+
+    // sort: Hammasi first, then O‘zbekiston, then alphabetical
+    const uniq = Array.from(new Set(arr));
+    uniq.sort((a, b) => {
+      if (a === "Hammasi") return -1;
+      if (b === "Hammasi") return 1;
+      if (a === "O‘zbekiston") return -1;
+      if (b === "O‘zbekiston") return 1;
+      return String(a).localeCompare(String(b));
+    });
+
+    return uniq;
   }, [allChannels]);
 
   const filtered = useMemo(() => {
@@ -457,7 +510,16 @@ export default function AIChat() {
     let list = allChannels.slice();
 
     if (category !== "Hammasi") list = list.filter((c) => (c.category || "Boshqa") === category);
-    if (country !== "Hammasi") list = list.filter((c) => (c.country || "Boshqa") === country);
+
+    // ✅ Country filter: treat "O‘zbekiston" also if tvg-country is UZ/UZB
+    if (country !== "Hammasi") {
+      list = list.filter((c) => {
+        const cc = String(c.country || "").trim();
+        if (!cc) return false;
+        if (country === "O‘zbekiston") return cc === "O‘zbekiston" || cc.toUpperCase() === "UZ" || cc.toUpperCase() === "UZB";
+        return cc === country;
+      });
+    }
 
     if (q) {
       list = list.filter((c) => {
@@ -489,7 +551,10 @@ export default function AIChat() {
 
   // default select
   useEffect(() => {
-    if (!selectedId && filtered.length) setSelectedId(filtered[0].id);
+    if (!selectedId && filtered.length) {
+      setSelectedId(filtered[0].id);
+      setAutoPlayToken((t) => t + 1);
+    }
   }, [filtered, selectedId]);
 
   // recents
@@ -498,8 +563,10 @@ export default function AIChat() {
     return recents.map((id) => map.get(id)).filter(Boolean);
   }, [allChannels, recents]);
 
+  // ✅ Autoplay on select
   const selectChannel = (ch) => {
     setSelectedId(ch.id);
+    setAutoPlayToken((t) => t + 1);
     setRecents((prev) => [ch.id, ...prev.filter((x) => x !== ch.id)].slice(0, 30));
   };
 
@@ -530,9 +597,11 @@ export default function AIChat() {
         // ignore cache issues
       }
 
-      // If current selectedId not exists, set first
-      if (loaded.length) setSelectedId((prev) => (loaded.some((x) => x.id === prev) ? prev : loaded[0].id));
-    } catch (e) {
+      if (loaded.length) {
+        setSelectedId((prev) => (loaded.some((x) => x.id === prev) ? prev : loaded[0].id));
+        setAutoPlayToken((t) => t + 1);
+      }
+    } catch {
       setError("Ochiq playlist yuklanmadi (internet/CORS bo‘lishi mumkin). Demo yoqildi.");
       setChannels(DEMO_CHANNELS);
       setSourceName("Demo");
@@ -541,7 +610,7 @@ export default function AIChat() {
     }
   };
 
-  // initial auto-load (if cache expired or data is demo)
+  // initial auto-load (if cache expired)
   useEffect(() => {
     if (sourceName !== "Open") return;
 
@@ -554,28 +623,40 @@ export default function AIChat() {
 
   return (
     <div className="h-full w-full p-4 md:p-6">
-      <div className="max-w-7xl mx-auto h-full">
+      {/* Hi-tech background */}
+      <div className="max-w-7xl mx-auto h-full relative">
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-fuchsia-500/25 blur-3xl" />
+          <div className="absolute top-10 right-0 h-80 w-80 rounded-full bg-cyan-400/25 blur-3xl" />
+          <div className="absolute bottom-0 left-1/3 h-96 w-96 rounded-full bg-emerald-400/15 blur-3xl" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#070A16] via-[#070A16] to-[#050615]" />
+        </div>
+
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-          <div>
-            <div className="text-2xl font-bold">📺 Live TV (PRO)</div>
-            <div className="text-sm text-gray-600">
+          <div className="text-white">
+            <div className="text-2xl font-bold">
+              <span className="bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-emerald-300 bg-clip-text text-transparent">
+                📺 Live TV (PRO)
+              </span>
+            </div>
+            <div className="text-sm text-white/70">
               Ochiq manbalar (iptv-org) avtomatik yuklanadi — foydalanuvchi hech narsa kiritmaydi.
             </div>
             {loading ? (
-              <div className="text-xs text-gray-600 mt-1">
+              <div className="text-xs text-white/70 mt-1">
                 Yuklanmoqda: {progress.ok}/{progress.total} manba…
               </div>
             ) : null}
-            {error ? <div className="text-xs text-red-600 mt-1">{error}</div> : null}
+            {error ? <div className="text-xs text-red-300 mt-1">{error}</div> : null}
           </div>
 
           <div className="flex items-center gap-2">
             <div className="hidden sm:flex items-center gap-2">
-              <Badge>{sourceName}</Badge>
-              <Badge>Search</Badge>
-              <Badge>Favorites</Badge>
-              <Badge>Recents</Badge>
+              <Badge tone="neon">{sourceName}</Badge>
+              <Badge tone="neon">Search</Badge>
+              <Badge tone="neon">Favorites</Badge>
+              <Badge tone="neon">Recents</Badge>
             </div>
 
             <IconBtn title="Yangilash (Open playlists)" onClick={refreshOpen}>
@@ -592,27 +673,27 @@ export default function AIChat() {
         </div>
 
         {/* Filters */}
-        <div className="rounded-2xl bg-white/70 backdrop-blur border border-black/10 shadow-sm p-3 md:p-4 mb-4">
+        <div className="rounded-3xl bg-white/10 backdrop-blur border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.45)] p-3 md:p-4 mb-4 text-white">
           <div className="flex flex-col md:flex-row gap-3 md:items-center">
             <div className="flex-1">
-              <div className="text-xs text-gray-600 mb-1">Qidiruv</div>
+              <div className="text-xs text-white/70 mb-1">Qidiruv</div>
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Kanal nomi, davlat, turkum..."
-                className="w-full h-10 px-3 rounded-xl border border-black/10 bg-white/80 focus:outline-none focus:ring-2 focus:ring-black/10"
+                className="w-full h-11 px-4 rounded-2xl border border-white/10 bg-black/30 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
               />
             </div>
 
             <div className="md:w-64">
-              <div className="text-xs text-gray-600 mb-1">Davlat</div>
+              <div className="text-xs text-white/70 mb-1">Davlat</div>
               <select
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
-                className="w-full h-10 px-3 rounded-xl border border-black/10 bg-white/80 focus:outline-none focus:ring-2 focus:ring-black/10"
+                className="w-full h-11 px-4 rounded-2xl border border-white/10 bg-black/30 text-white focus:outline-none focus:ring-2 focus:ring-fuchsia-300/25"
               >
                 {countries.map((c) => (
-                  <option key={c} value={c}>
+                  <option key={c} value={c} className="text-black">
                     {c}
                   </option>
                 ))}
@@ -620,14 +701,14 @@ export default function AIChat() {
             </div>
 
             <div className="md:w-64">
-              <div className="text-xs text-gray-600 mb-1">Turkum</div>
+              <div className="text-xs text-white/70 mb-1">Turkum</div>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full h-10 px-3 rounded-xl border border-black/10 bg-white/80 focus:outline-none focus:ring-2 focus:ring-black/10"
+                className="w-full h-11 px-4 rounded-2xl border border-white/10 bg-black/30 text-white focus:outline-none focus:ring-2 focus:ring-emerald-300/25"
               >
                 {categories.map((c) => (
-                  <option key={c} value={c}>
+                  <option key={c} value={c} className="text-black">
                     {c}
                   </option>
                 ))}
@@ -637,14 +718,14 @@ export default function AIChat() {
 
           {/* Quick: Recents */}
           {recentChannels.length ? (
-            <div className="mt-3 flex flex-wrap gap-2">
-              <div className="text-xs text-gray-600 w-full">Oxirgi ko‘rilganlar:</div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <div className="text-xs text-white/70 w-full">Oxirgi ko‘rilganlar:</div>
               {recentChannels.slice(0, 10).map((ch) => (
                 <button
                   key={ch.id}
                   type="button"
                   onClick={() => selectChannel(ch)}
-                  className="px-3 py-2 rounded-xl border border-black/10 bg-white/60 hover:bg-white text-sm"
+                  className="px-3 py-2 rounded-2xl border border-white/10 bg-white/10 hover:bg-white/15 text-sm transition"
                 >
                   {ch.name}
                 </button>
@@ -656,16 +737,16 @@ export default function AIChat() {
         {/* Main */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 h-[calc(100%-180px)]">
           {/* Channel list */}
-          <div className="lg:col-span-2 rounded-2xl bg-white/70 backdrop-blur border border-black/10 shadow-sm p-3 md:p-4 overflow-hidden">
+          <div className="lg:col-span-2 rounded-3xl bg-white/10 backdrop-blur border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.45)] p-3 md:p-4 overflow-hidden text-white">
             <div className="flex items-center justify-between mb-3">
               <div className="font-semibold">Kanallar</div>
-              <div className="text-xs text-gray-600">
+              <div className="text-xs text-white/70">
                 {filtered.length} ta • Fav: {favorites.size} ta
               </div>
             </div>
 
             {filtered.length === 0 ? (
-              <div className="text-sm text-gray-600 p-4 rounded-xl bg-black/5 border border-black/10">
+              <div className="text-sm text-white/70 p-4 rounded-2xl bg-black/30 border border-white/10">
                 Hech narsa topilmadi. Filtrlarni o‘zgartiring.
               </div>
             ) : (
@@ -680,8 +761,11 @@ export default function AIChat() {
                   return (
                     <div
                       className={[
-                        "group rounded-2xl border shadow-sm cursor-pointer transition mx-0",
-                        active ? "border-black/30 bg-white" : "border-black/10 bg-white/70 hover:bg-white",
+                        "group rounded-3xl border cursor-pointer transition mx-0",
+                        "shadow-[0_10px_30px_rgba(0,0,0,0.35)]",
+                        active
+                          ? "border-cyan-300/40 bg-gradient-to-r from-cyan-500/20 via-fuchsia-500/10 to-emerald-500/10"
+                          : "border-white/10 bg-white/5 hover:bg-white/10",
                       ].join(" ")}
                       onClick={() => selectChannel(ch)}
                       role="button"
@@ -691,7 +775,7 @@ export default function AIChat() {
                       }}
                     >
                       <div className="p-3 flex gap-3 items-center">
-                        <div className="h-10 w-10 rounded-xl bg-black/5 border border-black/10 flex items-center justify-center overflow-hidden">
+                        <div className="h-10 w-10 rounded-2xl bg-black/30 border border-white/10 flex items-center justify-center overflow-hidden">
                           {ch.logo ? (
                             <img src={ch.logo} alt={ch.name} className="h-full w-full object-cover" />
                           ) : (
@@ -701,7 +785,7 @@ export default function AIChat() {
 
                         <div className="min-w-0 flex-1">
                           <div className="font-semibold truncate">{ch.name}</div>
-                          <div className="text-xs text-gray-600 truncate">
+                          <div className="text-xs text-white/70 truncate">
                             {(ch.country || "Boshqa")} • {(ch.category || "Boshqa")} • {(ch.lang || "—")}
                           </div>
                         </div>
@@ -713,7 +797,7 @@ export default function AIChat() {
                             toggleFav(ch.id);
                           }}
                           className={[
-                            "h-9 w-9 rounded-xl border border-black/10 bg-white/70 hover:bg-white shadow-sm",
+                            "h-9 w-9 rounded-2xl border border-white/10 bg-black/30 hover:bg-black/20 shadow-sm",
                             "opacity-100 md:opacity-0 md:group-hover:opacity-100 transition",
                           ].join(" ")}
                           title={isFav ? "Favoritdan olib tashlash" : "Favoritga qo‘shish"}
@@ -729,13 +813,13 @@ export default function AIChat() {
           </div>
 
           {/* Player */}
-          <div className="lg:col-span-3 rounded-2xl bg-white/70 backdrop-blur border border-black/10 shadow-sm p-3 md:p-4">
+          <div className="lg:col-span-3 rounded-3xl bg-white/10 backdrop-blur border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.45)] p-3 md:p-4 text-white">
             <div className="flex items-start justify-between gap-3 mb-3">
               <div className="min-w-0">
                 <div className="font-semibold truncate">
                   {selectedChannel ? selectedChannel.name : "Kanal tanlanmagan"}
                 </div>
-                <div className="text-xs text-gray-600">
+                <div className="text-xs text-white/70">
                   {selectedChannel
                     ? `${selectedChannel.country || "Boshqa"} • ${selectedChannel.category || "Boshqa"} • ${
                         selectedChannel.lang || "—"
@@ -749,7 +833,7 @@ export default function AIChat() {
                   <button
                     type="button"
                     onClick={() => toggleFav(selectedChannel.id)}
-                    className="px-3 h-9 rounded-xl border border-black/10 bg-white/70 hover:bg-white shadow-sm"
+                    className="px-3 h-10 rounded-2xl border border-white/10 bg-white/10 hover:bg-white/15 shadow-sm transition"
                     title="Favorit"
                   >
                     {favorites.has(selectedChannel.id) ? "★ Favorit" : "☆ Favorit"}
@@ -757,7 +841,7 @@ export default function AIChat() {
                   <button
                     type="button"
                     onClick={() => window?.navigator?.clipboard?.writeText(selectedChannel.url || "")}
-                    className="px-3 h-9 rounded-xl border border-black/10 bg-white/70 hover:bg-white shadow-sm"
+                    className="px-3 h-10 rounded-2xl border border-white/10 bg-white/10 hover:bg-white/15 shadow-sm transition"
                     title="Linkni nusxalash"
                   >
                     🔗 Copy
@@ -766,11 +850,11 @@ export default function AIChat() {
               ) : null}
             </div>
 
-            <Player channel={selectedChannel} />
+            <Player channel={selectedChannel} autoPlayToken={autoPlayToken} />
 
-            <div className="mt-3 text-xs text-gray-600">
-              <span className="font-semibold">Eslatma:</span> HLS (.m3u8) ishlashi uchun hls.js CDN’dan yuklanadi.
-              Ba’zi streamlar CORS/geo-block sabab ishlamasligi mumkin.
+            <div className="mt-3 text-xs text-white/70">
+              <span className="font-semibold text-white">Eslatma:</span> HLS (.m3u8) ishlashi uchun hls.js CDN’dan
+              yuklanadi. Ba’zi streamlar CORS/geo-block sabab ishlamasligi mumkin.
             </div>
           </div>
         </div>
