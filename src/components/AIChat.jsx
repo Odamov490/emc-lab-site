@@ -1,4 +1,15 @@
 // src/components/AIChat.jsx
+// Endi bu bo‘lim TV kanallar ko‘rsatuvchi “Live TV” paneli bo‘ldi.
+// ✅ Kategoriyalar bo‘yicha filter
+// ✅ Davlat bo‘yicha filter
+// ✅ Qidiruv
+// ✅ Favorit (localStorage)
+// ✅ Kanal qo‘shish (custom) — m3u8 yoki iframe URL
+//
+// Eslatma:
+// - Chrome/Edge’da .m3u8 oqishi uchun HLS kerak bo‘lishi mumkin.
+//   Agar loyihangizda `hls.js` bo‘lsa, avtomatik ishlaydi.
+//   Aks holda video o‘ynamasa, iframe URL yoki MP4 oqimdan foydalaning.
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
@@ -37,6 +48,7 @@ const BUILTIN_CHANNELS = [
     country: "O‘zbekiston",
     category: "Yangiliklar",
     lang: "UZ",
+    // m3u8 demo o‘rniga real link qo‘ying
     url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
     type: "hls", // "hls" | "mp4" | "iframe"
     logo: "",
@@ -88,6 +100,7 @@ const BUILTIN_CHANNELS = [
     country: "Boshqa",
     category: "Yangiliklar",
     lang: "EN",
+    // Bu yerga real embed URL qo'ying (YouTube embed, Twitch embed, va h.k.)
     url: "https://www.youtube.com/embed/live_stream?channel=UC4R8DWoMoI7CAwX8_LjQHig",
     type: "iframe",
     logo: "",
@@ -121,6 +134,55 @@ function uid() {
   return "ch_" + Math.random().toString(16).slice(2) + "_" + Date.now().toString(16);
 }
 
+function Badge({ children }) {
+  return (
+    <span className="text-[11px] px-2 py-1 rounded-full bg-black/5 border border-black/10">
+      {children}
+    </span>
+  );
+}
+
+function IconButton({ title, onClick, children }) {
+  return (
+    <button
+      title={title}
+      onClick={onClick}
+      className="inline-flex items-center justify-center h-9 w-9 rounded-xl border border-black/10 bg-white/70 hover:bg-white shadow-sm"
+      type="button"
+    >
+      {children}
+    </button>
+  );
+}
+
+function Modal({ open, onClose, title, children }) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-black/30"
+        onClick={onClose}
+        role="button"
+        tabIndex={-1}
+      />
+      <div className="relative w-full max-w-lg rounded-2xl bg-white shadow-xl border border-black/10 overflow-hidden">
+        <div className="p-4 border-b border-black/10 flex items-center justify-between">
+          <div className="font-semibold">{title}</div>
+          <button
+            onClick={onClose}
+            className="h-9 w-9 rounded-xl border border-black/10 hover:bg-black/5"
+            type="button"
+            aria-label="Close"
+          >
+            ✕
+          </button>
+        </div>
+        <div className="p-4">{children}</div>
+      </div>
+    </div>
+  );
+}
+
 function HLSPlayer({ src, poster }) {
   const videoRef = useRef(null);
   const [hint, setHint] = useState("");
@@ -142,25 +204,29 @@ function HLSPlayer({ src, poster }) {
       }
 
       // Agar hls.js bo‘lsa, ishlatamiz (dynamic import)
-      try {
-        const mod = await import("hls.js");
-        if (cancelled) return;
-        const Hls = mod.default;
-        if (!Hls?.isSupported()) {
-          setHint("Brauzer HLS’ni qo‘llamayapti. Iltimos MP4 yoki iframe link ishlating.");
-          return;
-        }
-        hlsInstance = new Hls({
-          enableWorker: true,
-          lowLatencyMode: true,
-        });
-        hlsInstance.loadSource(src);
-        hlsInstance.attachMedia(video);
-      } catch (e) {
-        setHint(
-          "HLS oqim (.m3u8) o‘ynamasa, loyihaga `hls.js` o‘rnating yoki iframe/MP4 link ishlating."
-        );
-      }
+  try {
+  const mod = await import(/* @vite-ignore */ "hls.js");
+  if (cancelled) return;
+
+  const Hls = mod.default;
+  if (!Hls || !Hls.isSupported()) {
+    setHint("Brauzer HLS’ni qo‘llamaydi. MP4 yoki iframe ishlating.");
+    return;
+  }
+
+  hlsInstance = new Hls({
+    enableWorker: true,
+    lowLatencyMode: true,
+  });
+
+  hlsInstance.loadSource(src);
+  hlsInstance.attachMedia(video);
+} catch (e) {
+  setHint(
+    "HLS oqimni yuklab bo‘lmadi. npm i hls.js qilinganini tekshiring."
+  );
+}
+
     }
 
     setup();
@@ -197,7 +263,7 @@ function Player({ channel }) {
           <div className="text-3xl mb-2">📺</div>
           <div className="font-semibold">Kanal tanlang</div>
           <div className="text-sm text-gray-600 mt-1">
-            Pastdagi ro‘yxatdan kanalni bosib live ko‘rishni boshlang.
+            Chap tomondan kanalni bosib live ko‘rishni boshlang.
           </div>
         </div>
       </div>
@@ -223,17 +289,68 @@ function Player({ channel }) {
 
   if (channel.type === "mp4") {
     return (
-      <video
-        className="w-full rounded-2xl border border-black/10 bg-black/5"
-        controls
-        playsInline
-        src={channel.url}
-      />
+      <div className="w-full">
+        <video
+          className="w-full rounded-2xl border border-black/10 bg-black/5"
+          controls
+          playsInline
+          src={channel.url}
+        />
+      </div>
     );
   }
 
-  // default: HLS
+  // Default: HLS
   return <HLSPlayer src={channel.url} poster={channel.logo} />;
+}
+
+function ChannelCard({ ch, active, isFav, onSelect, onToggleFav }) {
+  return (
+    <div
+      className={[
+        "group rounded-2xl border shadow-sm cursor-pointer transition",
+        active ? "border-black/30 bg-white" : "border-black/10 bg-white/70 hover:bg-white",
+      ].join(" ")}
+      onClick={() => onSelect(ch)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") onSelect(ch);
+      }}
+    >
+      <div className="p-3 flex gap-3 items-center">
+        <div className="h-10 w-10 rounded-xl bg-black/5 border border-black/10 flex items-center justify-center overflow-hidden">
+          {ch.logo ? (
+            <img src={ch.logo} alt={ch.name} className="h-full w-full object-cover" />
+          ) : (
+            <span className="text-lg">📡</span>
+          )}
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="font-semibold truncate">{ch.name}</div>
+          <div className="text-xs text-gray-600 truncate">
+            {ch.country} • {ch.category} • {ch.lang || "—"}
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleFav(ch.id);
+          }}
+          className={[
+            "h-9 w-9 rounded-xl border border-black/10 bg-white/70 hover:bg-white shadow-sm",
+            "opacity-100 md:opacity-0 md:group-hover:opacity-100 transition",
+          ].join(" ")}
+          title={isFav ? "Favoritdan olib tashlash" : "Favoritga qo‘shish"}
+        >
+          {isFav ? "★" : "☆"}
+        </button>
+      </div>
+    </div>
+  );
 }
 
 export default function AIChat() {
@@ -245,8 +362,8 @@ export default function AIChat() {
   const [favorites, setFavorites] = useState(() => new Set(loadJSON(LS_FAV_KEY, [])));
   const [customChannels, setCustomChannels] = useState(() => loadJSON(LS_CUSTOM_KEY, []));
 
-  const [showAdd, setShowAdd] = useState(false);
-  const [form, setForm] = useState({
+  const [addOpen, setAddOpen] = useState(false);
+  const [addForm, setAddForm] = useState({
     name: "",
     country: "O‘zbekiston",
     category: "Yangiliklar",
@@ -256,10 +373,19 @@ export default function AIChat() {
     logo: "",
   });
 
-  const allChannels = useMemo(() => [...BUILTIN_CHANNELS, ...customChannels], [customChannels]);
+  const allChannels = useMemo(() => {
+    // Custom kanallarga unique id berilgan bo‘lishi shart
+    return [...BUILTIN_CHANNELS, ...customChannels];
+  }, [customChannels]);
+
+  const selectedChannel = useMemo(() => {
+    const found = allChannels.find((c) => c.id === selectedId);
+    return found || null;
+  }, [allChannels, selectedId]);
 
   const filtered = useMemo(() => {
     const q = normalize(query);
+
     let list = allChannels.slice();
 
     if (category !== "Hammasi") list = list.filter((c) => c.category === category);
@@ -283,15 +409,26 @@ export default function AIChat() {
     return list;
   }, [allChannels, category, country, query, favorites]);
 
-  const selectedChannel = useMemo(
-    () => allChannels.find((c) => c.id === selectedId) || null,
-    [allChannels, selectedId]
-  );
-
-  useEffect(() => saveJSON(LS_FAV_KEY, Array.from(favorites)), [favorites]);
-  useEffect(() => saveJSON(LS_CUSTOM_KEY, customChannels), [customChannels]);
+  const counts = useMemo(() => {
+    const byCat = {};
+    for (const cat of CATEGORIES) byCat[cat] = 0;
+    for (const c of allChannels) {
+      byCat["Hammasi"] = (byCat["Hammasi"] || 0) + 1;
+      byCat[c.category] = (byCat[c.category] || 0) + 1;
+    }
+    return byCat;
+  }, [allChannels]);
 
   useEffect(() => {
+    saveJSON(LS_FAV_KEY, Array.from(favorites));
+  }, [favorites]);
+
+  useEffect(() => {
+    saveJSON(LS_CUSTOM_KEY, customChannels);
+  }, [customChannels]);
+
+  useEffect(() => {
+    // Default tanlash: birinchi kanal
     if (!selectedId && filtered.length) setSelectedId(filtered[0].id);
   }, [filtered, selectedId]);
 
@@ -305,26 +442,25 @@ export default function AIChat() {
   };
 
   const addChannel = () => {
-    const name = form.name.trim();
-    const url = form.url.trim();
+    const name = addForm.name.trim();
+    const url = addForm.url.trim();
     if (!name || !url) return;
 
     const newCh = {
       id: uid(),
       name,
-      country: form.country,
-      category: form.category,
-      lang: form.lang.trim() || "—",
-      type: form.type,
+      country: addForm.country,
+      category: addForm.category,
+      lang: addForm.lang.trim() || "—",
+      type: addForm.type,
       url,
-      logo: form.logo.trim(),
+      logo: addForm.logo.trim(),
       note: "Custom kanal",
     };
 
-    setCustomChannels((p) => [newCh, ...p]);
-    setSelectedId(newCh.id);
-    setShowAdd(false);
-    setForm({
+    setCustomChannels((prev) => [newCh, ...prev]);
+    setAddOpen(false);
+    setAddForm({
       name: "",
       country: "O‘zbekiston",
       category: "Yangiliklar",
@@ -333,164 +469,161 @@ export default function AIChat() {
       url: "",
       logo: "",
     });
+    setSelectedId(newCh.id);
   };
 
-  // ❗Siz so‘raganidek: aynan “shu format” — markazda card, ichida TV UI
+  const removeCustom = (id) => {
+    setCustomChannels((prev) => prev.filter((c) => c.id !== id));
+    setFavorites((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+    if (selectedId === id) setSelectedId(null);
+  };
+
   return (
-    <div className="h-full w-full flex items-center justify-center p-4">
-      <div className="w-full max-w-5xl rounded-2xl bg-white/70 backdrop-blur border border-black/10 shadow p-4 md:p-6">
+    <div className="h-full w-full p-4 md:p-6">
+      <div className="max-w-7xl mx-auto h-full">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
           <div>
             <div className="text-2xl font-bold">📺 Live TV</div>
             <div className="text-sm text-gray-600">
-              Kanallarni davlat va turkum bo‘yicha saralab tomosha qiling.
+              Kanallarni turkum va davlat bo‘yicha saralab tomosha qiling.
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setShowAdd((v) => !v)}
-            className="h-10 px-4 rounded-xl border border-black/10 bg-white/80 hover:bg-white shadow-sm"
-          >
-            ➕ Kanal qo‘shish
-          </button>
+          <div className="flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-2">
+              <Badge>Emclab TV</Badge>
+              <Badge>Categories</Badge>
+              <Badge>Countries</Badge>
+            </div>
+
+            <IconButton title="Kanal qo‘shish" onClick={() => setAddOpen(true)}>
+              ➕
+            </IconButton>
+          </div>
         </div>
 
         {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Qidiruv: kanal, davlat, turkum..."
-            className="h-10 px-3 rounded-xl border border-black/10 bg-white/80 focus:outline-none focus:ring-2 focus:ring-black/10 md:col-span-2"
-          />
-
-          <select
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            className="h-10 px-3 rounded-xl border border-black/10 bg-white/80 focus:outline-none focus:ring-2 focus:ring-black/10"
-          >
-            {COUNTRIES.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="h-10 px-3 rounded-xl border border-black/10 bg-white/80 focus:outline-none focus:ring-2 focus:ring-black/10"
-          >
-            {CATEGORIES.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Add form (simple, inline) */}
-        {showAdd ? (
-          <div className="mb-4 rounded-2xl border border-black/10 bg-white/60 p-4">
-            <div className="font-semibold mb-3">➕ Yangi kanal qo‘shish</div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="rounded-2xl bg-white/70 backdrop-blur border border-black/10 shadow-sm p-3 md:p-4 mb-4">
+          <div className="flex flex-col md:flex-row gap-3 md:items-center">
+            <div className="flex-1">
+              <div className="text-xs text-gray-600 mb-1">Qidiruv</div>
               <input
-                value={form.name}
-                onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-                className="h-10 px-3 rounded-xl border border-black/10 bg-white"
-                placeholder="Kanal nomi (masalan: UzNews Live)"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Kanal nomi, davlat, turkum..."
+                className="w-full h-10 px-3 rounded-xl border border-black/10 bg-white/80 focus:outline-none focus:ring-2 focus:ring-black/10"
               />
+            </div>
 
-              <input
-                value={form.lang}
-                onChange={(e) => setForm((p) => ({ ...p, lang: e.target.value }))}
-                className="h-10 px-3 rounded-xl border border-black/10 bg-white"
-                placeholder="Til (UZ/RU/EN)"
-              />
-
+            <div className="md:w-64">
+              <div className="text-xs text-gray-600 mb-1">Davlat</div>
               <select
-                value={form.country}
-                onChange={(e) => setForm((p) => ({ ...p, country: e.target.value }))}
-                className="h-10 px-3 rounded-xl border border-black/10 bg-white"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                className="w-full h-10 px-3 rounded-xl border border-black/10 bg-white/80 focus:outline-none focus:ring-2 focus:ring-black/10"
               >
-                {COUNTRIES.filter((c) => c !== "Hammasi").map((c) => (
+                {COUNTRIES.map((c) => (
                   <option key={c} value={c}>
                     {c}
                   </option>
                 ))}
               </select>
+            </div>
 
+            <div className="md:w-64">
+              <div className="text-xs text-gray-600 mb-1">Turkum</div>
               <select
-                value={form.category}
-                onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}
-                className="h-10 px-3 rounded-xl border border-black/10 bg-white"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full h-10 px-3 rounded-xl border border-black/10 bg-white/80 focus:outline-none focus:ring-2 focus:ring-black/10"
               >
-                {CATEGORIES.filter((c) => c !== "Hammasi").map((c) => (
+                {CATEGORIES.map((c) => (
                   <option key={c} value={c}>
-                    {c}
+                    {c} ({counts[c] || 0})
                   </option>
                 ))}
               </select>
-
-              <select
-                value={form.type}
-                onChange={(e) => setForm((p) => ({ ...p, type: e.target.value }))}
-                className="h-10 px-3 rounded-xl border border-black/10 bg-white"
-              >
-                <option value="hls">HLS (.m3u8)</option>
-                <option value="mp4">MP4</option>
-                <option value="iframe">Iframe (YouTube/Twitch embed)</option>
-              </select>
-
-              <input
-                value={form.logo}
-                onChange={(e) => setForm((p) => ({ ...p, logo: e.target.value }))}
-                className="h-10 px-3 rounded-xl border border-black/10 bg-white"
-                placeholder="Logo URL (ixtiyoriy)"
-              />
-
-              <input
-                value={form.url}
-                onChange={(e) => setForm((p) => ({ ...p, url: e.target.value }))}
-                className="h-10 px-3 rounded-xl border border-black/10 bg-white md:col-span-2"
-                placeholder="Stream URL: m3u8 / mp4 / iframe embed"
-              />
-            </div>
-
-            <div className="mt-3 flex items-center justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setShowAdd(false)}
-                className="h-10 px-4 rounded-xl border border-black/10 bg-white/80 hover:bg-white"
-              >
-                Bekor
-              </button>
-              <button
-                type="button"
-                onClick={addChannel}
-                className="h-10 px-4 rounded-xl border border-black/10 bg-black text-white hover:bg-black/90"
-              >
-                Qo‘shish
-              </button>
-            </div>
-
-            <div className="mt-2 text-xs text-gray-600">
-              .m3u8 o‘ynamasa: <span className="font-mono">npm i hls.js</span> o‘rnating yoki iframe/MP4
-              ishlating.
             </div>
           </div>
-        ) : null}
 
-        {/* Main */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+          {/* Quick category chips */}
+          <div className="mt-3 flex flex-wrap gap-2">
+            {CATEGORIES.slice(0, 7).map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setCategory(c)}
+                className={[
+                  "px-3 py-2 rounded-xl border text-sm shadow-sm",
+                  category === c
+                    ? "border-black/30 bg-white"
+                    : "border-black/10 bg-white/60 hover:bg-white",
+                ].join(" ")}
+              >
+                {c} <span className="text-xs text-gray-500">({counts[c] || 0})</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Main layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 h-[calc(100%-180px)]">
+          {/* Channel list */}
+          <div className="lg:col-span-2 rounded-2xl bg-white/70 backdrop-blur border border-black/10 shadow-sm p-3 md:p-4 overflow-hidden">
+            <div className="flex items-center justify-between mb-3">
+              <div className="font-semibold">Kanallar</div>
+              <div className="text-xs text-gray-600">
+                {filtered.length} ta • Favorit: {favorites.size} ta
+              </div>
+            </div>
+
+            <div className="space-y-2 overflow-auto pr-1" style={{ maxHeight: "62vh" }}>
+              {filtered.length === 0 ? (
+                <div className="text-sm text-gray-600 p-4 rounded-xl bg-black/5 border border-black/10">
+                  Hech narsa topilmadi. Filtrlarni o‘zgartiring yoki yangi kanal qo‘shing.
+                </div>
+              ) : (
+                filtered.map((ch) => {
+                  const isFav = favorites.has(ch.id);
+                  const isActive = selectedId === ch.id;
+                  const isCustom = customChannels.some((c) => c.id === ch.id);
+
+                  return (
+                    <div key={ch.id} className="relative">
+                      <ChannelCard
+                        ch={ch}
+                        active={isActive}
+                        isFav={isFav}
+                        onSelect={(c) => setSelectedId(c.id)}
+                        onToggleFav={toggleFav}
+                      />
+                      {isCustom ? (
+                        <button
+                          type="button"
+                          onClick={() => removeCustom(ch.id)}
+                          className="absolute -top-2 -right-2 h-7 w-7 rounded-full bg-white border border-black/10 shadow flex items-center justify-center text-xs hover:bg-black/5"
+                          title="Custom kanalni o‘chirish"
+                        >
+                          🗑️
+                        </button>
+                      ) : null}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
           {/* Player */}
-          <div className="lg:col-span-3">
-            <div className="flex items-start justify-between gap-3 mb-2">
+          <div className="lg:col-span-3 rounded-2xl bg-white/70 backdrop-blur border border-black/10 shadow-sm p-3 md:p-4">
+            <div className="flex items-start justify-between gap-3 mb-3">
               <div className="min-w-0">
-                <div className="text-lg font-semibold truncate">
+                <div className="font-semibold truncate">
                   {selectedChannel ? selectedChannel.name : "Kanal tanlanmagan"}
                 </div>
                 <div className="text-xs text-gray-600">
@@ -505,16 +638,15 @@ export default function AIChat() {
                   <button
                     type="button"
                     onClick={() => toggleFav(selectedChannel.id)}
-                    className="h-9 px-3 rounded-xl border border-black/10 bg-white/80 hover:bg-white shadow-sm"
+                    className="px-3 h-9 rounded-xl border border-black/10 bg-white/70 hover:bg-white shadow-sm"
                     title="Favorit"
                   >
-                    {favorites.has(selectedChannel.id) ? "★" : "☆"}
+                    {favorites.has(selectedChannel.id) ? "★ Favorit" : "☆ Favorit"}
                   </button>
-
                   <button
                     type="button"
                     onClick={() => navigator.clipboard?.writeText(selectedChannel.url)}
-                    className="h-9 px-3 rounded-xl border border-black/10 bg-white/80 hover:bg-white shadow-sm"
+                    className="px-3 h-9 rounded-xl border border-black/10 bg-white/70 hover:bg-white shadow-sm"
                     title="Linkni nusxalash"
                   >
                     🔗 Copy
@@ -524,67 +656,124 @@ export default function AIChat() {
             </div>
 
             <Player channel={selectedChannel} />
-          </div>
 
-          {/* List */}
-          <div className="lg:col-span-2">
-            <div className="font-semibold mb-2">Kanallar ({filtered.length})</div>
-
-            <div className="space-y-2 max-h-[420px] overflow-auto pr-1">
-              {filtered.length === 0 ? (
-                <div className="text-sm text-gray-600 p-4 rounded-xl bg-black/5 border border-black/10">
-                  Hech narsa topilmadi. Filtrlarni o‘zgartiring yoki kanal qo‘shing.
-                </div>
-              ) : (
-                filtered.map((ch) => {
-                  const isFav = favorites.has(ch.id);
-                  const active = selectedId === ch.id;
-
-                  return (
-                    <button
-                      key={ch.id}
-                      type="button"
-                      onClick={() => setSelectedId(ch.id)}
-                      className={[
-                        "w-full text-left p-3 rounded-2xl border shadow-sm transition flex items-center gap-3",
-                        active
-                          ? "border-black/30 bg-white"
-                          : "border-black/10 bg-white/60 hover:bg-white",
-                      ].join(" ")}
-                    >
-                      <div className="h-10 w-10 rounded-xl bg-black/5 border border-black/10 flex items-center justify-center overflow-hidden">
-                        {ch.logo ? (
-                          <img src={ch.logo} alt={ch.name} className="h-full w-full object-cover" />
-                        ) : (
-                          <span className="text-lg">📡</span>
-                        )}
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <div className="font-semibold truncate">{ch.name}</div>
-                        <div className="text-xs text-gray-600 truncate">
-                          {ch.country} • {ch.category} • {ch.lang || "—"}
-                        </div>
-                      </div>
-
-                      <div className="text-lg" title={isFav ? "Favorit" : "Favorit emas"}>
-                        {isFav ? "★" : " "}
-                      </div>
-                    </button>
-                  );
-                })
-              )}
-            </div>
-
-            <div className="mt-3 text-xs text-gray-500">
-              Favoritlarni belgilasangiz, ular ro‘yxatda tepaga chiqadi.
+            <div className="mt-3 text-xs text-gray-600">
+              <span className="font-semibold">Maslahat:</span> Agar .m3u8 o‘ynamasa,{" "}
+              <span className="font-mono">npm i hls.js</span> o‘rnating yoki iframe/MP4 stream link
+              qo‘ying.
             </div>
           </div>
         </div>
 
-        <div className="mt-4 text-xs text-gray-400">
-          AI Chat o‘rniga Live TV modul yoqildi ✅
-        </div>
+        {/* Add channel modal */}
+        <Modal open={addOpen} onClose={() => setAddOpen(false)} title="➕ Yangi kanal qo‘shish">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="md:col-span-2">
+              <div className="text-xs text-gray-600 mb-1">Kanal nomi</div>
+              <input
+                value={addForm.name}
+                onChange={(e) => setAddForm((p) => ({ ...p, name: e.target.value }))}
+                className="w-full h-10 px-3 rounded-xl border border-black/10 bg-white focus:outline-none focus:ring-2 focus:ring-black/10"
+                placeholder="Masalan: UzNews Live"
+              />
+            </div>
+
+            <div>
+              <div className="text-xs text-gray-600 mb-1">Davlat</div>
+              <select
+                value={addForm.country}
+                onChange={(e) => setAddForm((p) => ({ ...p, country: e.target.value }))}
+                className="w-full h-10 px-3 rounded-xl border border-black/10 bg-white"
+              >
+                {COUNTRIES.filter((c) => c !== "Hammasi").map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <div className="text-xs text-gray-600 mb-1">Turkum</div>
+              <select
+                value={addForm.category}
+                onChange={(e) => setAddForm((p) => ({ ...p, category: e.target.value }))}
+                className="w-full h-10 px-3 rounded-xl border border-black/10 bg-white"
+              >
+                {CATEGORIES.filter((c) => c !== "Hammasi").map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <div className="text-xs text-gray-600 mb-1">Til</div>
+              <input
+                value={addForm.lang}
+                onChange={(e) => setAddForm((p) => ({ ...p, lang: e.target.value }))}
+                className="w-full h-10 px-3 rounded-xl border border-black/10 bg-white"
+                placeholder="UZ / RU / EN"
+              />
+            </div>
+
+            <div>
+              <div className="text-xs text-gray-600 mb-1">Player turi</div>
+              <select
+                value={addForm.type}
+                onChange={(e) => setAddForm((p) => ({ ...p, type: e.target.value }))}
+                className="w-full h-10 px-3 rounded-xl border border-black/10 bg-white"
+              >
+                <option value="hls">HLS (.m3u8)</option>
+                <option value="mp4">MP4</option>
+                <option value="iframe">Iframe (YouTube/Twitch/Player)</option>
+              </select>
+            </div>
+
+            <div className="md:col-span-2">
+              <div className="text-xs text-gray-600 mb-1">
+                URL (m3u8 / mp4 / embed link)
+              </div>
+              <input
+                value={addForm.url}
+                onChange={(e) => setAddForm((p) => ({ ...p, url: e.target.value }))}
+                className="w-full h-10 px-3 rounded-xl border border-black/10 bg-white"
+                placeholder="https://... (m3u8 yoki mp4 yoki iframe embed)"
+              />
+              <div className="text-[11px] text-gray-500 mt-1">
+                Iframe uchun odatda “embed” URL kerak bo‘ladi.
+              </div>
+            </div>
+
+            <div className="md:col-span-2">
+              <div className="text-xs text-gray-600 mb-1">Logo URL (ixtiyoriy)</div>
+              <input
+                value={addForm.logo}
+                onChange={(e) => setAddForm((p) => ({ ...p, logo: e.target.value }))}
+                className="w-full h-10 px-3 rounded-xl border border-black/10 bg-white"
+                placeholder="https://.../logo.png"
+              />
+            </div>
+          </div>
+
+          <div className="mt-4 flex items-center justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setAddOpen(false)}
+              className="px-4 h-10 rounded-xl border border-black/10 bg-white/70 hover:bg-white shadow-sm"
+            >
+              Bekor
+            </button>
+            <button
+              type="button"
+              onClick={addChannel}
+              className="px-4 h-10 rounded-xl border border-black/10 bg-black text-white hover:bg-black/90 shadow-sm"
+            >
+              Qo‘shish
+            </button>
+          </div>
+        </Modal>
       </div>
     </div>
   );
