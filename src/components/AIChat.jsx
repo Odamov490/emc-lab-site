@@ -1,11 +1,12 @@
 // src/components/AIChat.jsx
-// Live TV PRO (10k+ kanalga mos)
+// Live TV PRO — Auto Open Playlists (iptv-org)
+// ✅ Auto load (no user input)
 // ✅ Categories / Countries
 // ✅ Fast search
 // ✅ Favorites + Recents (localStorage)
-// ✅ M3U import (FILE) — link kiritish shart emas
-// ✅ HLS (m3u8) Chrome/Edge uchun hls.js CDN orqali (Vercel-safe)
+// ✅ HLS (.m3u8) via CDN (Vercel-safe)
 // ✅ Virtual list (10k+ kanal lag qilmaydi)
+// ✅ Cache (6 hours) to speed up
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
@@ -13,15 +14,30 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
    CONFIG
 ========================= */
 
-const LS_FAV_KEY = "emclab_tv_fav_v2";
-const LS_RECENT_KEY = "emclab_tv_recent_v2";
-const LS_LAST_SOURCE = "emclab_tv_last_source_v2";
-const LS_LAST_SELECTED = "emclab_tv_last_selected_v2";
+const LS_FAV_KEY = "emclab_tv_fav_v3";
+const LS_RECENT_KEY = "emclab_tv_recent_v3";
+const LS_LAST_SELECTED = "emclab_tv_last_selected_v3";
+const LS_CACHE_KEY = "emclab_tv_cache_channels_v3";
+const LS_CACHE_TIME = "emclab_tv_cache_time_v3";
+
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
 
 const HLS_CDN = "https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js";
 
-/** Demo-only (litsenziyasiz real TV linklar bermayman).
- *  Siz M3U fayl import qilib haqiqiy kanallarni kiritasiz. */
+// Ochiq manbalar (iptv-org). Ba'zi streamlar ishlamasligi mumkin — normal.
+// "World index" juda katta bo‘lishi mumkin, lekin VirtualList ko‘taradi.
+const OPEN_SOURCES = [
+  { key: "UZ", label: "🇺🇿 Uzbekistan", url: "https://iptv-org.github.io/iptv/countries/uz.m3u" },
+  { key: "News", label: "📰 News", url: "https://iptv-org.github.io/iptv/categories/news.m3u" },
+  { key: "Sports", label: "🏅 Sports", url: "https://iptv-org.github.io/iptv/categories/sports.m3u" },
+  { key: "Kids", label: "🧒 Kids", url: "https://iptv-org.github.io/iptv/categories/kids.m3u" },
+  { key: "Animation", label: "🎬 Animation", url: "https://iptv-org.github.io/iptv/categories/animation.m3u" },
+  { key: "Music", label: "🎵 Music", url: "https://iptv-org.github.io/iptv/categories/music.m3u" },
+  { key: "Movies", label: "🎞️ Movies", url: "https://iptv-org.github.io/iptv/categories/movies.m3u" },
+  { key: "World", label: "🌍 World (big)", url: "https://iptv-org.github.io/iptv/index.m3u" },
+];
+
+// Demo fallback (agar internet bo‘lmasa ham panel ishlaydi)
 const DEMO_CHANNELS = [
   {
     id: "demo-1",
@@ -114,11 +130,9 @@ function loadHlsFromCdn() {
 
 /* =========================
    M3U PARSER (EXTINF)
-   Minimal, but works for big lists
 ========================= */
 
 function parseExtinfAttrs(line) {
-  // line example: #EXTINF:-1 tvg-id="..." tvg-name="..." group-title="News",Channel Name
   const attrs = {};
   const beforeComma = line.split(",")[0] || "";
   const afterComma = line.includes(",") ? line.slice(line.indexOf(",") + 1) : "";
@@ -153,12 +167,10 @@ function parseM3U(text) {
         type: "hls",
         url: "",
         tvgId: attrs["tvg-id"] || "",
-        raw: attrs,
       };
       continue;
     }
 
-    // URL line (after EXTINF)
     if (current && !l.startsWith("#")) {
       current.url = l;
       current.type = guessType(l);
@@ -195,29 +207,6 @@ function IconBtn({ title, onClick, children }) {
   );
 }
 
-function Modal({ open, title, onClose, children }) {
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/30" onClick={onClose} role="button" tabIndex={-1} />
-      <div className="relative w-full max-w-2xl rounded-2xl bg-white shadow-xl border border-black/10 overflow-hidden">
-        <div className="p-4 border-b border-black/10 flex items-center justify-between">
-          <div className="font-semibold">{title}</div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="h-9 w-9 rounded-xl border border-black/10 hover:bg-black/5"
-            aria-label="Close"
-          >
-            ✕
-          </button>
-        </div>
-        <div className="p-4">{children}</div>
-      </div>
-    </div>
-  );
-}
-
 /* =========================
    PLAYER
 ========================= */
@@ -235,7 +224,6 @@ function HLSPlayer({ src, poster }) {
       const video = videoRef.current;
       if (!video || !src) return;
 
-      // Native HLS (Safari)
       const canNative = video.canPlayType("application/vnd.apple.mpegurl");
       if (canNative) {
         video.src = src;
@@ -316,12 +304,7 @@ function Player({ channel }) {
 
   if (channel.type === "mp4") {
     return (
-      <video
-        className="w-full rounded-2xl border border-black/10 bg-black/5"
-        controls
-        playsInline
-        src={channel.url}
-      />
+      <video className="w-full rounded-2xl border border-black/10 bg-black/5" controls playsInline src={channel.url} />
     );
   }
 
@@ -329,12 +312,10 @@ function Player({ channel }) {
 }
 
 /* =========================
-   VIRTUAL LIST (NO DEPENDENCY)
-   Fixed row height
+   VIRTUAL LIST
 ========================= */
 
 function VirtualList({ items, rowHeight = 76, height = 520, renderRow }) {
-  const ref = useRef(null);
   const [scrollTop, setScrollTop] = useState(0);
 
   const total = items.length;
@@ -349,7 +330,6 @@ function VirtualList({ items, rowHeight = 76, height = 520, renderRow }) {
 
   return (
     <div
-      ref={ref}
       style={{ height, overflow: "auto" }}
       className="pr-1"
       onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}
@@ -369,14 +349,80 @@ function VirtualList({ items, rowHeight = 76, height = 520, renderRow }) {
 }
 
 /* =========================
+   DATA LOADER (AUTO)
+========================= */
+
+async function fetchText(url) {
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+  return await res.text();
+}
+
+function dedupeAndNormalize(channels) {
+  const seen = new Set();
+  const out = [];
+
+  for (const c of channels) {
+    const url = (c.url || "").trim();
+    if (!url) continue;
+
+    const key = url.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+
+    out.push({
+      ...c,
+      id: c.id || makeId("auto"),
+      name: c.name || "TV",
+      country: c.country || "Boshqa",
+      category: c.category || "Boshqa",
+      lang: c.lang || "—",
+      logo: c.logo || "",
+      type: c.type || guessType(url),
+      url,
+    });
+  }
+  return out;
+}
+
+async function loadOpenPlaylists(setProgress) {
+  // Parallel fetch
+  const urls = OPEN_SOURCES.map((s) => s.url);
+  const results = await Promise.allSettled(urls.map(fetchText));
+
+  let ok = 0;
+  let all = [];
+
+  for (let i = 0; i < results.length; i++) {
+    const r = results[i];
+    if (r.status === "fulfilled") {
+      ok++;
+      const parsed = parseM3U(r.value);
+      all = all.concat(parsed);
+    }
+    setProgress?.({ ok, total: results.length });
+  }
+
+  return dedupeAndNormalize(all);
+}
+
+/* =========================
    MAIN
 ========================= */
 
 export default function AIChat() {
-  // Sources: demo + imported M3U (in-memory; user doesn’t type links)
-  const [sourceName, setSourceName] = useState(() => safeGetJSON(LS_LAST_SOURCE, "Demo"));
-  const [imported, setImported] = useState([]);
-  const [importOpen, setImportOpen] = useState(false);
+  // sources: Open (auto) + Demo fallback
+  const [sourceName, setSourceName] = useState("Open"); // default: auto open playlists
+  const [channels, setChannels] = useState(() => {
+    const cached = safeGetJSON(LS_CACHE_KEY, null);
+    const cachedAt = Number(localStorage.getItem(LS_CACHE_TIME) || 0);
+    if (cached && Array.isArray(cached) && cachedAt && Date.now() - cachedAt < CACHE_TTL_MS) return cached;
+    return DEMO_CHANNELS;
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState({ ok: 0, total: OPEN_SOURCES.length });
+  const [error, setError] = useState("");
 
   // filters
   const [category, setCategory] = useState("Hammasi");
@@ -391,9 +437,8 @@ export default function AIChat() {
   const [selectedId, setSelectedId] = useState(() => safeGetJSON(LS_LAST_SELECTED, null));
 
   const allChannels = useMemo(() => {
-    if (sourceName === "Demo") return DEMO_CHANNELS;
-    return imported.length ? imported : DEMO_CHANNELS;
-  }, [sourceName, imported]);
+    return sourceName === "Demo" ? DEMO_CHANNELS : channels;
+  }, [sourceName, channels]);
 
   const categories = useMemo(() => {
     const set = new Set(["Hammasi"]);
@@ -440,7 +485,6 @@ export default function AIChat() {
   // persist
   useEffect(() => safeSetJSON(LS_FAV_KEY, Array.from(favorites)), [favorites]);
   useEffect(() => safeSetJSON(LS_RECENT_KEY, recents), [recents]);
-  useEffect(() => safeSetJSON(LS_LAST_SOURCE, sourceName), [sourceName]);
   useEffect(() => safeSetJSON(LS_LAST_SELECTED, selectedId), [selectedId]);
 
   // default select
@@ -448,13 +492,15 @@ export default function AIChat() {
     if (!selectedId && filtered.length) setSelectedId(filtered[0].id);
   }, [filtered, selectedId]);
 
-  // add recent
+  // recents
+  const recentChannels = useMemo(() => {
+    const map = new Map(allChannels.map((c) => [c.id, c]));
+    return recents.map((id) => map.get(id)).filter(Boolean);
+  }, [allChannels, recents]);
+
   const selectChannel = (ch) => {
     setSelectedId(ch.id);
-    setRecents((prev) => {
-      const next = [ch.id, ...prev.filter((x) => x !== ch.id)].slice(0, 30);
-      return next;
-    });
+    setRecents((prev) => [ch.id, ...prev.filter((x) => x !== ch.id)].slice(0, 30));
   };
 
   const toggleFav = (id) => {
@@ -466,35 +512,45 @@ export default function AIChat() {
     });
   };
 
-  const recentChannels = useMemo(() => {
-    const map = new Map(allChannels.map((c) => [c.id, c]));
-    return recents.map((id) => map.get(id)).filter(Boolean);
-  }, [allChannels, recents]);
+  // AUTO LOAD open sources (on mount + reload)
+  const refreshOpen = async () => {
+    setLoading(true);
+    setError("");
+    setProgress({ ok: 0, total: OPEN_SOURCES.length });
 
-  // import M3U from file (no URL typing)
-  const onPickM3U = async (file) => {
-    if (!file) return;
-    const text = await file.text();
-    const parsed = parseM3U(text);
+    try {
+      const loaded = await loadOpenPlaylists(setProgress);
 
-    // normalize missing fields
-    const cleaned = parsed.map((c) => ({
-      ...c,
-      category: c.category || "Boshqa",
-      country: c.country || "Boshqa",
-      lang: c.lang || "—",
-      logo: c.logo || "",
-      type: c.type || guessType(c.url),
-    }));
+      setChannels(loaded.length ? loaded : DEMO_CHANNELS);
 
-    setImported(cleaned);
-    setSourceName("M3U");
-    setImportOpen(false);
-    setCategory("Hammasi");
-    setCountry("Hammasi");
-    setQuery("");
-    setSelectedId(cleaned[0]?.id || null);
+      try {
+        localStorage.setItem(LS_CACHE_TIME, String(Date.now()));
+        safeSetJSON(LS_CACHE_KEY, loaded);
+      } catch {
+        // ignore cache issues
+      }
+
+      // If current selectedId not exists, set first
+      if (loaded.length) setSelectedId((prev) => (loaded.some((x) => x.id === prev) ? prev : loaded[0].id));
+    } catch (e) {
+      setError("Ochiq playlist yuklanmadi (internet/CORS bo‘lishi mumkin). Demo yoqildi.");
+      setChannels(DEMO_CHANNELS);
+      setSourceName("Demo");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // initial auto-load (if cache expired or data is demo)
+  useEffect(() => {
+    if (sourceName !== "Open") return;
+
+    const cached = safeGetJSON(LS_CACHE_KEY, null);
+    const cachedAt = Number(localStorage.getItem(LS_CACHE_TIME) || 0);
+    const fresh = cached && Array.isArray(cached) && cachedAt && Date.now() - cachedAt < CACHE_TTL_MS;
+
+    if (!fresh) refreshOpen();
+  }, [sourceName]);
 
   return (
     <div className="h-full w-full p-4 md:p-6">
@@ -504,24 +560,31 @@ export default function AIChat() {
           <div>
             <div className="text-2xl font-bold">📺 Live TV (PRO)</div>
             <div className="text-sm text-gray-600">
-              10k+ kanal uchun optimizatsiya qilingan panel. (Real kanallarni M3U fayl orqali import qiling)
+              Ochiq manbalar (iptv-org) avtomatik yuklanadi — foydalanuvchi hech narsa kiritmaydi.
             </div>
+            {loading ? (
+              <div className="text-xs text-gray-600 mt-1">
+                Yuklanmoqda: {progress.ok}/{progress.total} manba…
+              </div>
+            ) : null}
+            {error ? <div className="text-xs text-red-600 mt-1">{error}</div> : null}
           </div>
 
           <div className="flex items-center gap-2">
             <div className="hidden sm:flex items-center gap-2">
-              <Badge>{sourceName === "Demo" ? "Demo" : "M3U"}</Badge>
+              <Badge>{sourceName}</Badge>
               <Badge>Search</Badge>
               <Badge>Favorites</Badge>
               <Badge>Recents</Badge>
             </div>
 
-            <IconBtn title="M3U import" onClick={() => setImportOpen(true)}>
-              📥
+            <IconBtn title="Yangilash (Open playlists)" onClick={refreshOpen}>
+              ↻
             </IconBtn>
+
             <IconBtn
-              title="Demo/M3U almashtirish"
-              onClick={() => setSourceName((p) => (p === "Demo" ? "M3U" : "Demo"))}
+              title="Open/Demo almashtirish"
+              onClick={() => setSourceName((p) => (p === "Open" ? "Demo" : "Open"))}
             >
               🔁
             </IconBtn>
@@ -603,7 +666,7 @@ export default function AIChat() {
 
             {filtered.length === 0 ? (
               <div className="text-sm text-gray-600 p-4 rounded-xl bg-black/5 border border-black/10">
-                Hech narsa topilmadi. Filtrlarni o‘zgartiring yoki M3U import qiling.
+                Hech narsa topilmadi. Filtrlarni o‘zgartiring.
               </div>
             ) : (
               <VirtualList
@@ -707,41 +770,10 @@ export default function AIChat() {
 
             <div className="mt-3 text-xs text-gray-600">
               <span className="font-semibold">Eslatma:</span> HLS (.m3u8) ishlashi uchun hls.js CDN’dan yuklanadi.
-              Agar stream CORS bilan bloklansa, MP4 yoki iframe ishlaydi.
+              Ba’zi streamlar CORS/geo-block sabab ishlamasligi mumkin.
             </div>
           </div>
         </div>
-
-        {/* Import Modal */}
-        <Modal open={importOpen} title="📥 M3U import (fayldan)" onClose={() => setImportOpen(false)}>
-          <div className="text-sm text-gray-700">
-            Bu panel 10 ming+ kanalni ko‘tara oladi. Real kanallar uchun odatda IPTV provayderingiz **M3U fayl** beradi.
-            Siz faqat shu faylni tanlaysiz — link qo‘lda kiritish shart emas.
-          </div>
-
-          <div className="mt-4 rounded-2xl border border-black/10 bg-black/5 p-4">
-            <div className="text-xs text-gray-600 mb-2">M3U faylni tanlang:</div>
-            <input
-              type="file"
-              accept=".m3u,.m3u8,text/plain"
-              onChange={(e) => onPickM3U(e.target.files?.[0])}
-              className="block w-full"
-            />
-            <div className="text-[11px] text-gray-500 mt-2">
-              Importdan keyin “M3U” source avtomatik tanlanadi.
-            </div>
-          </div>
-
-          <div className="mt-4 flex items-center justify-end gap-2">
-            <button
-              type="button"
-              onClick={() => setImportOpen(false)}
-              className="px-4 h-10 rounded-xl border border-black/10 bg-white/70 hover:bg-white shadow-sm"
-            >
-              Yopish
-            </button>
-          </div>
-        </Modal>
       </div>
     </div>
   );
