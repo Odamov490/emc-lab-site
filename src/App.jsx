@@ -328,13 +328,6 @@ ESD sinovi shuni ko‘rsatadi:
 
 “Bu qurilma odamlar ishlatadigan real sharoitda ishonchli ishlaydimi yoki yo‘qmi?”
 
-Bu sinovsiz:
-
-eksport yo‘q
-
-sertifikat yo‘q
-
-ishonch yo‘q
     `,
     ru: `
 🔹 Что такое электростатический разряд (ESD)?
@@ -455,13 +448,6 @@ ESD-испытание отвечает на главный вопрос:
 
 «Сможет ли устройство надежно работать в реальных условиях, когда к нему прикасаются люди?»
 
-Без этого испытания:
-
-невозможна сертификация
-
-невозможен экспорт
-
-отсутствует доверие к продукции
     `,
   },
   "O‘z MSt IEC 61000-4-4:2023": {
