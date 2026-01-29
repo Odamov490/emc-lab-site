@@ -679,9 +679,210 @@ D — отказ оборудования (недопустимо)
     uz: `
 🔹 Bu sinov nima?
 
+Kuchlanish zarbasi (Surge) — bu elektr tarmog‘ida juda qisqa vaqt ichida paydo bo‘ladigan, lekin katta energiyaga ega kuchlanish impulsidir.
+
+U asosan quyidagi holatlarda yuzaga keladi:
+
+chaqmoq urishi (to‘g‘ridan-to‘g‘ri yoki bilvosita)
+
+elektr tarmog‘ida katta yuklarning ulanishi yoki uzilishi
+
+transformator va podstansiya jarayonlari
+
+sanoat uskunalarining ishga tushishi
+
+Surge impulslari kam uchraydi, lekin elektron qurilmalar uchun eng xavfli ta’sirlardan biri hisoblanadi.
+
+🔹 Nima uchun Surge sinovi kerak?
+
+Agar qurilma kuchlanish zarbalariga chidamsiz bo‘lsa:
+
+elektron komponentlar kuyadi
+
+quvvat bloklari ishdan chiqadi
+
+boshqaruv platalari shikastlanadi
+
+qurilma butunlay yaroqsiz holga keladi
+
+👉 Surge sinovi qurilmaning elektr xavfsizligi va uzoq muddatli ishonchliligini baholaydi.
+
+🔹 Sinov qanday o‘tkaziladi?
+
+Sinov maxsus Surge generatori yordamida amalga oshiriladi.
+
+Impulslar quyidagi shaklda beriladi:
+
+kuchlanish impulsi: 1,2 / 50 µs
+
+tok impulsi: 8 / 20 µs
+
+Impulslar:
+
+quvvat liniyalariga (AC / DC)
+
+signal va aloqa liniyalariga
+
+maxsus CDN (ulash-ajratish tarmog‘i) orqali kiritiladi.
+
+🔹 Qaysi holatlar taqlid qilinadi?
+
+Sinov real hayotdagi quyidagi holatlarni modellashtiradi:
+
+chaqmoqning elektr tarmog‘iga ta’siri
+
+uzoq tashqi kabellar orqali keladigan impulslar
+
+tashqi muhitdan keladigan yuqori energiyali zarbalar
+
+Bu sinov EFT ga qaraganda kamroq, lekin ancha kuchli ta’sirni tekshiradi.
+
+🔹 Sinov darajalari nimani anglatadi?
+
+Sinov darajalari qurilmaning qayerda ishlatilishini ko‘rsatadi:
+
+past darajalar — maishiy va ofis qurilmalari
+
+yuqori darajalar — sanoat va tashqi muhitga ulangan qurilmalar
+
+Qurilma zarba vaqtida:
+
+ishlashni saqlab qolishi
+
+yoki xavfsiz holatda tiklanishi
+kerak.
+
+🔹 Natijalar qanday baholanadi?
+
+Baholash mezonlari:
+
+A — normal ishlash, buzilish yo‘q
+
+B — vaqtinchalik buzilish, avtomatik tiklanish
+
+C — operator aralashuvi talab etiladi
+
+D — doimiy shikastlanish (qabul qilinmaydi)
+
+🔹 Qayerlarda ayniqsa muhim?
+
+Surge sinovi ayniqsa muhim:
+
+tashqi elektr tarmoqlariga ulangan qurilmalar
+
+sanoat avtomatikasi
+
+energetika va aloqa uskunalari
+
+ochiq hududda ishlovchi elektronika
+
+🔹 Xulosa (oddiy qilib)
+
+Surge sinovi quyidagi savolga javob beradi:
+
+“Bu qurilma chaqmoq va tarmoqdagi kuchli zarbalarga bardosh bera oladimi?”
+
     `,
     ru: `
-🔹 Что такое электростатический разряд (ESD)?
+🔹 Что такое импульс перенапряжения (Surge)?
+
+Выброс напряжения (Surge) — это кратковременный импульс высокого напряжения с большой энергией, возникающий в электрических сетях.
+
+Основные источники:
+
+удары молнии (прямые и косвенные)
+
+коммутационные процессы в электросетях
+
+работа трансформаторов и подстанций
+
+включение мощного промышленного оборудования
+
+Такие импульсы редки, но являются одними из самых разрушительных для электроники.
+
+🔹 Зачем необходимо испытание Surge?
+
+Если устройство неустойчиво к выбросам напряжения:
+
+выходят из строя электронные компоненты
+
+повреждаются блоки питания
+
+нарушается работа управляющих плат
+
+оборудование полностью выходит из строя
+
+👉 Испытание Surge подтверждает электрическую безопасность и надежность оборудования.
+
+🔹 Как проводится испытание?
+
+Испытание выполняется с использованием генератора импульсов перенапряжения (Surge).
+
+Форма импульсов:
+
+напряжение: 1,2 / 50 мкс
+
+ток: 8 / 20 мкс
+
+Импульсы подаются:
+
+на линии питания (AC / DC)
+
+на сигнальные и коммуникационные линии
+
+через CDN (сеть связи/развязки).
+
+🔹 Какие условия моделируются?
+
+Испытание имитирует:
+
+воздействие молнии на электросеть
+
+проникновение импульсов по внешним кабелям
+
+высокоэнергетические перенапряжения
+
+В отличие от EFT, воздействие реже, но значительно мощнее.
+
+🔹 Уровни испытаний
+
+Уровни испытаний показывают условия эксплуатации:
+
+низкие уровни — бытовая и офисная среда
+
+высокие уровни — промышленная и уличная среда
+
+Устройство должно сохранять работоспособность или безопасно восстанавливаться.
+
+🔹 Оценка результатов
+
+Критерии:
+
+A — нормальная работа
+
+B — временное нарушение с самовосстановлением
+
+C — требуется вмешательство оператора
+
+D — необратимое повреждение (недопустимо)
+
+🔹 Где особенно важно?
+
+Испытание Surge критически важно для:
+
+оборудования, подключенного к внешним сетям
+
+промышленной автоматизации
+
+энергетических и телекоммуникационных систем
+
+уличных и инфраструктурных устройств
+
+🔹 Итог
+
+Испытание Surge отвечает на вопрос:
+
+«Выдержит ли устройство мощные импульсы перенапряжения, вызванные молнией или сетью?»
 
     `,
   },
@@ -690,9 +891,201 @@ D — отказ оборудования (недопустимо)
     uz: `
 🔹 Bu sinov nima?
 
+Kuchlanish provallari (voltage dips) va qisqa muddatli uzilishlar — bu elektr tarmog‘ida kuchlanishning keskin pasayib ketishi yoki butunlay yo‘qolib, qisqa vaqt ichida qayta tiklanishi holatlaridir.
+
+Bunday holatlar quyidagi sabablar bilan yuzaga keladi:
+
+yirik yuklarning (dvigatel, kompressor) ishga tushishi
+
+elektr tarmog‘idagi avariyalar
+
+podstansiya va ta’minot tizimidagi o‘zgarishlar
+
+avtomatik himoya tizimlarining ishga tushishi
+
+Bu hodisalar har kuni uchraydi va ko‘plab qurilmalar uchun muammo tug‘diradi.
+
+🔹 Nima uchun bu sinov kerak?
+
+Agar qurilma kuchlanish pasayishlariga chidamsiz bo‘lsa:
+
+o‘chib qoladi
+
+qayta yuklanadi
+
+noto‘g‘ri ishlay boshlaydi
+
+texnologik jarayon to‘xtaydi
+
+👉 Bu sinov qurilmaning elektr tarmog‘i barqaror bo‘lmagan sharoitlarda ham ishlay olishini tekshiradi.
+
+🔹 Sinov qanday o‘tkaziladi?
+
+Sinov maxsus kuchlanish provallari generatori yordamida amalga oshiriladi.
+
+Sinov jarayonida:
+
+kuchlanish ma’lum foizgacha pasaytiriladi (masalan, 0%, 40%, 70%)
+
+pasayish aniq belgilangan vaqt oralig‘ida davom etadi
+
+so‘ng kuchlanish normal holatga qaytariladi
+
+Bu jarayon bir necha marta takrorlanadi.
+
+🔹 Qanday holatlar tekshiriladi?
+
+Sinov quyidagilarni baholaydi:
+
+qurilma provallar vaqtida ishlay oladimi
+
+o‘chib qoladimi yoki osilib qoladimi
+
+kuchlanish qaytgach avtomatik tiklanadimi
+
+operator aralashuvi talab qilinadimi
+
+Bu real elektr tarmoqlaridagi vaziyatni aniq aks ettiradi.
+
+🔹 Sinov darajalari nimani anglatadi?
+
+Sinov darajalari:
+
+provallarning chuqurligi (kuchlanish foizi)
+
+davomiyligi (millisekund yoki sekund)
+
+bilan belgilanadi.
+
+Yuqori barqarorlik — qurilmaning sanoat va muhim tizimlar uchun mosligini ko‘rsatadi.
+
+🔹 Natijalar qanday baholanadi?
+
+Baholash mezonlari:
+
+A — normal ishlash, ta’sir yo‘q
+
+B — vaqtinchalik buzilish, avtomatik tiklanish
+
+C — operator aralashuvi zarur
+
+D — qurilma ishdan chiqadi (qabul qilinmaydi)
+
+🔹 Qayerlarda ayniqsa muhim?
+
+Bu sinov ayniqsa muhim:
+
+avtomatika va boshqaruv tizimlari
+
+serverlar va IT uskunalari
+
+sanoat qurilmalari
+
+uzluksiz ishlashi zarur bo‘lgan texnologiyalar
+
+🔹 Xulosa (oddiy qilib)
+
+Bu sinov quyidagiga javob beradi:
+
+“Elektr tarmog‘ida kuchlanish pasayib yoki yo‘qolib qolsa, qurilma o‘zini qanday tutadi?”
+
     `,
     ru: `
-🔹 Что такое электростатический разряд (ESD)?
+🔹 Что это за испытание?
+
+Провалы напряжения и кратковременные прерывания — это резкое снижение или полное исчезновение напряжения в электросети на короткий промежуток времени с последующим восстановлением.
+
+Основные причины:
+
+пуск мощных электродвигателей
+
+аварии в электрических сетях
+
+переключения на подстанциях
+
+срабатывание защитных устройств
+
+Это одни из самых распространённых нарушений качества электроэнергии.
+
+🔹 Зачем необходимо это испытание?
+
+Если оборудование неустойчиво к таким явлениям:
+
+происходит отключение
+
+перезапуск системы
+
+сбои в работе
+
+остановка технологических процессов
+
+👉 Испытание подтверждает работоспособность оборудования при нестабильном электропитании.
+
+🔹 Как проводится испытание?
+
+Испытание выполняется с использованием генератора провалов напряжения.
+
+В процессе:
+
+напряжение понижается до заданного уровня
+
+выдерживается определённое время
+
+затем восстанавливается до номинального значения
+
+Испытания повторяются несколько раз для оценки устойчивости.
+
+🔹 Что оценивается?
+
+Проверяется:
+
+сохранение работоспособности
+
+корректность восстановления
+
+необходимость вмешательства оператора
+
+отсутствие повреждений оборудования
+
+🔹 Уровни испытаний
+
+Уровни определяются:
+
+глубиной провала напряжения
+
+длительностью воздействия
+
+Чем выше устойчивость — тем выше надежность оборудования.
+
+🔹 Оценка результатов
+
+Критерии:
+
+A — нормальная работа
+
+B — временное нарушение с самовосстановлением
+
+C — требуется вмешательство оператора
+
+D — отказ оборудования (недопустимо)
+
+🔹 Где особенно важно?
+
+Испытание критично для:
+
+систем управления и автоматики
+
+серверного и IT-оборудования
+
+промышленной электроники
+
+непрерывных технологических процессов
+
+🔹 Итог
+
+Испытание IEC 61000-4-11 отвечает на вопрос:
+
+«Как поведёт себя устройство при падении или исчезновении напряжения в сети?»
 
     `,
   },
@@ -701,9 +1094,231 @@ D — отказ оборудования (недопустимо)
     uz: `
 🔹 Bu sinov nima?
 
+Konduktiv radiochastotali xalaqitlar — bu yuqori chastotali elektromagnit shovqinlarning kabel va simlar orqali qurilmaga kirib kelishidir.
+
+Bu shovqinlar havodan emas, balki:
+
+quvvat kabellari
+
+signal va aloqa liniyalari
+
+boshqaruv simlari
+
+orqali bevosita qurilma ichiga o‘tadi.
+
+🔹 Bunday xalaqitlar qayerdan paydo bo‘ladi?
+
+Real sharoitda konduktiv RF shovqinlar quyidagi manbalardan keladi:
+
+radio uzatkichlar
+
+mobil aloqa bazaviy stansiyalari
+
+sanoat radio uskunalari
+
+inverterlar va chastota o‘zgartirgichlar
+
+yuqori chastotali generatorlar
+
+Uzoq kabel bu holatda antenna kabi ishlaydi va RF signalni ichkariga olib kiradi.
+
+🔹 Nima uchun bu sinov kerak?
+
+Agar qurilma bunday xalaqitlarga chidamsiz bo‘lsa:
+
+noto‘g‘ri signallar paydo bo‘ladi
+
+sensorlar adashadi
+
+aloqa uziladi
+
+boshqaruv tizimi xato ishlaydi
+
+👉 Bu sinov qurilmaning RF muhitida barqaror ishlashini tekshiradi.
+
+🔹 Sinov qanday o‘tkaziladi?
+
+Sinov maxsus RF generatori yordamida amalga oshiriladi.
+
+Jarayon quyidagicha:
+
+RF signal 150 kHz – 80 MHz diapazonda yaratiladi
+
+signal kabelga CDN yoki EM-clamp orqali kiritiladi
+
+signal darajasi bosqichma-bosqich oshiriladi
+
+qurilmaning ishlashi kuzatiladi
+
+Bu usul real sharoitdagi RF ta’sirini aniq takrorlaydi.
+
+🔹 Qaysi liniyalar sinovdan o‘tkaziladi?
+
+Sinov odatda quyidagilarga qo‘llaniladi:
+
+AC / DC quvvat liniyalari
+
+signal kabellari
+
+boshqaruv va aloqa portlari (Ethernet, RS, CAN va boshqalar)
+
+Har bir kabel alohida baholanadi.
+
+🔹 Sinov darajalari nimani anglatadi?
+
+Sinov darajasi (V):
+
+qurilmaning ishlash muhiti
+
+sanoat yoki maishiy qo‘llanilishi
+
+ni belgilaydi.
+
+Yuqori daraja — og‘ir elektromagnit muhitga moslikni bildiradi.
+
+🔹 Natijalar qanday baholanadi?
+
+Baholash mezonlari:
+
+A — normal ishlash
+
+B — vaqtinchalik buzilish, avtomatik tiklanish
+
+C — operator aralashuvi talab etiladi
+
+D — doimiy shikastlanish (qabul qilinmaydi)
+
+🔹 Qayerlarda ayniqsa muhim?
+
+Bu sinov ayniqsa muhim:
+
+sanoat avtomatikasi
+
+PLC va boshqaruv modullari
+
+tibbiy va o‘lchov uskunalari
+
+aloqa va IT qurilmalari
+
+🔹 Xulosa (oddiy qilib)
+
+Bu sinov quyidagiga javob beradi:
+
+“Kabel orqali kelayotgan radiochastotali shovqinlar qurilmaning ishiga xalaqit qilmaydimi?”
+
     `,
     ru: `
-🔹 Что такое электростатический разряд (ESD)?
+🔹 Что это за испытание?
+
+Кондуктивные радиочастотные помехи — это высокочастотные электромагнитные воздействия, проникающие в оборудование через кабели и провода.
+
+В отличие от излучаемых помех, здесь RF-сигнал:
+
+поступает по линиям питания
+
+по сигнальным и управляющим кабелям
+
+напрямую попадает внутрь устройства
+
+🔹 Источники кондуктивных RF-помех
+
+Основные источники:
+
+радиопередатчики
+
+базовые станции мобильной связи
+
+промышленное RF-оборудование
+
+инверторы и преобразователи частоты
+
+мощные электронные установки
+
+Длинные кабели работают как приёмные антенны.
+
+🔹 Зачем необходимо это испытание?
+
+Если оборудование неустойчиво к таким помехам:
+
+появляются ложные сигналы
+
+нарушается управление
+
+возникают сбои связи
+
+оборудование работает некорректно
+
+👉 Испытание подтверждает устойчивость оборудования в радиочастотной среде.
+
+🔹 Как проводится испытание?
+
+Испытание выполняется с использованием:
+
+RF-генератора
+
+CDN или EM-clamp
+
+Параметры воздействия:
+
+частотный диапазон 150 кГц – 80 МГц
+
+подача сигнала через кабели
+
+пошаговое увеличение уровня воздействия
+
+Работа оборудования контролируется на всём диапазоне частот.
+
+🔹 Какие линии испытываются?
+
+Испытанию подвергаются:
+
+линии питания AC / DC
+
+сигнальные кабели
+
+линии управления и связи (Ethernet, RS-485, CAN и др.)
+
+🔹 Уровни испытаний
+
+Уровень испытаний определяется:
+
+условиями эксплуатации
+
+типом оборудования
+
+требуемой степенью электромагнитной устойчивости
+
+Чем выше уровень — тем выше устойчивость.
+
+🔹 Оценка результатов
+
+Критерии:
+
+A — нормальная работа
+
+B — временные нарушения с самовосстановлением
+
+C — требуется вмешательство оператора
+
+D — отказ оборудования (недопустимо)
+
+🔹 Где особенно важно?
+
+Испытание IEC 61000-4-6 критически важно для:
+
+промышленной автоматики
+
+ПЛК и систем управления
+
+измерительных и медицинских приборов
+
+телекоммуникационного оборудования
+
+🔹 Итог
+
+Испытание отвечает на вопрос:
+
+«Будет ли устройство стабильно работать при наличии радиочастотных помех, передающихся по кабелям?»
 
     `,
   },
@@ -713,9 +1328,230 @@ D — отказ оборудования (недопустимо)
     uz: `
 🔹 Bu sinov nima?
 
+Radioto‘lqinli elektromagnit maydon — bu atrof-muhitdagi radiochastotali nurlanish bo‘lib, u qurilmaga havo orqali, ya’ni kabelsiz ta’sir qiladi.
+
+Bu konduktiv sinovdan farqli ravishda:
+
+signal kabel orqali emas
+
+to‘g‘ridan-to‘g‘ri elektromagnit maydon orqali
+qurilmaga ta’sir ko‘rsatadi.
+
+🔹 Bunday elektromagnit maydonlar qayerdan keladi?
+
+Real hayotda bunday RF maydonlar quyidagi manbalardan hosil bo‘ladi:
+
+mobil aloqa bazaviy stansiyalari
+
+radio va televideniye uzatkichlari
+
+Wi-Fi va Bluetooth qurilmalari
+
+radar tizimlari
+
+sanoat RF uskunalari
+
+Qurilma bu manbalar yaqinida ishlaganda doimiy elektromagnit ta’sir ostida bo‘ladi.
+
+🔹 Nima uchun bu sinov kerak?
+
+Agar qurilma radioto‘lqinli elektromagnit maydonga chidamsiz bo‘lsa:
+
+noto‘g‘ri buyruqlar qabul qilinadi
+
+sensorlar xato o‘qiydi
+
+displey va boshqaruv buziladi
+
+qurilma beqaror ishlaydi
+
+👉 Bu sinov qurilmaning radioaloqa bilan to‘yingan muhitda ham ishonchli ishlashini tekshiradi.
+
+🔹 Sinov qanday o‘tkaziladi?
+
+Sinov maxsus anechoyik yoki yarim-anechoyik kamerada o‘tkaziladi.
+
+Jarayon:
+
+qurilma maxsus platformaga joylashtiriladi
+
+antenna yordamida 80 MHz – 6 GHz diapazonda RF signal nurlantiriladi
+
+elektromagnit maydon kuchlanganligi belgilangan darajagacha oshiriladi (V/m)
+
+qurilmaning ishlashi doimiy kuzatiladi
+
+Signal barcha yo‘nalishlardan berilib, real sharoit modellashtiriladi.
+
+🔹 Qanday holatlar tekshiriladi?
+
+Sinov davomida baholanadi:
+
+qurilma uzluksiz ishlayaptimi
+
+noto‘g‘ri ishlash holatlari bormi
+
+avtomatik tiklanish mavjudmi
+
+operator aralashuvi kerakmi
+
+🔹 Sinov darajalari nimani anglatadi?
+
+Sinov darajasi (V/m):
+
+elektromagnit muhitning og‘irligi
+
+qurilmaning qo‘llanilish sohasi
+
+ni bildiradi.
+
+Masalan:
+
+past darajalar — maishiy/ofis muhiti
+
+yuqori darajalar — sanoat va ochiq hududlar
+
+🔹 Natijalar qanday baholanadi?
+
+Baholash mezonlari:
+
+A — normal ishlash
+
+B — vaqtinchalik buzilish, avtomatik tiklanish
+
+C — operator aralashuvi talab etiladi
+
+D — qurilma ishdan chiqadi (qabul qilinmaydi)
+
+🔹 Qayerlarda ayniqsa muhim?
+
+Radiatsiyalangan RF sinovi ayniqsa muhim:
+
+simsiz texnologiyalar yonida ishlovchi qurilmalar
+
+sanoat avtomatikasi
+
+tibbiy va o‘lchov asboblari
+
+transport va infratuzilma elektronikalari
+
+🔹 Xulosa (oddiy qilib)
+
+Bu sinov quyidagiga javob beradi:
+
+“Qurilma kuchli radiochastotali nurlanish ostida ham to‘g‘ri ishlay oladimi?”
+
     `,
     ru: `
-🔹 Что такое электростатический разряд (ESD)?
+🔹 Что это за испытание?
+
+Радиочастотное электромагнитное поле — это излучаемое RF-воздействие, которое влияет на оборудование через пространство, без проводного подключения.
+
+В отличие от кондуктивных помех, здесь:
+
+воздействие осуществляется по воздуху
+
+электромагнитное поле напрямую влияет на электронные схемы
+
+🔹 Источники радиочастотных полей
+
+Основные источники:
+
+базовые станции мобильной связи
+
+радиовещательные и телевизионные передатчики
+
+Wi-Fi, Bluetooth
+
+радиолокационные системы
+
+промышленное RF-оборудование
+
+Оборудование может находиться под таким воздействием постоянно.
+
+🔹 Зачем необходимо это испытание?
+
+Если устройство неустойчиво к радиочастотному полю:
+
+возникают ложные срабатывания
+
+нарушается управление
+
+появляются сбои в работе
+
+система становится нестабильной
+
+👉 Испытание подтверждает устойчивость оборудования к внешнему электромагнитному излучению.
+
+🔹 Как проводится испытание?
+
+Испытание выполняется в:
+
+полуанэхоичной или анехоичной камере
+
+Процесс:
+
+оборудование устанавливается на испытательную площадку
+
+с помощью антенн создаётся RF-поле в диапазоне 80 МГц – 6 ГГц
+
+уровень поля задаётся в В/м
+
+оборудование контролируется на всех частотах
+
+Излучение подаётся с разных направлений.
+
+🔹 Что оценивается?
+
+Оценивается:
+
+корректность работы
+
+устойчивость к воздействию
+
+способность к самовосстановлению
+
+отсутствие повреждений
+
+🔹 Уровни испытаний
+
+Уровень (В/м) характеризует:
+
+условия эксплуатации
+
+степень электромагнитной насыщенности среды
+
+Чем выше уровень — тем выше требования к оборудованию.
+
+🔹 Оценка результатов
+
+Критерии:
+
+A — нормальная работа
+
+B — временные нарушения с самовосстановлением
+
+C — требуется вмешательство оператора
+
+D — отказ оборудования (недопустимо)
+
+🔹 Где особенно важно?
+
+Испытание IEC 61000-4-3 критически важно для:
+
+оборудования, работающего рядом с радиопередатчиками
+
+промышленной автоматики
+
+медицинской техники
+
+транспортных и инфраструктурных систем
+
+🔹 Итог
+
+Испытание отвечает на вопрос:
+
+«Сможет ли оборудование стабильно работать в условиях сильного радиочастотного излучения?»
 
     `,
   },
@@ -723,11 +1559,177 @@ D — отказ оборудования (недопустимо)
 
    "ГОСТ CISPR 14-1-2022": {
     uz: `
-🔹 Bu sinov nima?
+🔹 Bu nima?
+
+IRP (Индустриальные радиопомехи) — bu qurilmaning ishlashi davomida o‘zi hosil qiladigan radiochastotali elektromagnit shovqinlardir.
+
+Bu sinov:
+
+qurilmaning tashqariga qancha elektromagnit nurlanish chiqarayotganini
+
+atrofdagi radioaloqa va boshqa qurilmalarga xalaqit bermasligini
+
+baholaydi.
+
+👉 Bu immunitet emas, balki chiqarilayotgan shovqin (emissiya) sinovidir.
+
+🔹 Nima uchun bu sinov kerak?
+
+Agar qurilma haddan tashqari IRP chiqarsa:
+
+radio va TV signallar buziladi
+
+Wi-Fi va aloqa tizimlari ishlamaydi
+
+boshqa elektron qurilmalar noto‘g‘ri ishlaydi
+
+👉 Shu sababli davlat va xalqaro me’yorlar qurilmaning maksimal ruxsat etilgan nurlanish darajasini qat’iy belgilaydi.
+
+🔹 Sinov nimani o‘lchaydi?
+
+Ushbu sinovda o‘lchanadi:
+
+radiochastotali elektromagnit maydonning kuchlanganligi (V/m yoki dBµV/m)
+
+qurilma chiqarayotgan nurlanish spektri
+
+ruxsat etilgan limitlardan oshish-oshmasligi
+
+🔹 Sinov qanday o‘tkaziladi?
+
+Sinov maxsus:
+
+yarim-anechoyik kamera
+
+yoki ochiq sinov maydonchasida
+
+o‘tkaziladi.
+
+Jarayon:
+
+qurilma normal ish rejimida yoqiladi
+
+o‘lchov antennasi bilan 30 MHz – 300 MHz (va yuqori diapazonlar) tekshiriladi
+
+turli balandlik va masofalarda o‘lchov qilinadi
+
+maksimal chiqish aniqlanadi
+
+🔹 Qaysi qurilmalar uchun majburiy?
+
+ГОСТ CISPR 14-1 asosan quyidagilarga tatbiq etiladi:
+
+maishiy elektr jihozlari
+
+elektr asboblar
+
+maishiy mashinalar
+
+shunga o‘xshash qurilmalar
+
+🔹 Natijalar qanday baholanadi?
+
+O‘lchangan qiymatlar:
+
+standartda belgilangan limit chiziqlari bilan solishtiriladi
+
+Natija:
+
+✅ limitdan past — muvofiq
+
+❌ limitdan yuqori — nomuvofiq
+
+Bu yerda A/B/C/D yo‘q — faqat limitga mos yoki mos emas.
+
+🔹 Xulosa (oddiy qilib)
+
+Bu sinov quyidagiga javob beradi:
+
+“Qurilma ishlayotganda atrofga radio shovqin chiqarib, boshqa qurilmalarga xalaqit bermayaptimi?”
 
     `,
     ru: `
-🔹 Что такое электростатический разряд (ESD)?
+🔹 Что такое ИРП?
+
+Индустриальные радиопомехи (ИРП) — это радиочастотные электромагнитные излучения, которые устройство само создаёт во время работы.
+
+Данное испытание относится к:
+
+эмиссии (излучению)
+
+а не к помехоустойчивости
+
+Оно показывает, насколько сильно устройство излучает радиопомехи во внешнюю среду.
+
+🔹 Зачем проводится это испытание?
+
+Если оборудование превышает допустимые уровни ИРП:
+
+нарушается радиосвязь и телевещание
+
+возникают помехи Wi-Fi и связи
+
+страдает работа другой электроники
+
+👉 Поэтому нормативы строго ограничивают уровень излучения.
+
+🔹 Что измеряется?
+
+В ходе испытаний измеряется:
+
+напряжённость электромагнитного поля (dBµV/m)
+
+спектр радиопомех
+
+соответствие установленным пределам
+
+🔹 Как проводится испытание?
+
+Испытание проводится:
+
+в полуанэхоичной камере
+
+либо на открытой измерительной площадке
+
+Процедура:
+
+оборудование работает в нормальном режиме
+
+измерения выполняются в диапазоне 30 МГц – 300 МГц и выше
+
+антенна перемещается по высоте и расстоянию
+
+фиксируется максимальный уровень излучения
+
+🔹 Для какого оборудования применяется?
+
+ГОСТ CISPR 14-1 распространяется на:
+
+бытовые электрические приборы
+
+электроинструменты
+
+аналогичное оборудование
+
+🔹 Оценка результатов
+
+Результаты:
+
+сравниваются с предельными значениями стандарта
+
+Итог:
+
+✅ соответствует требованиям
+
+❌ превышает допустимый уровень
+
+Классификация A/B/C/D не применяется.
+
+🔹 Итог
+
+Испытание отвечает на вопрос:
+
+«Не создаёт ли устройство недопустимых радиопомех для окружающей среды?»
 
     `,
   },
@@ -735,11 +1737,207 @@ D — отказ оборудования (недопустимо)
 
    "O‘zMSt IEC 61000-3-3:2023": {
     uz: `
-🔹 Bu sinov nima?
+🔹 Bu nima?
+
+Kuchlanish o‘zgarishlari va tebranishlari — bu elektr tarmog‘ida yuklamaning tez-tez o‘zgarishi natijasida kuchlanishning vaqtinchalik pasayib-ko‘tarilishidir.
+
+Fliker (flicker) esa shu tebranishlar sabab:
+
+chiroqlar miltillashi
+
+yorug‘likning ko‘zga sezilarli o‘zgarishi
+
+insonda noqulaylik va charchoq
+
+kabi holatlarni yuzaga keltiradi.
+
+🔹 Fliker qayerdan paydo bo‘ladi?
+
+Fliker odatda quyidagi qurilmalar sababli yuzaga keladi:
+
+dvigatellar va kompressorlar
+
+payvandlash apparatlari
+
+isitgichlar
+
+kuchli impulsli yuklamalar
+
+tez-tez yoqilib-o‘chadigan qurilmalar
+
+Ayniqsa maishiy va umumiy tarmoqlarda bu muammo sezilarli bo‘ladi.
+
+🔹 Nima uchun bu sinov kerak?
+
+Agar qurilma fliker va kuchlanish tebranishlarini kuchli hosil qilsa:
+
+yoritish tizimlari bezovta qiladi
+
+boshqa qurilmalar beqaror ishlaydi
+
+elektr tarmog‘i sifati yomonlashadi
+
+👉 Shu sababli standart qurilmaning tarmoqqa ta’sirini cheklashni talab qiladi.
+
+Bu sinov qurilma nimaga chidamli ekanini emas, balki:
+
+qurilma elektr tarmog‘ini qanchalik “bezovta qilayotganini” baholaydi.
+
+🔹 Sinov nimani o‘lchaydi?
+
+Sinov jarayonida quyidagilar baholanadi:
+
+kuchlanish o‘zgarishlari (ΔU)
+
+qisqa muddatli fliker — Pst
+
+uzoq muddatli fliker — Plt
+
+Bu ko‘rsatkichlar inson ko‘zi sezgirligiga mos matematik model asosida hisoblanadi.
+
+🔹 Sinov qanday o‘tkaziladi?
+
+Sinov maxsus fliker analizatori yordamida amalga oshiriladi.
+
+Jarayon:
+
+qurilma normal ish rejimida ishlatiladi
+
+tarmoq kuchlanishidagi o‘zgarishlar o‘lchanadi
+
+fliker ko‘rsatkichlari hisoblanadi
+
+natijalar standart limitlari bilan solishtiriladi
+
+🔹 Qaysi qurilmalar uchun majburiy?
+
+IEC 61000-3-3 asosan:
+
+maishiy elektr qurilmalari
+
+ofis texnikasi
+
+16 A gacha bo‘lgan qurilmalar
+
+uchun qo‘llaniladi.
+
+🔹 Natijalar qanday baholanadi?
+
+Natijalar:
+
+standartda belgilangan limit qiymatlar bilan taqqoslanadi
+
+Baholash:
+
+✅ limitdan oshmasa — muvofiq
+
+❌ limitdan oshsa — nomuvofiq
+
+Bu sinovda A/B/C/D mezonlari qo‘llanilmaydi.
+
+🔹 Xulosa (oddiy qilib)
+
+Bu sinov quyidagiga javob beradi:
+
+“Bu qurilma elektr tarmog‘ida kuchlanishni buzib, chiroqlarni miltillatmayaptimi?”
 
     `,
     ru: `
-🔹 Что такое электростатический разряд (ESD)?
+🔹 Что это?
+
+Изменения и колебания напряжения — это временные отклонения напряжения в сети, возникающие из-за переменной нагрузки.
+
+Фликер (flicker) — это визуально заметное:
+
+мерцание света
+
+колебание яркости ламп
+
+которое вызывает дискомфорт у человека.
+
+🔹 Причины возникновения фликера
+
+Основные источники:
+
+электродвигатели
+
+компрессоры
+
+сварочные аппараты
+
+нагревательные устройства
+
+импульсные нагрузки
+
+Особенно заметно в бытовых и распределительных сетях.
+
+🔹 Зачем проводится это испытание?
+
+Если оборудование вызывает сильный фликер:
+
+ухудшается качество электроэнергии
+
+нарушается работа других устройств
+
+создаётся дискомфорт для пользователей
+
+👉 Испытание оценивает влияние оборудования на электрическую сеть, а не его помехоустойчивость.
+
+🔹 Что измеряется?
+
+В процессе испытаний оцениваются:
+
+изменения напряжения (ΔU)
+
+кратковременный фликер — Pst
+
+долговременный фликер — Plt
+
+Расчёты выполняются по модели чувствительности человеческого зрения.
+
+🔹 Как проводится испытание?
+
+Испытание выполняется с помощью анализатора фликера.
+
+Процедура:
+
+оборудование работает в штатном режиме
+
+измеряются колебания напряжения
+
+рассчитываются показатели фликера
+
+значения сравниваются с нормативными пределами
+
+🔹 Для какого оборудования применяется?
+
+Стандарт IEC 61000-3-3 применяется к:
+
+бытовым приборам
+
+офисному оборудованию
+
+устройствам с током до 16 А
+
+🔹 Оценка результатов
+
+Результаты:
+
+сравниваются с установленными пределами
+
+Итог:
+
+✅ соответствует требованиям
+
+❌ не соответствует требованиям
+
+Классификация A/B/C/D не используется.
+
+🔹 Итог
+
+Испытание отвечает на вопрос:
+
+«Не ухудшает ли оборудование качество напряжения в сети и не вызывает ли мерцание света?»
 
     `,
   },
@@ -747,11 +1945,211 @@ D — отказ оборудования (недопустимо)
 
    "O‘zMSt IEC 61000-3-2:2023": {
     uz: `
-🔹 Bu sinov nima?
+🔹 Bu nima?
+
+Tok garmoniklari — bu elektr qurilma iste’mol qilayotgan tokning ideal sinus shakldan og‘ishi natijasida paydo bo‘ladigan qo‘shimcha chastotalardir.
+
+Bunga sabab bo‘ladigan qurilmalar:
+
+impulsli quvvat manbalari
+
+invertorlar va zaryadlovchi qurilmalar
+
+LED yoritish tizimlari
+
+kompyuter va IT texnikasi
+
+Bunday qurilmalar tarmoqdan tokni notekis, bo‘lak-bo‘lak qilib oladi.
+
+🔹 Garmoniklar nimaga xavfli?
+
+Agar tok garmoniklari yuqori bo‘lsa:
+
+elektr tarmog‘i qizib ketadi
+
+transformator va kabellar ortiqcha yuklanadi
+
+avtomatik himoya noto‘g‘ri ishlaydi
+
+kuchlanish sifati yomonlashadi
+
+boshqa qurilmalar ishi buziladi
+
+👉 Shu sababli standartlar tok garmoniklarini qat’iy cheklaydi.
+
+🔹 Bu sinov nimani baholaydi?
+
+IEC 61000-3-2 sinovi:
+
+qurilma tarmoqqa qancha garmonik tok chiqarayotganini
+
+har bir garmonik (3-, 5-, 7- va boshqalar) bo‘yicha limitdan oshmasligini
+
+tekshiradi.
+
+Bu immunitet sinovi emas, balki tarmoqqa ta’sir (emissiya) sinovidir.
+
+🔹 Sinov qanday o‘tkaziladi?
+
+Sinov maxsus quvvat analizatori yordamida bajariladi.
+
+Jarayon:
+
+qurilma nominal rejimda ishlaydi
+
+tok shakli real vaqt rejimida o‘lchanadi
+
+garmonik spektr ajratib olinadi
+
+har bir garmonik standart limitlari bilan solishtiriladi
+
+🔹 Qurilmalar sinflari (A / B / C / D)
+
+IEC 61000-3-2 qurilmalarni to‘rt sinfga ajratadi:
+
+A sinf — ko‘pchilik maishiy va sanoat qurilmalari
+
+B sinf — ko‘chma elektr asboblar
+
+C sinf — yoritish uskunalari (LED, lampalar)
+
+D sinf — maxsus elektronika (kompyuterlar, TV, monitorlar)
+
+Har bir sinf uchun alohida garmonik limitlar belgilangan.
+
+🔹 Qaysi qurilmalar uchun majburiy?
+
+Standart asosan:
+
+16 A gacha bo‘lgan qurilmalar
+
+maishiy va ofis texnikasi
+
+yoritish uskunalari
+
+uchun majburiy hisoblanadi.
+
+🔹 Natijalar qanday baholanadi?
+
+Natijalar:
+
+har bir garmonik komponent bo‘yicha
+
+belgilangan limit qiymatlar bilan solishtiriladi
+
+Baholash:
+
+✅ limitdan oshmasa — muvofiq
+
+❌ limitdan oshsa — nomuvofiq
+
+Bu sinovda A/B/C/D ishlash mezonlari qo‘llanilmaydi (ular sinflar uchun).
+
+🔹 Xulosa (oddiy qilib)
+
+Bu sinov quyidagiga javob beradi:
+
+“Bu qurilma elektr tarmog‘ini garmonik toklar bilan qanchalik ifloslayapti?”
 
     `,
     ru: `
-🔹 Что такое электростатический разряд (ESD)?
+🔹 Что это такое?
+
+Гармоники тока — это дополнительные частотные составляющие тока, возникающие из-за нелинейного потребления электроэнергии.
+
+Основные источники:
+
+импульсные источники питания
+
+инверторы и зарядные устройства
+
+светодиодное освещение
+
+компьютерная и офисная техника
+
+Такое оборудование потребляет ток не по синусоиде.
+
+🔹 Почему гармоники опасны?
+
+Повышенный уровень гармоник приводит к:
+
+перегреву кабелей и трансформаторов
+
+снижению эффективности сети
+
+сбоям защитных устройств
+
+ухудшению качества электроэнергии
+
+👉 Поэтому уровень гармонических токов строго нормируется.
+
+🔹 Что оценивает испытание?
+
+Испытание IEC 61000-3-2 определяет:
+
+уровень гармонических токов
+
+соответствие каждого гармоника установленным пределам
+
+Это испытание относится к эмиссии, а не к помехоустойчивости.
+
+🔹 Как проводится испытание?
+
+Испытание выполняется с помощью анализатора качества электроэнергии.
+
+Процедура:
+
+оборудование работает в номинальном режиме
+
+измеряется форма тока
+
+рассчитываются гармонические составляющие
+
+значения сравниваются с нормативами
+
+🔹 Классы оборудования (A / B / C / D)
+
+Оборудование классифицируется:
+
+Класс A — общее оборудование
+
+Класс B — переносные инструменты
+
+Класс C — осветительное оборудование
+
+Класс D — компьютерная и мультимедийная техника
+
+Для каждого класса действуют свои пределы гармоник.
+
+🔹 Для какого оборудования применяется?
+
+Стандарт распространяется на:
+
+оборудование с током до 16 А
+
+бытовые и офисные устройства
+
+осветительные приборы
+
+🔹 Оценка результатов
+
+Результаты:
+
+сравниваются с установленными пределами
+
+Итог:
+
+✅ соответствует требованиям
+
+❌ не соответствует требованиям
+
+Критерии A/B/C/D применяются только для классификации, не для оценки работы.
+
+🔹 Итог
+
+Испытание отвечает на вопрос:
+
+«Не создаёт ли оборудование недопустимых гармонических искажений тока в сети?»
 
     `,
   },
@@ -759,11 +2157,181 @@ D — отказ оборудования (недопустимо)
 
    "ГОСТ CISPR 14-1-2022": {
     uz: `
-🔹 Bu sinov nima?
+🔹 Bu nima?
+
+IRP kuchlanishi tarmoq klemmalarida — bu qurilma ishlayotgan paytda elektr tarmog‘iga qaytarib yuboradigan radiochastotali shovqin kuchlanishidir.
+
+Bu shovqin:
+
+havo orqali tarqalmaydi
+
+to‘g‘ridan-to‘g‘ri elektr simlari orqali boshqa qurilmalarga o‘tadi
+
+👉 Bu chiqarilayotgan xalaqit (emissiya) sinoviga kiradi, immunitet emas.
+
+🔹 Nima uchun bu sinov kerak?
+
+Agar qurilma tarmoqqa kuchli IRP yuborsa:
+
+boshqa qurilmalar shovqin bilan ishlaydi
+
+radio va aloqa tizimlari buziladi
+
+umumiy elektr tarmog‘i “ifloslanadi”
+
+👉 Shu sababli standart qurilmaning tarmoqqa uzatayotgan shovqinini qat’iy cheklaydi.
+
+🔹 Sinov nimani o‘lchaydi?
+
+Sinov davomida o‘lchanadi:
+
+tarmoq klemmalaridagi radiochastotali kuchlanish darajasi
+
+o‘lchov birliklari: dBµV
+
+shovqin spektri va maksimal qiymatlar
+
+O‘lchovlar 150 kHz – 30 MHz chastota diapazonida amalga oshiriladi.
+
+🔹 Sinov qanday o‘tkaziladi?
+
+Sinov maxsus:
+
+LISN (Line Impedance Stabilization Network)
+
+o‘lchov qabul qilgichi (receiver)
+
+yordamida bajariladi.
+
+Jarayon:
+
+qurilma nominal rejimda ishlaydi
+
+LISN orqali tarmoq shovqini ajratib olinadi
+
+har bir faza va nol liniyasi bo‘yicha o‘lchanadi
+
+maksimal IRP darajasi aniqlanadi
+
+🔹 Qaysi qurilmalar uchun qo‘llaniladi?
+
+ГОСТ CISPR 14-1 asosan:
+
+maishiy elektr qurilmalari
+
+elektr asboblar
+
+maishiy mashinalar
+
+shunga o‘xshash uskunalar
+
+uchun majburiy hisoblanadi.
+
+🔹 Natijalar qanday baholanadi?
+
+O‘lchangan qiymatlar:
+
+standartda belgilangan limit chiziqlari bilan solishtiriladi
+
+Natija:
+
+✅ limitdan past — muvofiq
+
+❌ limitdan yuqori — nomuvofiq
+
+Bu sinovda A/B/C/D mezonlari qo‘llanilmaydi.
+
+🔹 Xulosa (oddiy qilib)
+
+Bu sinov quyidagiga javob beradi:
+
+“Qurilma elektr tarmog‘i orqali boshqa qurilmalarga radio shovqin tarqatmayaptimi?”
 
     `,
     ru: `
-🔹 Что такое электростатический разряд (ESD)?
+🔹 Что это такое?
+
+Напряжение ИРП на сетевых зажимах — это уровень радиочастотных помех, которые оборудование возвращает в электрическую сеть во время работы.
+
+Помехи:
+
+распространяются по проводам
+
+воздействуют на другое оборудование через сеть
+
+Это испытание относится к кондуктивной эмиссии.
+
+🔹 Зачем проводится это испытание?
+
+Если оборудование создает высокий уровень ИРП:
+
+возникают помехи в других устройствах
+
+нарушается работа радио- и телесистем
+
+ухудшается качество электросети
+
+👉 Поэтому стандарт ограничивает допустимый уровень таких помех.
+
+🔹 Что измеряется?
+
+В ходе испытаний измеряется:
+
+уровень напряжения радиопомех на сетевых зажимах
+
+единицы измерения: dBµV
+
+спектр помех
+
+Диапазон частот: 150 кГц – 30 МГц.
+
+🔹 Как проводится испытание?
+
+Испытание выполняется с использованием:
+
+LISN (сеть стабилизации импеданса линии)
+
+измерительного приёмника
+
+Процедура:
+
+оборудование работает в штатном режиме
+
+помехи отделяются от сети с помощью LISN
+
+измерения проводятся по каждой линии
+
+фиксируется максимальный уровень ИРП
+
+🔹 Для какого оборудования применяется?
+
+ГОСТ CISPR 14-1 распространяется на:
+
+бытовые электрические приборы
+
+электроинструменты
+
+бытовые машины и аналогичное оборудование
+
+🔹 Оценка результатов
+
+Результаты:
+
+сравниваются с предельными значениями стандарта
+
+Итог:
+
+✅ соответствует требованиям
+
+❌ не соответствует требованиям
+
+Классификация A/B/C/D не применяется.
+
+🔹 Итог
+
+Испытание отвечает на вопрос:
+
+«Не создает ли оборудование недопустимых радиопомех в электрической сети?»
 
     `,
   },
