@@ -208,22 +208,260 @@ const QUICK_LINKS = [
 const TEST_DETAILS = {
   "O’zMSt IEC 61000.4.2-2023": {
     uz: `
-Elektrostatik razryad (ESD) sinovi qurilmaning inson/atrof-muhitdan keladigan statik zaryadga barqarorligini baholaydi.
+🔹 Bu sinov nima?
 
-• Sinov darajalari: ±2…±15 kV (havo va bevosita kontakt)
-• Qo‘llanishi: maishiy, sanoat va IT qurilmalari
-• Natija: qurilma ishi uzluksizligi va tiklanish mezonlari (A/B/C/D)
+Elektrostatik razryad (ESD) — bu inson tanasida yoki atrof-muhitda to‘plangan statik elektr zaryadining birdaniga qurilmaga o‘tib ketishidir.
 
-Tayyorlash: yerga ulash, plastik korpus, ochiq portlar, devorga o‘rnatish sharoitlari va h.k.
+Oddiy misollar:
+
+Qishda eshik tutqichiga tekkanda “tok urishi”
+
+Qurilmani qo‘l bilan ushlaganda chiqadigan chaqnash
+
+Plastik buyumlar ishqalanishidan hosil bo‘ladigan zaryad
+
+ESD sinovi qurilma shunday holatlarda ishlashda davom etadimi yoki yo‘qmi, shuni tekshiradi.
+
+🔹 Nima uchun bu sinov kerak?
+
+Real hayotda qurilmalar:
+
+odamlar tomonidan ushlanadi
+
+ulab-ajratiladi
+
+plastik, metall, gilamli xonalarda ishlaydi
+
+quruq havoda statik zaryad yig‘iladi
+
+Agar qurilma ESD ga chidamsiz bo‘lsa:
+
+osilib qoladi
+
+qayta yuklanadi
+
+ma’lumot yo‘qoladi
+
+butunlay ishdan chiqishi mumkin
+
+👉 Shu sababli ESD sinovi xavfsizlik, ishonchlilik va sertifikatlash uchun majburiy.
+
+🔹 Sinov qanday o‘tkaziladi?
+
+ESD sinovi maxsus ESD generatori yordamida bajariladi. Qurilmaga nazorat ostida sun’iy statik zarba beriladi.
+
+1️⃣ Kontakt razryad (Contact discharge)
+
+Zaryad to‘g‘ridan-to‘g‘ri metall qismga beriladi
+
+Odatda ±2, ±4, ±6, ±8 kV
+
+Eng og‘ir va qat’iy sinov turi
+
+Metall korpusli yoki ochiq kontaktli qurilmalar uchun
+
+2️⃣ Havo orqali razryad (Air discharge)
+
+Zaryad qurilmaga yaqinlashtirib beriladi
+
+±2…±15 kV gacha
+
+Plastik korpusli qurilmalar uchun
+
+Real hayotga eng yaqin sharoit
+
+🔹 Qaysi joylarga zarba beriladi?
+
+Sinov faqat bitta nuqtaga emas, balki:
+
+tugmalar
+
+portlar (USB, LAN, HDMI va h.k.)
+
+displey atrofi
+
+korpus chetlari
+
+foydalanuvchi tez-tez tegadigan joylar
+
+bo‘yicha o‘tkaziladi.
+
+🔹 Sinov darajalari nimani anglatadi?
+Daraja	Ma’nosi
+±2 kV	Eng past, ofis sharoiti
+±4 kV	O‘rtacha foydalanish
+±8 kV	Og‘ir sharoit
+±15 kV	Juda og‘ir, sanoat muhiti
+
+Qurilmaning qaysi darajagacha bardosh berishi — uning klassini ko‘rsatadi.
+
+🔹 Natijalar (A / B / C / D) nimani bildiradi?
+Mezon	Izoh
+A	Qurilma normal ishlaydi, hech qanday ta’sir yo‘q
+B	Vaqtinchalik buzilish bo‘ladi, lekin o‘zi tiklanadi
+C	Ishlash buziladi, operator aralashuvi kerak
+D	Qurilma ishdan chiqadi (qabul qilinmaydi)
+
+👉 Sertifikatlashda odatda A yoki B qabul qilinadi.
+
+🔹 Sinovga tayyorlash nima uchun muhim?
+
+Noto‘g‘ri tayyorlangan qurilma noto‘g‘ri natija beradi.
+
+Tayyorlashda:
+
+yerga ulash (grounding)
+
+ochiq portlar holati
+
+devorga yoki stolga o‘rnatish
+
+kabel uzunliklari
+
+plastik/metall yuzalar
+
+aniq standart bo‘yicha sozlanadi.
+
+🔹 Xulosa (oddiy qilib)
+
+ESD sinovi shuni ko‘rsatadi:
+
+“Bu qurilma odamlar ishlatadigan real sharoitda ishonchli ishlaydimi yoki yo‘qmi?”
+
+Bu sinovsiz:
+
+eksport yo‘q
+
+sertifikat yo‘q
+
+ishonch yo‘q
     `,
     ru: `
-Испытание на электростатический разряд (ESD) оценивает устойчивость оборудования к статическим зарядам от человека/окружения.
+🔹 Что такое электростатический разряд (ESD)?
 
-• Уровни: ±2…±15 кВ (контакт/воздух)
-• Область: бытовые, промышленные и IT-устройства
-• Результат: критерии функционирования A/B/C/D
+Электростатический разряд (ESD) — это внезапный перенос накопленного статического электрического заряда от человека или окружающей среды к электронному устройству.
 
-Подготовка: заземление, пластиковый корпус, открытые порты, настенное крепление и т.д.
+Простые примеры из жизни:
+
+«Удар током» при касании дверной ручки зимой
+
+Разряд при прикосновении к устройству руками
+
+Статический заряд, возникающий из-за трения пластика, одежды или ковров
+
+ESD-испытание проверяет, сможет ли устройство продолжать нормально работать в таких условиях.
+
+🔹 Зачем необходимо ESD-испытание?
+
+В реальных условиях эксплуатации устройства:
+
+постоянно трогают руками
+
+подключают и отключают кабели
+
+используют в помещениях с сухим воздухом
+
+эксплуатируют рядом с пластиковыми и металлическими поверхностями
+
+Если устройство неустойчиво к ESD, возможны:
+
+зависания
+
+самопроизвольные перезагрузки
+
+потеря данных
+
+полный выход из строя
+
+👉 Поэтому ESD-испытание является обязательным для безопасности, надежности и сертификации.
+
+🔹 Как проводится испытание?
+
+Испытание выполняется с помощью специального генератора электростатических разрядов, который подает контролируемые искусственные разряды на устройство.
+
+1️⃣ Контактный разряд (Contact discharge)
+
+Разряд подается непосредственно на металлическую часть устройства
+
+Типичные уровни: ±2, ±4, ±6, ±8 кВ
+
+Самый строгий и тяжелый вид испытаний
+
+Применяется для устройств с металлическим корпусом или открытыми контактами
+
+2️⃣ Воздушный разряд (Air discharge)
+
+Разряд подается через воздух при приближении электрода
+
+Диапазон: ±2…±15 кВ
+
+Используется для пластиковых корпусов
+
+Максимально приближен к реальным условиям эксплуатации
+
+🔹 В какие точки подается разряд?
+
+Испытания проводятся не в одной точке, а по всей поверхности, включая:
+
+кнопки управления
+
+разъемы (USB, LAN, HDMI и др.)
+
+область вокруг дисплея
+
+края корпуса
+
+зоны, к которым пользователь прикасается чаще всего
+
+🔹 Что означают уровни испытаний?
+Уровень	Значение
+±2 кВ	Минимальный уровень, офисные условия
+±4 кВ	Обычные условия эксплуатации
+±8 кВ	Тяжелые условия
+±15 кВ	Очень тяжелые, промышленные условия
+
+Максимальный выдерживаемый уровень показывает класс устойчивости устройства.
+
+🔹 Критерии оценки результатов (A / B / C / D)
+Критерий	Описание
+A	Устройство работает нормально, без нарушений
+B	Временное нарушение, устройство самовосстанавливается
+C	Нарушение работы, требуется вмешательство оператора
+D	Устройство выходит из строя (не допускается)
+
+👉 Для сертификации обычно допускаются A и B.
+
+🔹 Почему важна правильная подготовка к испытанию?
+
+Неправильная подготовка может привести к некорректным результатам.
+
+При подготовке учитываются:
+
+заземление
+
+состояние открытых портов
+
+установка на столе или крепление на стене
+
+длина и тип кабелей
+
+материалы корпуса (пластик / металл)
+
+Все параметры настраиваются строго по стандарту.
+
+🔹 Краткий вывод
+
+ESD-испытание отвечает на главный вопрос:
+
+«Сможет ли устройство надежно работать в реальных условиях, когда к нему прикасаются люди?»
+
+Без этого испытания:
+
+невозможна сертификация
+
+невозможен экспорт
+
+отсутствует доверие к продукции
     `,
   },
   "O‘z MSt IEC 61000-4-4:2023": {
