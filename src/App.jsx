@@ -4,7 +4,6 @@ import SinovDasturlari from "./components/SinovDasturlari";
 import Login from "./pages/Login"; // login sahifang
  // asosiy sahifa
  import { Routes, Route, useNavigate } from "react-router-dom";
- import QrTizimi from "./components/QrTizimi";
 
 /********************* CONFIG *********************/
 const NAV = [
