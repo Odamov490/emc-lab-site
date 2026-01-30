@@ -4,7 +4,6 @@ import SinovDasturlari from "./components/SinovDasturlari";
 import Login from "./pages/Login"; // login sahifang
  // asosiy sahifa
  import { Routes, Route, useNavigate } from "react-router-dom";
- import QrTizimi from "./components/QrTizimi";
 
 /********************* CONFIG *********************/
 const NAV = [
@@ -3520,7 +3519,6 @@ export default function App() {
       <Route path="/" element={<EMCLabUltra />} />
       <Route path="/login" element={<Login />} />
 <Route path="/sinov-dasturlari" element={<SinovDasturlari />} />
-<Route path="/qr-tizimi" element={<QrTizimi/>} />
 
     </Routes>
     
