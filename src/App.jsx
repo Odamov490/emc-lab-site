@@ -2922,7 +2922,7 @@ const navigate = useNavigate();
 
 
             </div>
-            
+
   <button
     onClick={() => navigate("/login")}
     className="ml-3 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 
@@ -3290,7 +3290,7 @@ const navigate = useNavigate();
           id="contact"
           title={lang==="uz" ? "Bog‘lanish" : "Контакты"}
           subtitle={lang==="uz" ? "Ariza qoldiring – 1 ish kuni ichida javob" : "Оставьте заявку – ответ в течение 1 рабочего дня"}
-        >
+         >
           <div className="grid md:grid-cols-2 gap-8">
             {/* Chap — forma */}
             <Card className="p-6 space-y-4">
@@ -3340,14 +3340,14 @@ const navigate = useNavigate();
                   <label className="text-sm font-medium">{lang==="uz" ? "Telefon" : "Телефон"}</label>
                   <input name="phone" className="mt-1 w-full rounded-xl border px-3 py-2" placeholder="+998 __ ___ __ __" />
                 </div>
-                <div>
+                {/* <div>
                   <label className="text-sm font-medium">{lang==="uz" ? "Qiziqtirgan sinov(lar)" : "Интересующие испытания"}</label>
                   <select name="test" className="mt-1 w-full rounded-xl border px-3 py-2">
                     {TESTS.map((tst, i) => (
                       <option key={i}>{`${tst.code} – ${tst.title}`}</option>
                     ))}
                   </select>
-                </div>
+                </div> */}
                 <div>
                   <label className="text-sm font-medium">{lang==="uz" ? "Xabar" : "Сообщение"}</label>
                   <textarea
