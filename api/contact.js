@@ -22,7 +22,7 @@ export default async function handler(req, res) {
       `👤 Ism: ${name}\n` +
       `✉️ Email: ${email}\n` +
       `📱 Tel: ${phone || "-"}\n` +
-      `🧰 Sinov: ${test || "-"}\n` +
+   //   `🧰 Sinov: ${test || "-"}\n` +
       `💬 Xabar: ${message || "-"}`;
 
     // 10s timeout (ixtiyoriy)
