@@ -59,7 +59,7 @@ const STAFF = [
   { name: "Joldasbaev Dastanbek", role: "2-toifali mutaxassis", img: "/staff/8.jpg" },
   { name: "Sobirov Doston", role: "Texnik xodim", img: "/staff/9.png" },
   { name: "Karimov Suxrob", role: "Texnik xodim", img: "/staff/10.png" },
-  { name: "Sharofiddinov Najmiddin", role: "Texnik xodim", img: "/staff/11.png" },
+  { name: "Bayonxonov Sobitxon", role: "Texnik xodim", img: "/staff/11.png" },
  
 ];
 
