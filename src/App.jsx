@@ -17,8 +17,9 @@ const NAV = [
   { href: "#excursion", label: { uz: "Ekskursiya", ru: "Экскурсия" } },
   { href: "#team", label: { uz: "Jamoa", ru: "Команда" } },
   { href: "#pricing", label: { uz: "Narxlar", ru: "Цены" } },
-   { href: "/news", label: { uz: "Yangiliklar", ru: "Новости" } },
   { href: "#contact", label: { uz: "Bog‘lanish", ru: "Контакты" } },
+   { href: "/sinov-dasturlari", label: { uz: "Sinov dasturlari", ru: "Программы испытаний" } },
+     { href: "/news", label: { uz: "Yangiliklar", ru: "Новости" } },
 ];
 
 const TESTS = [
@@ -2921,12 +2922,6 @@ useEffect(() => {
                 </a>
               ))}
             </nav>
-           <a
-  href="/sinov-dasturlari"
-  className="rounded-2xl border border-black/10 bg-gray-900 text-white px-3 py-1.5 text-sm hover:-translate-y-0.5 transition will-change-transform"
->
-  {lang==="uz" ? "Sinov dasturlari" : "Программы испытаний"}
-</a>
 
   <div className="flex items-center gap-3">
               <button onClick={() => setLang("uz")} className={`hover:underline ${lang === "uz" ? "font-semibold" : ""}`}>UZ</button>
