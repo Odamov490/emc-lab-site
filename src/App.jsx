@@ -18,7 +18,7 @@ const NAV = [
   { href: "#team", label: { uz: "Jamoa", ru: "Команда" } },
   { href: "#pricing", label: { uz: "Narxlar", ru: "Цены" } },
   { href: "#contact", label: { uz: "Bog‘lanish", ru: "Контакты" } },
-   { href: "/sinov-dasturlari", label: { uz: "Sinov dasturlari", ru: "Программы испытаний" } },
+   { href: "/sinov-dasturlari", label: { uz: "Dasturlar", ru: "Программы" } },
      { href: "/news", label: { uz: "Yangiliklar", ru: "Новости" } },
 ];
 
@@ -2907,7 +2907,7 @@ useEffect(() => {
               <span className="font-semibold">EMC Lab</span>
             </a>
 
-            <nav className="hidden md:flex items-center gap-10">
+            <nav className="hidden md:flex items-center gap-7">
               {NAV.map((n) => (
                 <a
                   key={n.href}
