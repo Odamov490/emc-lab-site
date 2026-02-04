@@ -10,16 +10,19 @@ SESSION = os.environ["TG_SESSION"]
 CHANNEL = os.environ.get("TG_CHANNEL", "uztestrasmiy")
 
 OUT_FILE = "public/news.json"
-MEDIA_DIR = "public/news_media"   # rasm shu yerga tushadi
+MEDIA_DIR = "public/news_media"
 LIMIT = 30
 
 def fmt_date(dt):
-    if not dt:
-        return None
-    return dt.strftime("%Y-%m-%d")
+    return dt.strftime("%Y-%m-%d") if dt else None
+
+def make_photo_url(filename: str) -> str:
+    # Saytda ochilishi uchun public ichidagi yo'lni beramiz
+    return f"/news_media/{filename}"
 
 async def main():
     items = []
+
     os.makedirs("public", exist_ok=True)
     os.makedirs(MEDIA_DIR, exist_ok=True)
 
@@ -27,41 +30,35 @@ async def main():
         channel = await client.get_entity(CHANNEL)
 
         async for msg in client.iter_messages(channel, limit=LIMIT):
-            # text bo'lmasa ham rasm bo'lishi mumkin — shuning uchun o'tkazib yubormaymiz
-            text = (msg.message or "").strip()
+            if not msg.message:
+                continue
 
-            # title: birinchi qatordan
-            title = (text.split("\n")[0].strip() if text else "Yangilik")[:120]
+            text = msg.message.strip()
+            title = text.split("\n")[0][:120] if text else "Yangilik"
 
-            photo_url = None
+            photo_path = None
+            # ✅ Agar postda rasm bo'lsa, yuklab olamiz
             if msg.photo:
-                # fayl nomini tg_id asosida beramiz (barqaror)
-                # telethon kengaytmani o'zi topib beradi (.jpg/.png/.webp)
-                filename_base = f"tg_{CHANNEL}_{msg.id}"
-                saved_path = await client.download_media(
-                    msg,
-                    file=os.path.join(MEDIA_DIR, filename_base)
-                )
-                if saved_path:
-                    # Windows path -> URLga moslashtiramiz
-                    saved_path = saved_path.replace("\\", "/")
-                    # public/... dan keyingi qismi saytga URL bo'ladi
-                    # masalan: public/news_media/tg_xxx_123.jpg => /news_media/tg_xxx_123.jpg
-                    if saved_path.startswith("public/"):
-                        photo_url = "/" + saved_path[len("public/"):]
-                    else:
-                        # ehtiyot uchun
-                        photo_url = "/news_media/" + os.path.basename(saved_path)
+                filename = f"{CHANNEL}_{msg.id}.jpg"
+                save_to = os.path.join(MEDIA_DIR, filename)
+                try:
+                    await client.download_media(msg, file=save_to)
+                    # Agar yuklab olingan bo'lsa, saytdagi path:
+                    if os.path.exists(save_to) and os.path.getsize(save_to) > 0:
+                        photo_path = make_photo_url(filename)
+                except Exception:
+                    photo_path = None
 
             items.append({
                 "tg_id": msg.id,
                 "date": fmt_date(msg.date),
-                "title": title or "Yangilik",
-                "text": text or None,
+                "title": title,
+                "text": text,
                 "url": f"https://t.me/{CHANNEL}/{msg.id}",
-                "photo": photo_url
+                "photo": photo_path
             })
 
+    # yangisi tepada tursin
     items.sort(key=lambda x: x["tg_id"], reverse=True)
 
     with open(OUT_FILE, "w", encoding="utf-8") as f:
