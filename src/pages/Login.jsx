@@ -35,7 +35,7 @@ const STAFF_PHOTOS = {
   "Joldasbaev Dastanbek": "/staff/8.jpg",
   "Sobirov Doston": "/staff/9.png",
   "Karimov Suxrob": "/staff/10.png",
-  "Bayonxonov Sobitxon": "/staff/11.png",
+  "Bayonxonov Sobitxon": "/staff/11.jpg",
   "Suxanov Alijan": "/staff/12.png",
 };
 
