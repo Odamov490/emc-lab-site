@@ -1,116 +1,130 @@
 import os
 import json
+import re
 from datetime import datetime
-from pathlib import Path
 from telethon import TelegramClient
 from telethon.sessions import StringSession
 
 API_ID = int(os.environ["TG_API_ID"])
 API_HASH = os.environ["TG_API_HASH"]
 SESSION = os.environ["TG_SESSION"]
-CHANNEL = os.environ.get("TG_CHANNEL", "uztestrasmiy").lstrip("@")
+CHANNEL = os.environ.get("TG_CHANNEL", "uztestrasmiy")
 
 OUT_FILE = "public/news.json"
-MEDIA_DIR = Path("public/news_media")
+MEDIA_DIR = "public/news_media"
+
+# Nechta post ko'rsatamiz
 LIMIT = 30
 
+# Albomlarni to'g'ri yig'ish uchun biroz ko'proq o'qiymiz
+FETCH_LIMIT = 120
+
+
 def fmt_date(dt):
-    return dt.strftime("%Y-%m-%d") if dt else None
-
-def safe_text(s: str) -> str:
-    return (s or "").strip()
-
-async def pick_album_first_media(client: TelegramClient, msg):
-    """Agar album bo'lsa (grouped_id), shu albomdagi birinchi media xabarni topadi."""
-    gid = getattr(msg, "grouped_id", None)
-    if not gid:
-        return msg
-
-    # Albom ichida media bo'lgan birinchi xabarni topamiz
-    async for m in client.iter_messages(msg.peer_id, limit=50):
-        if getattr(m, "grouped_id", None) == gid and (m.photo or m.document):
-            return m
-    return msg
-
-async def download_first_photo(client: TelegramClient, msg, channel_username: str):
-    """
-    Telethon saqlagan fayl pathini oladi, keyin public/news_media ga ko'chiradi.
-    Return: "/news_media/xxx.ext" yoki None
-    """
-    MEDIA_DIR.mkdir(parents=True, exist_ok=True)
-
-    target = await pick_album_first_media(client, msg)
-    if not (target.photo or target.document):
+    if not dt:
         return None
+    return dt.strftime("%Y-%m-%d")
 
-    # Telethon o'zi ext bilan saqlasin (temp)
-    tmp_dir = Path(".tmp_media")
-    tmp_dir.mkdir(parents=True, exist_ok=True)
 
-    try:
-        saved_path = await client.download_media(target, file=str(tmp_dir))
-        if not saved_path:
-            return None
+def safe_title(s: str, max_len=120):
+    s = (s or "").strip()
+    s = re.sub(r"\s+", " ", s)
+    return s[:max_len] if s else "Yangilik"
 
-        saved_path = Path(saved_path)
-        if not saved_path.exists() or saved_path.stat().st_size == 0:
-            return None
 
-        ext = saved_path.suffix.lower() or ".jpg"
-        final_name = f"{channel_username}_{msg.id}{ext}"
-        final_path = MEDIA_DIR / final_name
+def web_path_from_local(local_path: str):
+    # "public/news_media/xxx.jpg" -> "/news_media/xxx.jpg"
+    local_path = local_path.replace("\\", "/")
+    if local_path.startswith("public/"):
+        return "/" + local_path[len("public/") :]
+    return "/" + local_path
 
-        # ko'chirish
-        saved_path.replace(final_path)
-
-        # tmp papkani tozalash (bo'sh qolsa)
-        try:
-            if saved_path.parent.exists():
-                for p in saved_path.parent.glob("*"):
-                    pass
-        except:
-            pass
-
-        return f"/news_media/{final_name}"
-    except Exception:
-        return None
 
 async def main():
-    items = []
+    os.makedirs("public", exist_ok=True)
+    os.makedirs(MEDIA_DIR, exist_ok=True)
 
     async with TelegramClient(StringSession(SESSION), API_ID, API_HASH) as client:
         channel = await client.get_entity(CHANNEL)
 
-        async for msg in client.iter_messages(channel, limit=LIMIT):
-            text = safe_text(msg.message or "")
+        # 1) Xabarlarni guruhlab olamiz (album: grouped_id)
+        groups = {}  # key -> list[msg]
+        async for msg in client.iter_messages(channel, limit=FETCH_LIMIT):
+            key = msg.grouped_id or msg.id
+            groups.setdefault(key, []).append(msg)
 
-            # faqat text bo'lmasa-yu, media bo'lsa ham olamiz
-            if not text and not (msg.photo or msg.document):
+        # 2) Har bir guruhdan 1 ta post yasaymiz
+        items = []
+        for key, msgs in groups.items():
+            # Caption/text bor postni topamiz (albomda caption faqat bittasida bo'ladi)
+            caption_msg = None
+            for m in msgs:
+                if m.message and m.message.strip():
+                    caption_msg = m
+                    break
+            if not caption_msg:
                 continue
 
-            title = text.split("\n")[0][:120] if text else "Yangilik"
-            photo_url = await download_first_photo(client, msg, CHANNEL)
+            text = caption_msg.message.strip()
+            title = safe_title(text.split("\n")[0])
 
-            items.append({
-                "tg_id": msg.id,
-                "date": fmt_date(msg.date),
-                "title": title,
-                "text": text,
-                "url": f"https://t.me/{CHANNEL}/{msg.id}",
-                "photo": photo_url
-            })
+            # Rasm/top media bo'lgan xabarni topamiz (albumda birinchisi odatda photo bo'ladi)
+            media_msg = None
+            for m in msgs:
+                if m.photo:
+                    media_msg = m
+                    break
 
-    items.sort(key=lambda x: x["tg_id"], reverse=True)
+            photo_url = None
+            if media_msg:
+                # bir xil nomda qayta-qayta yozilishi uchun key dan foydalanamiz
+                # Telethon o'zi extension qo'yadi (.jpg/.png)
+                out_base = os.path.join(MEDIA_DIR, str(key))
+                local = await client.download_media(media_msg, file=out_base)
+                if local:
+                    photo_url = web_path_from_local(local)
 
-    os.makedirs("public", exist_ok=True)
-    with open(OUT_FILE, "w", encoding="utf-8") as f:
-        json.dump(
-            {"ok": True, "updated_at": datetime.utcnow().isoformat() + "Z", "items": items},
-            f,
-            ensure_ascii=False,
-            indent=2
-        )
+            items.append(
+                {
+                    "tg_id": int(key),  # album bo'lsa grouped_id
+                    "date": fmt_date(caption_msg.date),
+                    "title": title,
+                    "text": text,
+                    "url": f"https://t.me/{CHANNEL}/{caption_msg.id}",
+                    "photo": photo_url,  # "/news_media/....jpg" yoki None
+                }
+            )
+
+        # 3) Eng yangi LIMIT ta post
+        items.sort(key=lambda x: x["tg_id"], reverse=True)
+        items = items[:LIMIT]
+
+        # 4) Eski rasm fayllarni tozalash (o'sib ketmasin)
+        keep = set()
+        for it in items:
+            if it.get("photo"):
+                keep.add(it["photo"].split("/")[-1])  # filename
+
+        try:
+            for fn in os.listdir(MEDIA_DIR):
+                if fn not in keep:
+                    p = os.path.join(MEDIA_DIR, fn)
+                    if os.path.isfile(p):
+                        os.remove(p)
+        except Exception:
+            pass
+
+        payload = {
+            "ok": True,
+            "updated_at": datetime.utcnow().isoformat() + "Z",
+            "items": items,
+        }
+
+        with open(OUT_FILE, "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+
 
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(main())

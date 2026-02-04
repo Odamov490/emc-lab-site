@@ -1,87 +1,93 @@
 import React, { useMemo, useState } from "react";
 
-function formatDate(d) {
-  if (!d) return "";
-  try {
-    // d = "2026-02-04" yoki ISO bo‘lishi mumkin
-    const dt = new Date(d);
-    if (Number.isNaN(dt.getTime())) return String(d);
-    return dt.toLocaleDateString();
-  } catch {
-    return String(d);
-  }
+function formatDateUZ(dateStr) {
+  if (!dateStr) return "";
+  // dateStr: "2026-02-04"
+  const [y, m, d] = dateStr.split("-");
+  if (!y || !m || !d) return dateStr;
+  return `${d}.${m}.${y}`;
 }
 
-function stripLinks(text = "") {
-  // pastdagi "➡️ Telegram | Web-sayt | ..." kabi qatorlarni yengillashtirish
-  return text
-    .replace(/➡️[\s\S]*$/m, "") // oxiridagi promo qatorlarni olib tashlaydi
-    .trim();
+function clampText(text, max = 220) {
+  const t = (text || "").trim();
+  if (t.length <= max) return t;
+  return t.slice(0, max).trimEnd() + "…";
 }
 
 export default function NewsCard({ item }) {
-  const [open, setOpen] = useState(false);
+  const [imgOk, setImgOk] = useState(true);
 
-  const dateStr = useMemo(() => formatDate(item?.date), [item?.date]);
-
-  const title = (item?.title || "").trim();
-  const textFull = stripLinks(item?.text || "");
-  const textShort =
-    textFull.length > 180 ? textFull.slice(0, 180).trim() + "…" : textFull;
-
-  const photo = item?.photo || null;
-  const tgUrl = item?.url || item?.link || null;
+  const dateLabel = useMemo(() => formatDateUZ(item?.date), [item?.date]);
 
   return (
-    <article className="rounded-[26px] overflow-hidden shadow-sm border border-black/5 bg-gradient-to-br from-[#0a7bb6] to-[#0a6aa0] text-white">
-      {/* TOP: image */}
-      {photo ? (
-        <div className="w-full aspect-[16/10] bg-black/15">
+    <article className="rounded-[28px] overflow-hidden border border-black/10 shadow-sm bg-[#0B77A6]">
+      {/* Image area */}
+      <div className="relative w-full aspect-[16/10] bg-white/10">
+        {item?.photo && imgOk ? (
           <img
-            src={photo}
-            alt={title || "News"}
+            src={item.photo}
+            alt={item?.title || "news"}
             className="w-full h-full object-cover"
             loading="lazy"
+            onError={() => setImgOk(false)}
           />
-        </div>
-      ) : (
-        <div className="w-full aspect-[16/10] bg-white/10" />
-      )}
+        ) : (
+          <div className="absolute inset-0 bg-white/10" />
+        )}
 
-      {/* CONTENT */}
-      <div className="p-6 space-y-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="text-xs text-white/80">{dateStr}</div>
-
-          {/* Badge (xuddi standart badge kabi) */}
-          <div className="shrink-0 px-3 py-1 rounded-full bg-white text-[#0a6aa0] text-[11px] font-semibold">
-            Telegram
-          </div>
+        {/* Top pills */}
+        <div className="absolute left-4 top-4 flex items-center gap-2">
+          {dateLabel ? (
+            <span className="text-xs px-3 py-1 rounded-full bg-white/15 text-white">
+              {dateLabel}
+            </span>
+          ) : null}
         </div>
 
-        <h3 className="font-semibold leading-snug text-[15px] md:text-[16px]">
-          {title || "Yangilik"}
-        </h3>
-
-        <p className="text-sm text-white/90 leading-relaxed">
-          {open ? textFull : textShort}
-        </p>
-
-        <div className="flex items-center gap-3 pt-2">
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            className="inline-flex items-center justify-center rounded-full bg-white text-[#0a6aa0] px-4 py-2 text-sm font-semibold hover:bg-white/95 active:scale-[0.99]"
-          >
-            {open ? "Yopish" : "Batafsil"}
-          </button>
-
-          {tgUrl ? (
+        <div className="absolute right-4 top-4">
+          {item?.url ? (
             <a
-              className="text-sm underline text-white/90 hover:text-white"
-              href={tgUrl}
+              href={item.url}
               target="_blank"
               rel="noreferrer"
+              className="text-xs px-3 py-1 rounded-full bg-white text-[#0B77A6] font-medium"
+            >
+              Telegram
+            </a>
+          ) : null}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-6 text-white">
+        <h3 className="font-semibold leading-snug text-[15px] md:text-[16px]">
+          {item?.title || "Yangilik"}
+        </h3>
+
+        {item?.text ? (
+          <p className="mt-3 text-sm leading-relaxed text-white/90">
+            {clampText(item.text, 260)}
+          </p>
+        ) : null}
+
+        <div className="mt-5 flex items-center gap-3">
+          <button
+            type="button"
+            className="px-5 py-2 rounded-full bg-white text-[#0B77A6] text-sm font-semibold"
+            onClick={() => {
+              // oddiy: "Batafsil" bosilganda telegramga ochadi
+              if (item?.url) window.open(item.url, "_blank", "noreferrer");
+            }}
+          >
+            Batafsil
+          </button>
+
+          {item?.url ? (
+            <a
+              href={item.url}
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm underline underline-offset-4 text-white/90 hover:text-white"
             >
               Telegram’da ochish →
             </a>

@@ -24,7 +24,7 @@ jobs:
         run: |
           pip install telethon
 
-      - name: Fetch news from Telegram
+      - name: Fetch news from Telegram (with media)
         env:
           TG_API_ID: ${{ secrets.TG_API_ID }}
           TG_API_HASH: ${{ secrets.TG_API_HASH }}
@@ -37,6 +37,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-         git add public/news.json public/news_media || true
+          git add public/news.json public/news_media
           git diff --cached --quiet || git commit -m "Update news.json + media from Telegram"
           git push
