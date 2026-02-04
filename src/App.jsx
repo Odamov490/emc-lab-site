@@ -5,7 +5,6 @@ import Login from "./pages/Login"; // login sahifang
  // asosiy sahifa
  import { Routes, Route, useNavigate } from "react-router-dom";
  import NewsPage from "./components/NewsPage";
-import NewsPage from "./components/NewsPage";
 
 
 /********************* CONFIG *********************/
@@ -3505,9 +3504,11 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<EMCLabUltra />} />
-      <Route path="/news" element={<NewsPage />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/news" element={<NewsPage />} />
       <Route path="/sinov-dasturlari" element={<SinovDasturlari />} />
+
     </Routes>
+    
   );
 }
