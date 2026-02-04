@@ -15,27 +15,17 @@ export default function NewsPage() {
         setLoading(true);
         setErr("");
 
-        // 1) Asosiy: lokal statik fayl (Vercel'da ishlaydi)
-        let res = await fetch("/news.json", { cache: "no-store" });
-
-        // 2) Agar /news.json topilmasa, fallback: GitHub raw link
-        if (!res.ok) {
-          res = await fetch(
-            "https://raw.githubusercontent.com/Odamov490/emc-lab-site/main/public/news.json",
-            { cache: "no-store" }
-          );
-        }
-
-        if (!res.ok) throw new Error("News fetch failed");
+        // Static JSON (GitHub Actions yangilab turadi)
+        const res = await fetch("/news.json", { cache: "no-store" });
+        if (!res.ok) throw new Error("news.json topilmadi");
 
         const data = await res.json();
         if (!alive) return;
 
-        // news.json array bo'ladi: [{...}, {...}]
         setItems(Array.isArray(data) ? data : []);
       } catch (e) {
         if (!alive) return;
-        setErr("Yangiliklarni olishda xatolik (news.json topilmadi yoki format xato).");
+        setErr("Yangiliklarni olishda xatolik (news.json)");
         setItems([]);
       } finally {
         if (!alive) return;
@@ -53,7 +43,7 @@ export default function NewsPage() {
     <main className="max-w-6xl mx-auto px-4 py-10">
       <h1 className="text-3xl font-bold">Yangiliklar</h1>
       <p className="text-sm opacity-70 mt-2">
-        Press-relizlar va e’lonlar (hozircha news.json orqali)
+        Telegram kanalidan avtomatik yangilanadi
       </p>
 
       {loading ? (
@@ -72,8 +62,8 @@ export default function NewsPage() {
         </div>
       ) : (
         <div className="grid md:grid-cols-3 gap-6 mt-8">
-          {items.map((item, idx) => (
-            <NewsCard key={item.tg_id || item.id || idx} item={item} />
+          {items.map((item) => (
+            <NewsCard key={item.tg_id || item.id} item={item} />
           ))}
         </div>
       )}
