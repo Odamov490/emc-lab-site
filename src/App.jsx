@@ -12,13 +12,13 @@ const NAV = [
   { href: "#about", label: { uz: "Biz haqimizda", ru: "О нас" } },
   { href: "#services", label: { uz: "Xizmatlar", ru: "Услуги" } },
   { href: "#equipment", label: { uz: "Jihozlar", ru: "Оборудование" } },
-  { href: "#accreditation", label: { uz: "Akkreditatsiya", ru: "Аккредитация" } },
+ // { href: "#accreditation", label: { uz: "Akkreditatsiya", ru: "Аккредитация" } },
   { href: "#gallery", label: { uz: "Galereya", ru: "Галерея" } },
-  { href: "#excursion", label: { uz: "Ekskursiya", ru: "Экскурсия" } },
+  //{ href: "#excursion", label: { uz: "Ekskursiya", ru: "Экскурсия" } },
   { href: "#team", label: { uz: "Jamoa", ru: "Команда" } },
   { href: "#pricing", label: { uz: "Narxlar", ru: "Цены" } },
   { href: "#contact", label: { uz: "Bog‘lanish", ru: "Контакты" } },
-   { href: "/sinov-dasturlari", label: { uz: "Dasturlar", ru: "Программы" } },
+   { href: "/sinov-dasturlari", label: { uz: "Sinov dasturlari", ru: "Программы испытаний" } },
      { href: "/news", label: { uz: "Yangiliklar", ru: "Новости" } },
 ];
 
