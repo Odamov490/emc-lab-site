@@ -37,6 +37,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add public/news.json public/news_media || true
+         git add public/news.json public/news_media || true
           git diff --cached --quiet || git commit -m "Update news.json + media from Telegram"
           git push
