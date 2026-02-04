@@ -2825,27 +2825,20 @@ const navigate = useNavigate();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
- useEffect(() => {
-  const sectionIds = NAV
-    .filter((n) => n.href.startsWith("#")) // faqat sectionlar
-    .map((n) => n.href.replace("#", ""));
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) setActive(entry.target.id);
-      });
-    },
-    { rootMargin: "-40% 0px -55% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] }
-  );
-
-  sectionIds.forEach((id) => {
-    const el = document.getElementById(id);
-    if (el) observer.observe(el);
-  });
-
-  return () => observer.disconnect();
-}, []);
+  // scrollspy
+  useEffect(() => {
+    const sectionIds = NAV.map((n) => n.href.replace('#', ''));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActive(entry.target.id);
+        });
+      },
+      { rootMargin: "-40% 0px -55% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] }
+    );
+    sectionIds.forEach((id) => { const el = document.getElementById(id); if (el) observer.observe(el); });
+    return () => observer.disconnect();
+  }, []);
 
   // hash anchor smooth align
   useEffect(() => {
