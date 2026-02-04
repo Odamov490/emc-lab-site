@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "title": "Yangi EMC sinov yo‘nalishlari ishga tushdi",
+    "date": "2026-02-01",
+    "summary": "Laboratoriyada IEC 61000-4-3 va 4-6 sinovlari kengaytirildi.",
+    "source": "EMC Lab"
+  },
+  {
+    "id": 2,
+    "title": "Yangi jihoz ESW8 ishga tushirildi",
+    "date": "2026-01-20",
+    "summary": "R&S ESW8 qabul qilgich rasmiy foydalanishga topshirildi.",
+    "source": "EMC Lab"
+  }
+]
