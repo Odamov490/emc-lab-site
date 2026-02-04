@@ -1,6 +1,7 @@
 import os
 import json
 from datetime import datetime
+from pathlib import Path
 from telethon import TelegramClient
 from telethon.sessions import StringSession
 
@@ -10,7 +11,7 @@ SESSION = os.environ["TG_SESSION"]
 CHANNEL = os.environ.get("TG_CHANNEL", "uztestrasmiy")
 
 OUT_FILE = "public/news.json"
-MEDIA_DIR = "public/news_media"
+MEDIA_DIR = Path("public/news_media")
 LIMIT = 30
 
 def fmt_date(dt):
@@ -18,57 +19,56 @@ def fmt_date(dt):
         return None
     return dt.strftime("%Y-%m-%d")
 
-def safe_ext(msg):
-    # msg.file.ext ko‘pincha ".jpg", ".png" bo‘ladi
+def safe_text(s: str) -> str:
+    return (s or "").strip()
+
+async def download_first_photo(client: TelegramClient, msg, channel_username: str):
+    """
+    Returns web path like: /news_media/uztestrasmiy_7653.jpg  or None
+    Handles:
+      - single photo
+      - album (grouped_id): downloads first media message in that group
+    """
+    MEDIA_DIR.mkdir(parents=True, exist_ok=True)
+
+    # album bo'lsa: shu grouped_id bo'yicha eng birinchi media postni topamiz
+    target = msg
+    if getattr(msg, "grouped_id", None):
+        # grouped_id bo'yicha oxirgi 20ta ichidan qidiramiz (yetarli bo'ladi)
+        async for m in client.iter_messages(msg.peer_id, limit=25):
+            if getattr(m, "grouped_id", None) == msg.grouped_id and (m.photo or m.document):
+                target = m
+                break
+
+    if not (target.photo or target.document):
+        return None
+
+    filename = f"{channel_username}_{msg.id}.jpg"
+    file_path = MEDIA_DIR / filename
+
+    # telethon o'zi formatni topib beradi, lekin biz .jpg nom beramiz
     try:
-        ext = msg.file.ext
-        if ext and ext.startswith(".") and len(ext) <= 6:
-            return ext
+        await client.download_media(target, file=str(file_path))
+        if file_path.exists() and file_path.stat().st_size > 0:
+            return f"/news_media/{filename}"
     except Exception:
-        pass
-    return ".jpg"
+        return None
+
+    return None
 
 async def main():
     items = []
-    seen_group = set()
-
-    os.makedirs("public", exist_ok=True)
-    os.makedirs(MEDIA_DIR, exist_ok=True)
 
     async with TelegramClient(StringSession(SESSION), API_ID, API_HASH) as client:
         channel = await client.get_entity(CHANNEL)
 
         async for msg in client.iter_messages(channel, limit=LIMIT):
-            # Album bo‘lsa, bir xil grouped_id ko‘p keladi — dublikatni o‘tkazamiz
-            if msg.grouped_id:
-                if msg.grouped_id in seen_group:
-                    continue
-                seen_group.add(msg.grouped_id)
-
-            text = (msg.message or "").strip()
-
-            # Agar umuman text ham media ham bo‘lmasa — o‘tkazamiz
-            if not text and not msg.media:
+            text = safe_text(msg.message or "")
+            if not text and not (msg.photo or msg.document):
                 continue
 
-            title = (text.split("\n")[0][:120] if text else "Yangilik")
-
-            photo_url = None
-            # Agar rasm/video fayl bo‘lsa, download qilib public ichiga saqlaymiz
-            if msg.media:
-                # rasm bo‘lsa msg.photo bo‘ladi, ba’zan boshqa media ham bo‘lishi mumkin
-                if msg.photo:
-                    ext = safe_ext(msg)
-                    file_name = f"{msg.id}{ext}"
-                    out_path = os.path.join(MEDIA_DIR, file_name)
-
-                    try:
-                        saved = await client.download_media(msg, file=out_path)
-                        if saved:
-                            # sayt ichida ochiladigan yo‘l
-                            photo_url = f"/news_media/{file_name}"
-                    except Exception:
-                        photo_url = None
+            title = text.split("\n")[0][:120] if text else "Yangilik"
+            photo_url = await download_first_photo(client, msg, CHANNEL)
 
             items.append({
                 "tg_id": msg.id,
@@ -81,6 +81,7 @@ async def main():
 
     items.sort(key=lambda x: x["tg_id"], reverse=True)
 
+    os.makedirs("public", exist_ok=True)
     with open(OUT_FILE, "w", encoding="utf-8") as f:
         json.dump(
             {

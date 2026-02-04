@@ -3,7 +3,7 @@ name: Update Telegram News
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/5 * * * *"   # har 5 minutda
+    - cron: "*/5 * * * *"   # har 5 daqiqada
 
 permissions:
   contents: write
@@ -14,8 +14,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -26,7 +24,7 @@ jobs:
         run: |
           pip install telethon
 
-      - name: Fetch news from Telegram (with photos)
+      - name: Fetch news from Telegram
         env:
           TG_API_ID: ${{ secrets.TG_API_ID }}
           TG_API_HASH: ${{ secrets.TG_API_HASH }}
@@ -39,10 +37,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # news.json + rasm papkasi
-          git add public/news.json
-          git add public/news_media || true
-
-          git diff --cached --quiet || git commit -m "Update news.json from Telegram (with photos)"
+          git add public/news.json public/news_media || true
+          git diff --cached --quiet || git commit -m "Update news.json + media from Telegram"
           git push
