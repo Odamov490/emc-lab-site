@@ -14,83 +14,80 @@ MEDIA_DIR = "public/news_media"
 LIMIT = 30
 
 def fmt_date(dt):
-    return dt.strftime("%Y-%m-%d") if dt else None
+    if not dt:
+        return None
+    return dt.strftime("%Y-%m-%d")
 
-def make_photo_url(filename: str) -> str:
-    return f"/news_media/{filename}"
-
-async def pick_photo_message(client, msg, channel_entity):
-    """
-    Qaytaradi: (photo_msg, suffix)
-    - Oddiy post bo'lsa: msg o'zi
-    - Albom bo'lsa: shu albomdagi birinchi media xabar
-    """
-    # Album bo'lsa
-    if getattr(msg, "grouped_id", None):
-        gid = msg.grouped_id
-        # Albomdagi xabarlarni topish uchun biroz ko'proq skan qilamiz
-        candidates = []
-        async for m in client.iter_messages(channel_entity, limit=80):
-            if getattr(m, "grouped_id", None) == gid:
-                # rasm/video bo'lishi mumkin, biz rasmga yaqin media borligini tekshiramiz
-                if m.photo or m.document:
-                    candidates.append(m)
-        # eskidan yangiga tartiblash, birinchisini olamiz
-        if candidates:
-            candidates.sort(key=lambda x: x.id)
-            return candidates[0], f"album_{gid}"
-        return None, None
-
-    # Oddiy post
-    if msg.photo or msg.document:
-        return msg, "single"
-
-    return None, None
+def safe_ext(msg):
+    # msg.file.ext ko‘pincha ".jpg", ".png" bo‘ladi
+    try:
+        ext = msg.file.ext
+        if ext and ext.startswith(".") and len(ext) <= 6:
+            return ext
+    except Exception:
+        pass
+    return ".jpg"
 
 async def main():
     items = []
+    seen_group = set()
+
     os.makedirs("public", exist_ok=True)
     os.makedirs(MEDIA_DIR, exist_ok=True)
 
     async with TelegramClient(StringSession(SESSION), API_ID, API_HASH) as client:
-        channel_entity = await client.get_entity(CHANNEL)
+        channel = await client.get_entity(CHANNEL)
 
-        async for msg in client.iter_messages(channel_entity, limit=LIMIT):
-            if not msg.message:
+        async for msg in client.iter_messages(channel, limit=LIMIT):
+            # Album bo‘lsa, bir xil grouped_id ko‘p keladi — dublikatni o‘tkazamiz
+            if msg.grouped_id:
+                if msg.grouped_id in seen_group:
+                    continue
+                seen_group.add(msg.grouped_id)
+
+            text = (msg.message or "").strip()
+
+            # Agar umuman text ham media ham bo‘lmasa — o‘tkazamiz
+            if not text and not msg.media:
                 continue
 
-            text = msg.message.strip()
-            title = text.split("\n")[0][:120] if text else "Yangilik"
+            title = (text.split("\n")[0][:120] if text else "Yangilik")
 
-            photo_path = None
+            photo_url = None
+            # Agar rasm/video fayl bo‘lsa, download qilib public ichiga saqlaymiz
+            if msg.media:
+                # rasm bo‘lsa msg.photo bo‘ladi, ba’zan boshqa media ham bo‘lishi mumkin
+                if msg.photo:
+                    ext = safe_ext(msg)
+                    file_name = f"{msg.id}{ext}"
+                    out_path = os.path.join(MEDIA_DIR, file_name)
 
-            photo_msg, suffix = await pick_photo_message(client, msg, channel_entity)
-
-            # ✅ Rasmni yuklash (photo yoki document ichidan ham chiqadi)
-            if photo_msg:
-                filename = f"{CHANNEL}_{msg.id}_{suffix}.jpg"
-                save_to = os.path.join(MEDIA_DIR, filename)
-                try:
-                    await client.download_media(photo_msg, file=save_to)
-                    if os.path.exists(save_to) and os.path.getsize(save_to) > 0:
-                        photo_path = make_photo_url(filename)
-                except Exception:
-                    photo_path = None
+                    try:
+                        saved = await client.download_media(msg, file=out_path)
+                        if saved:
+                            # sayt ichida ochiladigan yo‘l
+                            photo_url = f"/news_media/{file_name}"
+                    except Exception:
+                        photo_url = None
 
             items.append({
                 "tg_id": msg.id,
                 "date": fmt_date(msg.date),
-                "title": title,
+                "title": title or "Yangilik",
                 "text": text,
                 "url": f"https://t.me/{CHANNEL}/{msg.id}",
-                "photo": photo_path
+                "photo": photo_url
             })
 
     items.sort(key=lambda x: x["tg_id"], reverse=True)
 
     with open(OUT_FILE, "w", encoding="utf-8") as f:
         json.dump(
-            {"ok": True, "updated_at": datetime.utcnow().isoformat() + "Z", "items": items},
+            {
+                "ok": True,
+                "updated_at": datetime.utcnow().isoformat() + "Z",
+                "items": items
+            },
             f,
             ensure_ascii=False,
             indent=2
