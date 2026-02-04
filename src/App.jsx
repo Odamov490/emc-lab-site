@@ -2907,7 +2907,7 @@ useEffect(() => {
               <span className="font-semibold">EMC Lab</span>
             </a>
 
-            <nav className="hidden md:flex items-center gap-7">
+            <nav className="hidden md:flex items-center gap-10">
               {NAV.map((n) => (
                 <a
                   key={n.href}
