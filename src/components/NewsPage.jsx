@@ -18,8 +18,10 @@ export default function NewsPage() {
         setLoading(true);
         setErr("");
 
+        // 1) Asosiy: Vercel/Static
         let res = await fetch("/news.json", { cache: "no-store" });
 
+        // 2) Fallback: GitHub raw
         if (!res.ok) {
           res = await fetch(FALLBACK_RAW, { cache: "no-store" });
         }
@@ -29,7 +31,16 @@ export default function NewsPage() {
         const data = await res.json();
         if (!alive) return;
 
-        setItems(Array.isArray(data) ? data : []);
+        // ✅ Ikkala formatni ham qo‘llab-quvvatlaymiz:
+        // A) { ok:true, items:[...] }
+        // B) [ ... ]
+        const list = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.items)
+          ? data.items
+          : [];
+
+        setItems(list);
       } catch (e) {
         if (!alive) return;
         setErr("Yangiliklarni olishda xatolik (news.json topilmadi yoki format xato).");
