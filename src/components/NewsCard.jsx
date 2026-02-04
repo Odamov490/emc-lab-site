@@ -1,84 +1,89 @@
-// src/components/NewsCard.jsx
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 
-function formatDate(dateStr) {
-  if (!dateStr) return "";
+function formatDate(d) {
+  if (!d) return "";
   try {
-    // dateStr: "2026-02-04"
-    const d = new Date(dateStr);
-    return new Intl.DateTimeFormat("uz-UZ", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(d);
+    // d = "2026-02-04" yoki ISO bo‘lishi mumkin
+    const dt = new Date(d);
+    if (Number.isNaN(dt.getTime())) return String(d);
+    return dt.toLocaleDateString();
   } catch {
-    return dateStr;
+    return String(d);
   }
 }
 
+function stripLinks(text = "") {
+  // pastdagi "➡️ Telegram | Web-sayt | ..." kabi qatorlarni yengillashtirish
+  return text
+    .replace(/➡️[\s\S]*$/m, "") // oxiridagi promo qatorlarni olib tashlaydi
+    .trim();
+}
+
 export default function NewsCard({ item }) {
-  const dateText = useMemo(() => formatDate(item?.date), [item?.date]);
+  const [open, setOpen] = useState(false);
+
+  const dateStr = useMemo(() => formatDate(item?.date), [item?.date]);
 
   const title = (item?.title || "").trim();
-  const text = (item?.text || "").trim();
-  const url = item?.url || item?.link || "";
+  const textFull = stripLinks(item?.text || "");
+  const textShort =
+    textFull.length > 180 ? textFull.slice(0, 180).trim() + "…" : textFull;
+
   const photo = item?.photo || null;
+  const tgUrl = item?.url || item?.link || null;
 
   return (
-    <article className="group rounded-2xl border bg-white overflow-hidden shadow-sm transition hover:shadow-lg hover:-translate-y-0.5">
-      {/* Photo */}
+    <article className="rounded-[26px] overflow-hidden shadow-sm border border-black/5 bg-gradient-to-br from-[#0a7bb6] to-[#0a6aa0] text-white">
+      {/* TOP: image */}
       {photo ? (
-        <div className="relative w-full aspect-[16/10] bg-black/5 overflow-hidden">
+        <div className="w-full aspect-[16/10] bg-black/15">
           <img
             src={photo}
-            alt={title || "news"}
-            className="w-full h-full object-cover transition duration-300 group-hover:scale-[1.03]"
+            alt={title || "News"}
+            className="w-full h-full object-cover"
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/0 to-black/0" />
-          {dateText ? (
-            <div className="absolute left-3 top-3 text-xs px-2 py-1 rounded-full bg-white/90 backdrop-blur border border-white/60">
-              {dateText}
-            </div>
-          ) : null}
         </div>
       ) : (
-        <div className="relative w-full aspect-[16/10] bg-gradient-to-br from-black/[0.04] to-black/[0.08]">
-          {dateText ? (
-            <div className="absolute left-3 top-3 text-xs px-2 py-1 rounded-full bg-white/90 backdrop-blur border border-white/60">
-              {dateText}
-            </div>
-          ) : null}
-        </div>
+        <div className="w-full aspect-[16/10] bg-white/10" />
       )}
 
-      {/* Body */}
-      <div className="p-4">
-        {title ? (
-          <h3 className="font-semibold leading-snug text-[15px] line-clamp-2">
-            {title}
-          </h3>
-        ) : null}
+      {/* CONTENT */}
+      <div className="p-6 space-y-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="text-xs text-white/80">{dateStr}</div>
 
-        {text ? (
-          <p className="mt-2 text-sm text-black/70 leading-relaxed line-clamp-4 whitespace-pre-wrap">
-            {text}
-          </p>
-        ) : null}
-
-        <div className="mt-4 flex items-center justify-between gap-3">
-          <div className="text-xs text-black/45">
-            {item?.tg_id ? `#${item.tg_id}` : ""}
+          {/* Badge (xuddi standart badge kabi) */}
+          <div className="shrink-0 px-3 py-1 rounded-full bg-white text-[#0a6aa0] text-[11px] font-semibold">
+            Telegram
           </div>
+        </div>
 
-          {url ? (
+        <h3 className="font-semibold leading-snug text-[15px] md:text-[16px]">
+          {title || "Yangilik"}
+        </h3>
+
+        <p className="text-sm text-white/90 leading-relaxed">
+          {open ? textFull : textShort}
+        </p>
+
+        <div className="flex items-center gap-3 pt-2">
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            className="inline-flex items-center justify-center rounded-full bg-white text-[#0a6aa0] px-4 py-2 text-sm font-semibold hover:bg-white/95 active:scale-[0.99]"
+          >
+            {open ? "Yopish" : "Batafsil"}
+          </button>
+
+          {tgUrl ? (
             <a
-              href={url}
+              className="text-sm underline text-white/90 hover:text-white"
+              href={tgUrl}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 text-sm font-medium px-3 py-1.5 rounded-xl border bg-white hover:bg-black/5 transition"
             >
-              Telegram’da ochish <span aria-hidden>→</span>
+              Telegram’da ochish →
             </a>
           ) : null}
         </div>
