@@ -4,6 +4,9 @@ import SinovDasturlari from "./components/SinovDasturlari";
 import Login from "./pages/Login"; // login sahifang
  // asosiy sahifa
  import { Routes, Route, useNavigate } from "react-router-dom";
+ import NewsPage from "./components/NewsPage";
+import NewsPage from "./components/NewsPage";
+
 
 /********************* CONFIG *********************/
 const NAV = [
@@ -15,6 +18,7 @@ const NAV = [
   { href: "#excursion", label: { uz: "Ekskursiya", ru: "Экскурсия" } },
   { href: "#team", label: { uz: "Jamoa", ru: "Команда" } },
   { href: "#pricing", label: { uz: "Narxlar", ru: "Цены" } },
+   { href: "/news", label: { uz: "Yangiliklar", ru: "Новости" } },
   { href: "#contact", label: { uz: "Bog‘lanish", ru: "Контакты" } },
 ];
 
@@ -2821,20 +2825,27 @@ const navigate = useNavigate();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // scrollspy
-  useEffect(() => {
-    const sectionIds = NAV.map((n) => n.href.replace('#', ''));
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActive(entry.target.id);
-        });
-      },
-      { rootMargin: "-40% 0px -55% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] }
-    );
-    sectionIds.forEach((id) => { const el = document.getElementById(id); if (el) observer.observe(el); });
-    return () => observer.disconnect();
-  }, []);
+ useEffect(() => {
+  const sectionIds = NAV
+    .filter((n) => n.href.startsWith("#")) // faqat sectionlar
+    .map((n) => n.href.replace("#", ""));
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) setActive(entry.target.id);
+      });
+    },
+    { rootMargin: "-40% 0px -55% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] }
+  );
+
+  sectionIds.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el);
+  });
+
+  return () => observer.disconnect();
+}, []);
 
   // hash anchor smooth align
   useEffect(() => {
@@ -3501,10 +3512,9 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<EMCLabUltra />} />
+      <Route path="/news" element={<NewsPage />} />
       <Route path="/login" element={<Login />} />
-<Route path="/sinov-dasturlari" element={<SinovDasturlari />} />
-
+      <Route path="/sinov-dasturlari" element={<SinovDasturlari />} />
     </Routes>
-    
   );
 }
