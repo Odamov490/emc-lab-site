@@ -2885,7 +2885,12 @@ const navigate = useNavigate();
               onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
               className="flex items_center gap-3"
             >
-              <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-400 ring-2 ring-white/60" aria-hidden />
+            <img
+  src="/favicon.png"
+  alt="EMC Lab"
+  className="h-9 w-9 rounded-2xl object-cover ring-2 ring-white/60"
+/>
+
               <span className="font-semibold">EMC Lab</span>
             </a>
 
