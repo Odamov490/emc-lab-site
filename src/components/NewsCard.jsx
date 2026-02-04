@@ -1,34 +1,48 @@
 import React from "react";
 
 export default function NewsCard({ item }) {
+  const link = item.link || item.url; // ✅ telegram link
   return (
-    <article className="rounded-2xl border overflow-hidden bg-white/50">
+    <article className="rounded-2xl border overflow-hidden bg-white/60 hover:shadow transition">
+      {/* RASM */}
       {item.photo ? (
         <div className="w-full aspect-[16/10] bg-black/5">
           <img
             src={item.photo}
-            alt=""
+            alt={item.title || "Yangilik rasmi"}
             className="w-full h-full object-cover"
             loading="lazy"
           />
         </div>
       ) : null}
 
-      <div className="p-4 space-y-2">
-        <div className="text-xs opacity-60">
-          {item.date ? new Date(item.date).toLocaleString() : ""}
-        </div>
+      <div className="p-4 space-y-3">
+        {/* SANA */}
+        {item.date ? (
+          <div className="text-xs opacity-60">
+            {new Date(item.date).toLocaleDateString("uz-UZ")}
+          </div>
+        ) : null}
 
+        {/* SARLAVHA */}
+        {item.title ? (
+          <h3 className="font-semibold leading-snug">
+            {item.title}
+          </h3>
+        ) : null}
+
+        {/* MATN */}
         {item.text ? (
-          <div className="text-sm leading-relaxed whitespace-pre-wrap">
+          <div className="text-sm leading-relaxed whitespace-pre-wrap line-clamp-5">
             {item.text}
           </div>
         ) : null}
 
-        {item.link ? (
+        {/* TELEGRAM LINK */}
+        {link ? (
           <a
-            className="text-sm underline opacity-80 hover:opacity-100"
-            href={item.link}
+            className="inline-block text-sm underline opacity-80 hover:opacity-100"
+            href={link}
             target="_blank"
             rel="noreferrer"
           >

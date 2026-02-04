@@ -3,7 +3,7 @@ name: Update Telegram News
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/5 * * * *"   # har 5 daqiqada
+    - cron: "*/30 * * * *"   # har 30 daqiqada
 
 permissions:
   contents: write
