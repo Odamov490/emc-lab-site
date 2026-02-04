@@ -2,6 +2,9 @@
 import React, { useEffect, useState } from "react";
 import NewsCard from "./NewsCard";
 
+const FALLBACK_RAW =
+  "https://raw.githubusercontent.com/Odamov490/emc-lab-site/refs/heads/main/public/news.json";
+
 export default function NewsPage() {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
@@ -15,9 +18,13 @@ export default function NewsPage() {
         setLoading(true);
         setErr("");
 
-        // Static JSON (GitHub Actions yangilab turadi)
-        const res = await fetch("/news.json", { cache: "no-store" });
-        if (!res.ok) throw new Error("news.json topilmadi");
+        let res = await fetch("/news.json", { cache: "no-store" });
+
+        if (!res.ok) {
+          res = await fetch(FALLBACK_RAW, { cache: "no-store" });
+        }
+
+        if (!res.ok) throw new Error("News fetch failed");
 
         const data = await res.json();
         if (!alive) return;
@@ -25,7 +32,7 @@ export default function NewsPage() {
         setItems(Array.isArray(data) ? data : []);
       } catch (e) {
         if (!alive) return;
-        setErr("Yangiliklarni olishda xatolik (news.json)");
+        setErr("Yangiliklarni olishda xatolik (news.json topilmadi yoki format xato).");
         setItems([]);
       } finally {
         if (!alive) return;
@@ -43,7 +50,7 @@ export default function NewsPage() {
     <main className="max-w-6xl mx-auto px-4 py-10">
       <h1 className="text-3xl font-bold">Yangiliklar</h1>
       <p className="text-sm opacity-70 mt-2">
-        Telegram kanalidan avtomatik yangilanadi
+        Press-relizlar va e’lonlar (Telegram → GitHub Actions → news.json)
       </p>
 
       {loading ? (
@@ -62,8 +69,8 @@ export default function NewsPage() {
         </div>
       ) : (
         <div className="grid md:grid-cols-3 gap-6 mt-8">
-          {items.map((item) => (
-            <NewsCard key={item.tg_id || item.id} item={item} />
+          {items.map((item, idx) => (
+            <NewsCard key={item.tg_id || item.id || idx} item={item} />
           ))}
         </div>
       )}
