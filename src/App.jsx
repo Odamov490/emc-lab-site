@@ -2887,7 +2887,6 @@ const navigate = useNavigate();
             >
              <img
   src="/favicon.png"
-  alt="EMC Lab"
   className="h-9 w-9 rounded-2xl object-cover ring-2 ring-white/60"
 />
 
