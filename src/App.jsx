@@ -2893,7 +2893,7 @@ const navigate = useNavigate();
 
               <span className="font-semibold">EMC Lab</span>
             </a>
-s
+
             <nav className="hidden md:flex items-center gap-7">
               {NAV.map((n) => (
                 <a
