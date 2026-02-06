@@ -22,7 +22,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install telethon
+          python -m pip install --upgrade pip
+          pip install telethon requests python-dotenv
 
       - name: Fetch news from Telegram (with media)
         env:
