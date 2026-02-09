@@ -1,102 +1,92 @@
 import React, { useEffect, useMemo, useState } from "react";
-import NewsCard from "./NewsCard";
+import NewsCard from "../components/NewsCard";
 
-function fmtUpdated(iso) {
-  if (!iso) return "";
+function fmtUpdatedAt(s) {
+  if (!s) return "";
   try {
-    const d = new Date(iso);
-    // Uzbek formatga yaqin: DD.MM.YYYY, HH:MM
-    const dd = String(d.getDate()).padStart(2, "0");
-    const mm = String(d.getMonth() + 1).padStart(2, "0");
-    const yy = d.getFullYear();
-    const hh = String(d.getHours()).padStart(2, "0");
-    const mi = String(d.getMinutes()).padStart(2, "0");
-    return `${dd}.${mm}.${yy}, ${hh}:${mi}`;
+    const d = new Date(s);
+    if (Number.isNaN(d.getTime())) return String(s);
+    return d.toLocaleString();
   } catch {
-    return "";
+    return String(s);
   }
 }
 
-export default function NewsPage() {
-  const [loading, setLoading] = useState(true);
-  const [items, setItems] = useState([]);
-  const [updatedAt, setUpdatedAt] = useState("");
+export default function News() {
+  const [data, setData] = useState(null);
+  const [q, setQ] = useState("");
   const [err, setErr] = useState("");
 
   useEffect(() => {
     let alive = true;
 
-    async function run() {
+    (async () => {
       try {
-        setLoading(true);
         setErr("");
-
-        let res = await fetch("/news.json", { cache: "no-store" });
-
-        // fallback (agar kerak bo'lsa)
-        if (!res.ok) {
-          res = await fetch(
-            "https://raw.githubusercontent.com/Odamov490/emc-lab-site/main/public/news.json",
-            { cache: "no-store" }
-          );
-        }
-
-        if (!res.ok) throw new Error("News fetch failed");
-        const data = await res.json();
-
+        const res = await fetch("/news.json", { cache: "no-store" });
+        if (!res.ok) throw new Error("news.json yuklanmadi");
+        const js = await res.json();
         if (!alive) return;
-
-        const list = Array.isArray(data?.items) ? data.items : [];
-        setItems(list);
-        setUpdatedAt(data?.updated_at || "");
+        setData(js);
       } catch (e) {
         if (!alive) return;
-        setErr("Yangiliklarni olishda xatolik (news.json topilmadi yoki format xato).");
-        setItems([]);
-        setUpdatedAt("");
-      } finally {
-        if (!alive) return;
-        setLoading(false);
+        setErr(String(e?.message || e));
       }
-    }
+    })();
 
-    run();
     return () => {
       alive = false;
     };
   }, []);
 
-  const updatedLabel = useMemo(() => fmtUpdated(updatedAt), [updatedAt]);
+  const items = Array.isArray(data?.items) ? data.items : [];
+
+  const filtered = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    if (!s) return items;
+    return items.filter((it) => {
+      const t = `${it?.title || ""}\n${it?.text || ""}`.toLowerCase();
+      return t.includes(s);
+    });
+  }, [items, q]);
 
   return (
-    <main className="max-w-6xl mx-auto px-4 py-10">
-      <h1 className="text-4xl font-extrabold tracking-tight">Yangiliklar</h1>
-      <p className="text-sm opacity-70 mt-2">
-      
-        {updatedLabel ? ` • Yangilandi: ${updatedLabel}` : ""}
-      </p>
-
-      {loading ? (
-        <div className="mt-10 rounded-2xl border p-6">Yuklanmoqda...</div>
-      ) : err ? (
-        <div className="mt-10 rounded-2xl border p-6">
-          <div className="font-semibold">Xatolik</div>
-          <div className="text-sm opacity-70 mt-2">{err}</div>
-        </div>
-      ) : items.length === 0 ? (
-        <div className="mt-10 rounded-2xl border p-6">
-          <div className="font-semibold">Hozircha yangiliklar yo‘q</div>
-          <div className="text-sm opacity-70 mt-2">
-            Tez orada yangiliklar shu yerda chiqadi.
+    <main className="max-w-6xl mx-auto px-4 md:px-6 py-10">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+            Yangiliklar
+          </h1>
+          <div className="mt-2 text-sm opacity-70">
+            • Yangilandi: {fmtUpdatedAt(data?.updated_at)}
           </div>
         </div>
-      ) : (
-        <div className="grid md:grid-cols-3 gap-8 mt-10">
-          {items.map((item, idx) => (
-            <NewsCard key={item?.tg_id || idx} item={item} />
-          ))}
+
+        <div className="w-full md:w-[360px]">
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Qidirish (sarlavha yoki matn)..."
+            className="w-full rounded-2xl border border-black/10 bg-white/70 px-4 py-3 outline-none focus:ring-2 focus:ring-black/10"
+          />
         </div>
-      )}
+      </div>
+
+      {err ? (
+        <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 text-red-800 p-4">
+          Xatolik: {err}
+        </div>
+      ) : null}
+
+      <section className="mt-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {filtered.map((item) => (
+          <NewsCard key={item?.tg_id || item?.url || Math.random()} item={item} />
+        ))}
+      </section>
+
+      {!err && data && filtered.length === 0 ? (
+        <div className="mt-10 opacity-70">Hech narsa topilmadi.</div>
+      ) : null}
     </main>
   );
 }
