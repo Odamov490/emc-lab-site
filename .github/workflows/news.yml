@@ -23,15 +23,14 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install telethon
+          pip install telethon python-dotenv
 
-      - name: Fetch news from Telegram (with media)
+      - name: Fetch news from Telegram (Telethon + media)
         env:
           TG_API_ID: ${{ secrets.TG_API_ID }}
           TG_API_HASH: ${{ secrets.TG_API_HASH }}
           TG_SESSION: ${{ secrets.TG_SESSION }}
           TG_CHANNEL: ${{ secrets.TG_CHANNEL }}
-          TG_LIMIT: "30"
         run: |
           python scripts/fetch_telegram_news.py
 
