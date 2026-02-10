@@ -1,17 +1,11 @@
 {
-  "tg_id": 7653,
-  "date": "2026-02-04",
-  "title": {
-    "uz": "UzTest DM xodimlari uchun ...",
-    "ru": "Для сотрудников UzTest DM ..."
-  },
-  "text": {
-    "uz": "Asl telegram matni...",
-    "ru": "Перевод на русский..."
-  },
-  "url": "https://t.me/uztestrasmiy/7653",
-  "photos": [
-    "/news_media/7653_1.jpg",
-    "/news_media/7653_2.jpg"
-  ]
+  "tg_id": 7644,
+  "date": "2026-02-03",
+  "title": "Uzbek sarlavha",
+  "text": "Uzbek matn...",
+  "title_ru": "Русский заголовок",
+  "text_ru": "Русский текст...",
+  "url": "https://t.me/uztestrasmiy/7644",
+  "photos": ["/news_media/7644.jpg", "/news_media/7645.jpg"],
+  "photo": "/news_media/7644.jpg"
 }
