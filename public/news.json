@@ -1,19 +1,17 @@
 {
-  "ok": true,
-
-  "updated_at": "2026-02-10T11:32:31.434059Z",
-  "items": [
-    {
-      "tg_id": 7683,
-      "grouped_id": 14165750175587858,
-      "date": "2026-02-10",
-      "title": "“UzTest” DM Olmaliq filiali va \"Jurabek Laboratories\" hamkorlik aloqalarini kengaytirmoqda",
-      "text": "“UzTest” DM Olmaliq filiali va \"Jurabek Laboratories\" hamkorlik aloqalarini kengaytirmoqda\n\n“UzTest” DM Olmaliq filiali xodimlari va «Jurabek Laboratories» MCHJ QK mutaxassislari o‘rtasida amaliy hamkorlik doirasida ishlab chiqarish jarayonlarini o‘rganish, mahsulotlar sifat nazoratini kuchaytirish va zamonaviy texnologik uskunalardan samarali foydalanishga qaratilgan ishlar olib borilmoqda.\n\nShuningdek, korxona vakillariga muvofiqlik baholash yo‘nalishida amalga oshirilayotgan ishlar, tadbirkorlik sub'ektlariga yaratilayotgan imkoniyatlar, filialda ko‘rsatilayotgan xizmatlar hamda sifatni boshqarish tizimini joriy etish masalalari bo‘yicha tushunchalar berildi.\n\nKelgusida hamkorlikni yanada rivojlantirish bo‘yicha kelishuvlar amalga oshirildi.\n\n➡️ Telegram | Web-sayt | Instagram | Facebook | YouTube",
-      "url": "https://t.me/uztestrasmiy/7683",
-      "photos": [
-        "/news_media/7683.jpg",
-        "/news_media/7682.jpg"
-      ]
-    }
+  "tg_id": 7653,
+  "date": "2026-02-04",
+  "title": {
+    "uz": "UzTest DM xodimlari uchun ...",
+    "ru": "Для сотрудников UzTest DM ..."
+  },
+  "text": {
+    "uz": "Asl telegram matni...",
+    "ru": "Перевод на русский..."
+  },
+  "url": "https://t.me/uztestrasmiy/7653",
+  "photos": [
+    "/news_media/7653_1.jpg",
+    "/news_media/7653_2.jpg"
   ]
 }
