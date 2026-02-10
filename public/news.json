@@ -1,5 +1,6 @@
 {
   "ok": true,
+<<<<<<< HEAD
   "updated_at": "2026-02-10T11:32:31.434059Z",
   "items": [
     {
@@ -122,39 +123,26 @@
     {
       "tg_id": 7655,
       "grouped_id": 14161594770303810,
+=======
+  "updated_at": "2026-02-09T06:05:00Z",
+  "items": [
+    {
+      "tg_id": 14161594770303810,
+>>>>>>> 092d8a6 (Yangilandi)
       "date": "2026-02-04",
-      "title": "“UzTest” DM xodimlari uchun davlat tilida ish yuritish bo‘yicha malaka oshirish kurslari boshlandi",
-      "text": "“UzTest” DM xodimlari uchun davlat tilida ish yuritish bo‘yicha malaka oshirish kurslari boshlandi\n\nJoriy yilning 2-fevraldan 27-fevralga qadar “UzTest” davlat muassasasi rahbarlari, laboratoriya va bo‘lim boshliqlari hamda hududiy filial rahbarlari uchun Toshkent davlat o‘zbek tili va adabiyoti universiteti huzuridagi Davlat tilida ish yuritish asoslarini o‘qitish va malaka oshirish markazi tomonidan masofaviy onlayn shaklda o‘zbek adabiy tili me’yorlari hamda davlat tilida ish yuritish yo‘nalishida qisqa muddatli malaka oshirish o‘quv kurslari boshlandi. \n\nKurslar davomida tinglovchilarga o‘zbek adabiy tili me’yorlariga amal qilish, rasmiy hujjatlarni davlat tilida to‘g‘ri va aniq rasmiylashtirish, xizmat yozishmalari, buyruq va farmoyishlar bilan ishlash tartibi bo‘yicha nazariy va amaliy mashg‘ulotlar olib borilmoqda.\n\n➡️ Telegram | Web-sayt | Instagram | Facebook | YouTube",
-      "url": "https://t.me/uztestrasmiy/7655",
-      "photos": [
-        "/news_media/7655.jpg",
-        "/news_media/7654.jpg",
-        "/news_media/7653.jpg"
-      ]
+      "title": "Yangilik sarlavhasi",
+      "text": "Post matni (to‘liq)...",
+      "url": "https://t.me/uztestrasmiy/7653",
+      "photo": "/news_media/14161594770303810.jpg"
     },
     {
-      "tg_id": 7652,
-      "grouped_id": 14161512996880594,
-      "date": "2026-02-04",
-      "title": "“UzTest” DM Surxondaryo filiali “Yashil makon” loyihasi doirasida ko‘kalamzorlashtirish ishlarini olib bormoqda",
-      "text": "“UzTest” DM Surxondaryo filiali “Yashil makon” loyihasi doirasida ko‘kalamzorlashtirish ishlarini olib bormoqda\n\n“Yashil makon” umummilliy loyihasini kengaytirish doirasida ekologik vaziyatni barqarorlashtirishga qaratilgan belgilangan vazifalarni samarali tashkil etish hamda 2025-yil kuz mavsumida ko‘kalamzorlashtirish, manzarali, mevali va buta ko‘chatlarini ekish tadbirlari tizimli va uyushqoqlik bilan tashkil etilmoqda.\n\n“2025–2026-yillarda “Yashil makon” umummilliy loyihasi doirasida respublika hududlarida daraxt va buta ko‘chatlarini ekish ishlarini samarali tashkil etish chora-tadbirlari to‘g‘risida”gi 2025-yil 4-noyabrdagi 66-sonli majlis bayoni hamda Surxondaryo viloyati hokimining 2025-yil 27-oktabrdagi 259-8-0-F/25-sonli farmoyishiga muvofiq, “UzTest” DM Surxondaryo filiali xodimlari tomonidan belgilangan vazifalar ijrosini ta’minlash maqsadida ko‘kalamzorlashtirish tadbirlariga mas’uliyat bilan yondashilib, atrof-muhitni muhofaza qilish va yashil hududlar maydonini kengaytirishga qaratilgan amaliy ishlar olib borilmoqda.\n\n➡️ Telegram | Web-sayt | Instagram | Facebook | YouTube",
-      "url": "https://t.me/uztestrasmiy/7652",
-      "photos": [
-        "/news_media/7652.jpg",
-        "/news_media/7651.jpg",
-        "/news_media/7650.jpg",
-        "/news_media/7649.jpg",
-        "/news_media/7648.jpg"
-      ]
-    },
-    {
-      "tg_id": 7647,
-      "grouped_id": 14161031733887082,
+      "tg_id": 14161031733887082,
       "date": "2026-02-03",
-      "title": "“UzTest” DM Sinov laboratoriyalari majmuasida ilmiy faoliyatni rivojlantirishga qaratilgan uchrashuv bo‘lib o‘tdi",
-      "text": "“UzTest” DM Sinov laboratoriyalari majmuasida ilmiy faoliyatni rivojlantirishga qaratilgan uchrashuv bo‘lib o‘tdi\n\nO‘zbekiston texnik jihatdan tartibga solish agentligi direktori maslahatchisi, professor Mamadaliyeva Noibaxon Saidaminovna “UzTest” DM Sinov laboratoriyalari majmuasida laboratoriya xodimlari bilan uchrashuv o‘tkazdi.\n\nUchrashuv davomida laboratoriyada faoliyat yuritayotgan mutaxassislar, ayniqsa ilmiy-tadqiqot ishlarini boshlash istagida bo‘lgan xodimlar bilan ochiq va samimiy muloqot tashkil etildi. Suhbat jarayonida sinov natijalarini ilmiy jihatdan asoslash, ularni tahlil qilish, amaliy tajribalarni ilmiy maqola va ishlanmalar ko‘rinishida rasmiylashtirish, shuningdek ilmiy faoliyatni tizimli yo‘lga qo‘yish masalalari yuzasidan batafsil tavsiyalar berildi.\n\nShuningdek, laboratoriyaning moddiy-texnik bazasi, olib borilayotgan sinov ishlari hamda amaliy jarayonlar bilan yaqindan tanishilib, faoliyat samaradorligini yanada oshirish bo‘yicha fikr almashildi.\n\n➡️ Telegram | Web-sayt | Instagram | Facebook | YouTube",
-      "url": "https://t.me/uztestrasmiy/7647",
+      "title": "Album bo‘lgan post",
+      "text": "Album post matni...",
+      "url": "https://t.me/uztestrasmiy/7644",
       "photos": [
+<<<<<<< HEAD
         "/news_media/7647.jpg",
         "/news_media/7646.jpg",
         "/news_media/7645.jpg",
@@ -217,6 +205,11 @@
         "/news_media/7636.jpg",
         "/news_media/7635.jpg",
         "/news_media/7634.jpg"
+=======
+        "/news_media/14161031733887082.jpg",
+        "/news_media/14161031733887082_2.jpg",
+        "/news_media/14161031733887082_3.jpg"
+>>>>>>> 092d8a6 (Yangilandi)
       ]
     }
   ]
