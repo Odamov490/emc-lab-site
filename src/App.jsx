@@ -2879,7 +2879,7 @@ useEffect(() => {
         <div className="border-b border-black/10 dark:border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur">
           <div className="mx-auto max-w-7xl px-4 py-2 flex items-center justify-between text-xs">
             <div className="flex items-center gap-2">
-             <Badge>O‘zbekiston ilmiy-sinov va sifat nazorati markazi (UzTest) davlat muassasasi</Badge>
+           //  <Badge>O‘zbekiston ilmiy-sinov va sifat nazorati markazi (UzTest) davlat muassasasi</Badge>
               {/*  <Badge>ISO/IEC 17025</Badge>
               <Badge>ILAC – G8</Badge> */}
             </div>
