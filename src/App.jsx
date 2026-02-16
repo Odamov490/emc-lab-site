@@ -2880,9 +2880,7 @@ useEffect(() => {
           <div className="mx-auto max-w-7xl px-4 py-2 flex items-center justify-between text-xs">
           <div className="w-full overflow-hidden bg-yellow-50 border border-yellow-300 rounded-xl">
   <div className="whitespace-nowrap animate-marquee py-2 text-sm text-yellow-800 font-medium">
-    ⚠️ Sayt hozir TEST rejimida ishlamoqda. Ushbu platforma hozircha hech qanday tashkilotga rasman tegishli emas. 
-    Undagi ma'lumotlar doimiy (konstanta) emas va istalgan vaqtda o‘zgartirilishi mumkin. 
-    Foydalanishda ehtiyot bo‘ling.
+   ⚠️Sayt hozir TEST rejimida ishlamoqda. Ushbu platforma hozircha hech qanday tashkilotga rasman tegishli emas. Saytda joylashtirilgan ma’lumotlar sinov xarakteriga ega bo‘lib, istalgan vaqtda yangilanishi yoki o‘zgartirilishi mumkin.
   </div>
 </div>
 
