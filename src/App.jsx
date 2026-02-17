@@ -2974,7 +2974,7 @@ useEffect(() => {
                     : "ESD, EFT/B, Surge, RF иммунитет, мерцание, гармоники и измерения помех. В рамках аккредитации Oʼz DSt ISO/IEC 17025:2019."}
                 </p>
                 <div className="mt-6 flex flex-col xs:flex-row sm:flex-row items-start sm:items-center gap-3">
-                  <a href="#services" className="rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm font-medium shadow hover:shadow-md">
+                  <a className="rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm font-medium shadow hover:shadow-md">
                     {lang==="uz" ? "Xizmatlarni ko‘rish" : "Смотреть услуги"}
                   </a>
                   <a href="#contact" className="rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm font-medium shadow hover:shadow-md">
