@@ -2977,7 +2977,7 @@ useEffect(() => {
 
   {/* EMC Akademiyasi – Primary */}
   <a 
-    href="https://academy.emclab.uz/"
+   // href="https://academy.emclab.uz/"
     target="_blank"
     rel="noopener noreferrer"
     className="
