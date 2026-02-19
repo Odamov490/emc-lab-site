@@ -2973,48 +2973,66 @@ useEffect(() => {
                     ? "ESD, EFT/B, Surge, RF immunitet, Flicker, Garmonik va emissiya o‘lchovlari. Oʼz DSt ISO/IEC 17025:2019 akkreditatsiya doirasida."
                     : "ESD, EFT/B, Surge, RF иммунитет, мерцание, гармоники и измерения помех. В рамках аккредитации Oʼz DSt ISO/IEC 17025:2019."}
                 </p>
-                <div className="mt-6 flex flex-col xs:flex-row sm:flex-row items-start sm:items-center gap-3">
-              <a 
-  href="https://academy.emclab.uz/"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="
-    relative inline-flex items-center justify-center
-    px-6 py-3
-    text-sm font-semibold
-    text-white
-    rounded-2xl
-    overflow-hidden
-    bg-gradient-to-r from-sky-600 via-cyan-500 to-blue-600
-    bg-[length:200%_200%]
-    shadow-lg
-    transition-all duration-500
-    hover:scale-105
-    hover:shadow-2xl
-    hover:bg-[position:100%_0]
-  "
->
-  <span className="relative z-10">
-    {lang === "uz" ? "EMC Akademiyasi" : "Академия EMC"}
-  </span>
+            <div className="mt-6 flex flex-col xs:flex-row sm:flex-row items-start sm:items-center gap-3">
 
-  {/* Shine Effect */}
-  <span className="
-    absolute top-0 left-[-75%]
-    w-1/2 h-full
-    bg-white/20
-    skew-x-12
-    transition-all duration-700
-    group-hover:left-[125%]
-  "></span>
-</a>
+  {/* EMC Akademiyasi – Primary */}
+  <a 
+    href="https://academy.emclab.uz/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="
+      group relative inline-flex items-center justify-center
+      px-6 py-3
+      text-sm font-semibold
+      text-white
+      rounded-2xl
+      overflow-hidden
+      bg-gradient-to-r from-sky-600 via-cyan-500 to-blue-600
+      bg-[length:200%_200%]
+      shadow-lg
+      transition-all duration-500
+      hover:scale-105
+      hover:shadow-2xl
+      hover:bg-[position:100%_0]
+    "
+  >
+    <span className="relative z-10">
+      {lang === "uz" ? "EMC Akademiyasi" : "Академия EMC"}
+    </span>
 
+    <span className="
+      absolute top-0 left-[-75%]
+      w-1/2 h-full
+      bg-white/20
+      skew-x-12
+      transition-all duration-700
+      group-hover:left-[125%]
+    "></span>
+  </a>
 
-                 
-                  <a href="#contact" className="rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-4 py-2 text-sm font-medium shadow hover:shadow-md">
-                    {lang==="uz" ? "Ariza qoldirish" : "Оставить заявку"}
-                  </a>
-                </div>
+  {/* Ariza qoldirish – Action (Green) */}
+  <a 
+    href="#contact"
+    className="
+      inline-flex items-center justify-center
+      px-6 py-3
+      text-sm font-semibold
+      text-white
+      rounded-2xl
+      bg-gradient-to-r from-emerald-500 to-green-600
+      shadow-md
+      transition-all duration-300
+      hover:scale-105
+      hover:shadow-xl
+      hover:from-emerald-600
+      hover:to-green-700
+    "
+  >
+    {lang==="uz" ? "Ariza qoldirish" : "Оставить заявку"}
+  </a>
+
+</div>
+
 
                 <div className="mt-8 grid grid-cols-3 gap-3 sm:gap-6 text-center">
                   {[{ v: "1200+", l: lang==="uz" ? "o‘lchov" : "измерений" },
